@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="img/ico" href="../Pictures/Icons/Blind Eye.ico">
+		<style>
+			body {
+				background-color: black;
+				color: white;
+				font-family: Calibri;
+			}
+			input, textarea, button {
+				-webkit-animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-duration: 0.5s;
+				animation-fill-mode: both;
+				background-color: transparent;
+				border: 1px solid #aaa;
+				color: white;
+			}
+			textarea {
+				font-family: Calibri;
+				width: 100%;
+			}
+			input, textarea {
+				-moz-border-radius: 3px;
+				-webkit-border-radius: 3px;
+				border-radius: 3px;
+			}
+			input[type=number] {
+				text-align: right;
+			}
+			button {
+				-moz-border-radius: 6px;
+				-webkit-border-radius: 6px;
+				border-radius: 6px;
+				cursor: pointer;
+				display: inline-block;
+				margin-bottom: 6px;
+			}
+			button:active:enabled {
+				position: relative;
+				top: 1px;
+			}
+			button:disabled {
+				border-color: #444;
+				color: #666;
+				cursor: default;
+			}
+			button:hover:enabled {
+				background-color: #333;
+			}
+			.invalid-input {
+				background-color: darkred;
+			}
+			.invisible-text {
+				color: transparent;
+			}
+			
+			@keyframes disabled-button {
+				from {
+					border-color: #aaa;
+					color: white;
+				}
+				to {
+					border-color: #444;
+					color: #666;
+				}
+			}
+			@keyframes enabled-button {
+				from {
+					border-color: #444;
+					color: #666;
+				}
+				to {
+					border-color: #aaa;
+					color: white;
+				}
+			}
+			@keyframes hidden-text {
+				from {
+					color: white;
+				}
+				to {
+					color: transparent;
+				}
+			}
+			@keyframes invalid-input {
+				from {
+					background-color: transparent;
+				}
+				to {
+					background-color: darkred;
+				}
+			}
+		</style>
+		<script>
+			var quota;
+			var visible = false;
+			
+			function documentLoaded() {
+				quotaChanged();
+				setTextareaLabel();
+			}
+			
+			function animate(element, name, direction) {
+				//console.log('animate('+element.id+',\''+name+'\',\''+direction+'\')');
+				element = getElement(element);
+				element.style.animationDirection = direction;
+				element.style.webkitAnimationDirection = direction;
+				element.style.animationName = name;
+				element.style.webkitAnimationName = name;
+				element.addEventListener('animationEnd', animationEnd, false);
+				element.addEventListener('webkitAnimationEnd', animationEnd, false);
+			}
+			
+			function animationEnd() {
+				this.removeEventListener('animationEnd', animationEnd);
+				this.removeEventListener('webkitAnimationEnd', animationEnd);
+				this.style.animationName = '';
+				this.style.webkitAnimationName = '';
+				this.style.animationDirection = '';
+				this.style.webkitAnimationDirection = '';
+			}
+			
+			function clearClicked() {
+				setButtonEnabled('showButton', false)
+				setButtonEnabled('copyButton', false)
+				setButtonEnabled('clearButton', false)
+				var textarea = document.getElementById('textarea');
+				textarea.readonly = true;
+				setCaretPosition(textarea, 0);
+				setTextareaLabel();
+				if (visible) {
+					animate(textarea, 'hidden-text', 'forwards');
+					textarea.className = 'invisible-text';
+					textarea.addEventListener('animationEnd', textareaCleared, false);
+					textarea.addEventListener('webkitAnimationEnd', textareaCleared, false);
+					visible = false;
+				}
+				else {
+					textareaCleared();
+				}
+			}
+			
+			function copyClicked() {
+				document.getElementById('textarea').select();
+				document.execCommand('copy');
+				document.getElementById('copyButton').focus();
+			}
+			
+			function getElement(element) {
+				if (typeof(element) == 'string')
+					element = document.getElementById(element);
+				return element;
+			}
+			
+			function quotaChanged() {
+				var quotaInput = document.getElementById('quota');
+				var newQuota = parseInt(quotaInput.value);
+				if (isNaN(newQuota))
+				{
+					if (quota != Infinity)
+					{
+						animate(quotaInput, 'invalid-input', 'forwards');
+						quotaInput.className = 'invalid-input';
+					}
+					quota = Infinity;
+				}
+				else
+				{
+					if (quota == Infinity)
+					{
+						animate(quotaInput, 'invalid-input', 'reverse');
+						quotaInput.className = '';
+					}
+					quota = newQuota;
+				}
+				textareaChanged();
+			}
+			
+			function setButtonEnabled(button, enabled) {
+				button = getElement(button);
+				//console.log('setButtonEnabled('+button.id+','+enabled+')');
+				if (!enabled != button.disabled)
+					animate(button, (enabled?'en':'dis')+'abled-button', 'forwards');
+				button.disabled = !enabled;
+			}
+			
+			function setCaretPosition(element, caretPos) {
+				element = getElement(element);
+				if (element.createTextRange) {
+					var range = element.createTextRange();
+					range.move('character', caretPos);
+					range.select();
+				}
+				else if (element.setSelectionRange) {
+					element.setSelectionRange(caretPos, caretPos);
+				}
+				element.focus();
+			}
+			
+			function setTextareaLabel() {
+				var options=[
+					"Your Magnus Opus:",
+					"Your brain dump:",
+					"Your darkest secrets:",
+					"Your ramblings:",
+					"Once upon a time...",
+				];
+				document.getElementById('textareaLabel').innerHTML = options[Math.floor(Math.random()*options.length)];
+			}
+			
+			function showClicked() {
+				if (!visible) {
+					var textarea = document.getElementById('textarea');
+					setButtonEnabled('showButton', false);
+					animate(textarea, 'hidden-text', 'reverse');
+					textarea.className = '';
+					visible = true;
+				}
+			}
+			
+			function textareaChanged() {
+				var text = document.getElementById('textarea').value || '';
+				var words = text.match(/\b\w+\b/gm) || [];
+				setButtonEnabled('showButton' , !visible && words.length >= quota);
+				setButtonEnabled('copyButton' , text != '');
+				setButtonEnabled('clearButton', text != '');
+			}
+			
+			function textareaCleared() {
+				var textarea = document.getElementById('textarea');
+				textarea.removeEventListener('animationEnd', textareaCleared);
+				textarea.removeEventListener('webkitAnimationEnd', textareaCleared);
+				textarea.value = '';
+				textareaChanged();
+				textarea.focus();
+				textarea.readonly = false;
+			}
+		</script>
+		<title>BlindType</title>
+	</head>
+	<body onload='documentLoaded()'>
+		<h1>BlindType</h1>
+		<p>This tool hides what you are typing while you type.  This lets you focus on the flow of the writing without being distracted by the editing process.</p>
+		<p>Set a word quota.  You will not be able to view what you have written until you have written at least this many words.</p>
+		<p><label for='quota'>Word&nbsp;quota:</label> <input id='quota' type='number' onchange='quotaChanged()' style='width: 5ch;' value='100'/></p>
+		<p>
+			<label id='textareaLabel' for='textarea'></label><br/>
+			<textarea id='textarea' rows='20' class='invisible-text' onkeyup='textareaChanged()' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false'></textarea>
+		</p>
+		<p>
+			<button id='showButton'  onclick='showClicked()'  disabled>Show</button>
+			<button id='copyButton'  onclick='copyClicked()'  disabled>Copy</button>
+			<button id='clearButton' onclick='clearClicked()' disabled>Clear</button>
+		</p>
+	</body>
+</html>
