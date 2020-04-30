@@ -1,23 +1,63 @@
+var body;
+var cardStacks;
+var epidemicButton;
+var epidemicCount;
+var epidemicDiv;
+var epidemicTurns;
+var fundingCount;
+var infectionRate;
+var infectionRates;
+var latestPhaseDiv;
+var newGameButton;
+var newPhaseButton;
+var nextTurnButton;
+
 window.onload = () => {
     window.onload = undefined;
     body = document.getElementById('body');
-    infectionRate = document.getElementById("infectionRate");
     epidemicButton = document.getElementById("epidemicButton");
-    epidemicButton.onclick = ev => nextPhase(true);
+    epidemicCount = document.getElementById("epidemicCount");
+    epidemicDiv = document.getElementById("epidemicDiv");
+    epidemicTurns = document.getElementById("epidemicTurns");
+    fundingCount = document.getElementById("fundingCount");
+    infectionRate = document.getElementById("infectionRate");
+    newGameButton = document.getElementById("newGameButton");
     newPhaseButton = document.getElementById("newPhaseButton");
-    newPhaseButton.onclick = ev => nextPhase(false);
+    nextTurnButton = document.getElementById("nextTurnButton");
 
+    epidemicButton.onclick = e => nextPhase(true);
+    newGameButton.onclick = e => newGameButtonOnClick();
+    newPhaseButton.onclick = e => nextPhase(false);
+    nextTurnButton.onclick = e => nextTurn();
+
+    startNewGame();
+}
+
+function newGameButtonOnClick() {
+    if (confirm("Start a new game?")) {
+        startNewGame();
+    }
+}
+
+function startNewGame() {
+    getAllPhases().forEach(phase => body.removeChild(phase));
+
+    var epidemicCards = parseInt(epidemicCount.value);
+    var fundingCards = parseInt(fundingCount.value);
+    cardStacks = new Array(epidemicCards);
+    for(var i = 0; i < epidemicCards; i++) {
+        cardStacks[i] = 0;
+    }
+    for (var playerCards = fundingCards + cities.length + epidemicCards - 1; playerCards >= 0; playerCards--) {
+        cardStacks[playerCards % epidemicCards]++;
+    }
+    cardStacks = [0, ...cardStacks];
+    
+    infectionRates = [2, 2, 2, 3, 3, 4, 4].slice(0, epidemicCards + 1);
     nextPhase(false);
     cities.sort((a, b) => a.name < b.name ? -1 : 1).forEach(createCity);
     nextPhase(true);
 }
-
-var body;
-var epidemicButton;
-var infectionRate;
-var infectionRates = [2, 2, 2, 3, 3, 4, 4];
-var latestPhaseDiv;
-var newPhaseButton;
 
 function nextPhase(epidemic) {
     if (latestPhaseDiv && latestPhaseDiv.childNodes.length === 0) {
@@ -26,6 +66,11 @@ function nextPhase(epidemic) {
 
     if (epidemic) {
         infectionRate.innerHTML = infectionRates.shift();
+        if (cardStacks.length >= 2) {
+            cardStacks[1] = cardStacks[0] + cardStacks[1];
+        }
+        cardStacks.shift();
+        recalculateEpidemicTurns();
     }
 
     var countdownSpan = document.createElement('span');
@@ -38,7 +83,7 @@ function nextPhase(epidemic) {
     latestPhaseDiv.classList.add('phase');
     latestPhaseDiv.appendChild(countdownDiv);
     
-    body.insertBefore(latestPhaseDiv, body.childNodes[2]);
+    body.insertBefore(latestPhaseDiv, epidemicDiv.nextSibling);
 
     recalculateCountdowns();
 
@@ -102,10 +147,31 @@ function cityOnRightClick(cityDiv) {
     recalculateCountdowns();
 }
 
+function nextTurn() {
+    for (var i = 2; i > 0; i--) {
+        if (cardStacks.length > 0) {
+            cardStacks[0]--;
+            if (cardStacks[0] === 0) {
+                cardStacks.shift();
+            }
+        }
+    }
+    recalculateEpidemicTurns();
+}
+
+function recalculateEpidemicTurns() {
+    if (cardStacks.length > 0) {
+        var turns = Math.ceil(cardStacks[0] / 2);
+        epidemicTurns.innerHTML = turns === 1 ? '1 turn' : '1 - ' + turns + ' turns';
+    } else {
+        epidemicTurns.innerHTML = 'never';
+    }
+}
+
 function recalculateCountdowns() {
     var cities = 0;
     var rate = parseInt(infectionRate.innerHTML);
-    [...document.getElementsByClassName('phase')].forEach((phase, index) => {
+    getAllPhases().forEach((phase, index) => {
         var countdown = phase.firstChild.firstChild;
         if (index === 0) {
             countdown.innerHTML = 'Dicard<br/>Pile';
@@ -115,9 +181,14 @@ function recalculateCountdowns() {
             cities = cities + phase.childNodes.length - 2;
             var lastTurn = Math.ceil(cities / rate);
 
-            countdown.innerHTML = firstTurn === lastTurn
-                ? firstTurn + '<br/>turn'
+            countdown.innerHTML =
+                  lastTurn === 1 ? lastTurn + '<br/>turn'
+                : firstTurn === lastTurn ? firstTurn + '<br/>turns'
                 : firstTurn + ' - ' + lastTurn + '<br/>turns'
         }
     });
+}
+
+function getAllPhases() {
+    return [...document.getElementsByClassName('phase')];
 }

@@ -4,34 +4,53 @@ body {
 }
 
 body div {
+    border-top: 3px solid green;
     padding: 10px;
     width: calc(100% - 26px);
+    vertical-align: baseline;
 }
 
-button {
+body div:first-child {
+    border-top: 0px;
+}
+
+div, input {
     font-size: 30px;
+}
+
+input {
+    background-color: transparent;
+    border: 2px solid darkgreen;
+    border-radius: 10%;
+    color: lightgreen;
+    margin-bottom: 5px;
+    margin-right: 20px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+input#epidemicButton {
+    background-color: #FF000020;
+    border-color: #FF0000;
+    color: #FF0000;
 }
 
 span.label {
     color: green;
-    font-size: 40px;
-    font-weight: bold;
 }
 
-span.infectionRate {
+span.value {
     color: lightgreen;
-    font-size: 40px;
     font-weight: bold;
 }
 
 div.phase {
-    border-top: 3px solid green;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     opacity: 0.5;
 }
-div.phase:nth-child(3) {
+div.phase:nth-child(4) {
     opacity: 1.0;
 }
 
@@ -54,6 +73,7 @@ div.phase div span {
 
 div.city {
     border: 1px solid #808080;
+    border-radius: 10%;
 }
 
 div.black {
@@ -69,5 +89,5 @@ div.red {
 }
 
 div.yellow {
-    background-color: #FFFF0040;
+    background-color: #80800040;
 }
