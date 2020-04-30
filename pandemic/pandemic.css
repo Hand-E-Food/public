@@ -3,32 +3,71 @@ body {
     font-family: sans-serif;
 }
 
-div.epidemic {
-    width: 100%;
+body div {
+    padding: 10px;
+    width: calc(100% - 26px);
 }
 
-span.infectionRate {
+button {
+    font-size: 30px;
+}
+
+span.label {
     color: green;
     font-size: 40px;
     font-weight: bold;
 }
 
+span.infectionRate {
+    color: lightgreen;
+    font-size: 40px;
+    font-weight: bold;
+}
+
 div.phase {
-    border: 3px solid green;
-    margin: 3px;
+    border-top: 3px solid green;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     opacity: 0.5;
-    padding: 10px;
-    width: calc(100% - 26px);
 }
 div.phase:nth-child(3) {
     opacity: 1.0;
 }
 
-div.city {
-    border: 1px solid #808080;
+div.phase div {
+    align-items: center;
     color: white;
+    display: flex;
     font-size: 14pt;
+    height: 120px;
+    justify-content: center;
     margin: 1px;
     padding: 2px;
-    width: 100%;
+    width: 120px;
+}
+
+div.phase div span {
+    margin: 0px;
+    text-align: center;
+}
+
+div.city {
+    border: 1px solid #808080;
+}
+
+div.black {
+    background-color: #00000040;
+}
+
+div.blue {
+    background-color: #0000FF40;
+}
+
+div.red {
+    background-color: #FF000040;
+}
+
+div.yellow {
+    background-color: #FFFF0040;
 }
