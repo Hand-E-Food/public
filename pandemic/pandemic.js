@@ -92,28 +92,28 @@ function nextPhase(epidemic) {
 }
 
 function createCity(city) {
-    var onclick = e => cityOnLeftClick(cityDiv);
-    var oncontextmenu = e => { cityOnRightClick(cityDiv); return false; }
-
     var citySpan = document.createElement('span');
     citySpan.innerHTML = city.name;
-    citySpan.onclick = onclick;
-    citySpan.oncontextmenu = oncontextmenu;
 
     var cityDiv = document.createElement('div');
     cityDiv.classList.add('city');
     cityDiv.classList.add(city.color);
-    cityDiv.onclick = onclick;
-    cityDiv.oncontextmenu = oncontextmenu;
     cityDiv.appendChild(citySpan);
 
     latestPhaseDiv.appendChild(cityDiv);
+
+    var onclick = e => cityOnLeftClick(cityDiv);
+    var oncontextmenu = e => { cityOnRightClick(cityDiv); return false; }
+    citySpan.onclick = onclick;
+    citySpan.oncontextmenu = oncontextmenu;
+    cityDiv.onclick = onclick;
+    cityDiv.oncontextmenu = oncontextmenu;
 }
 
 function cityOnLeftClick(cityDiv) {
     var phaseDiv = cityDiv.parentNode
 
-    if (phaseDiv === body.childNodes[2]) {
+    if (phaseDiv === latestPhaseDiv) {
         return;
     }
 
