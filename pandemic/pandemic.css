@@ -9,9 +9,12 @@ body {
 
 body>div {
     border-top: 3px solid green;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     padding: 10px;
-    width: calc(100% - 26px);
     vertical-align: baseline;
+    width: calc(100% - 26px);
 }
 
 body>div:first-child {
@@ -24,19 +27,17 @@ div, input {
 
 input {
     background-color: transparent;
-    border: 2px solid darkgreen;
+    border-color: darkgreen;
+    border-style: solid;
+    border-width: 2px;
     border-radius: 10%;
     color: lightgreen;
     margin-bottom: 5px;
-    margin-left: 5px;
-    margin-right: 20px;
     margin-top: 5px;
     text-align: center;
 }
 
-input.epidemic {
-    background-color: #FF000020;
-    border-color: #FF0000;
+.epidemic {
     color: #FF0000;
 }
 
@@ -50,33 +51,30 @@ span.value {
 }
 
 div.phase {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     opacity: 0.5;
 }
 div.phase:nth-child(4) {
     opacity: 1.0;
 }
 
-div.phase>div {
+div>div {
     align-items: center;
     color: white;
     display: flex;
-    font-size: 14pt;
-    height: 120px;
+    font-size: 12pt;
+    height: 60px;
     justify-content: center;
     margin: 1px;
     padding: 2px;
-    width: 120px;
+    width: 100px;
 }
 
-div.phase>div>span {
+div>div>span {
     margin: 0px;
     text-align: center;
 }
 
-div.city {
+div.button {
     border-width: 1px;
     border-style: solid;
     border-radius: 10%;

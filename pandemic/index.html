@@ -18,18 +18,29 @@
             <input id="newGameButton" type="button" value="New Game"/>
         </div>
         <div id="epidemicDiv" class="hidden">
-            <input id="epidemicButton" class="epidemic" type="button" value="Epidemic!"/>
-            <input id="newPhaseButton" type="button" value="New Phase"/>
-            <span class="label">Infection Rate:</span>
-            <span id="infectionRateOutput" class="value"></span>
-            <br/>
-            <svg id="pawn" viewbox="0 0 4 4" fill="white" stroke="transparent" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 4 L2 0 L3 4 Z"/>
-                <circle cx="2" cy="1" r="1"/>
-            </svg>
-            <input id="nextTurnButton" type="button" value="Next Turn"/>
-            <span class="label">Next Epidemic in </span>
-            <span id="epidemicTurns" class="value"></span>
+            <div id="epidemicButton" class="red epidemic button">
+                <span>Epidemic!</span>
+            </div>
+            <div id="newPhaseButton" class="yellow button">
+                <span>New Phase</span>
+            </div>
+            <div id="nextTurnButton" class="blue button">
+                <span>
+                    Next Turn
+                    <br/>
+                    <svg id="pawn" viewbox="0 0 4 4" fill="white" stroke="transparent" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4 L2 0 L3 4 Z"/>
+                        <circle cx="2" cy="1" r="1"/>
+                    </svg>
+                </span>
+            </div>
+            <p style="width: 100%;">
+                <span class="label">Epidemic in </span>
+                <span id="epidemicTurns" class="value"></span>
+                <br/>
+                <span class="label">Infection Rate: </span>
+                <span id="infectionRateOutput" class="value"></span>
+            </p>
         </div>
         <div></div>
     </body>

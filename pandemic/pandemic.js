@@ -73,7 +73,7 @@ function startNewGame() {
 }
 
 function nextPhase(epidemic) {
-    if (latestPhaseDiv && latestPhaseDiv.childNodes.length === 0) {
+    if (latestPhaseDiv && latestPhaseDiv.querySelector(".button").length === 0) {
         return;
     }
 
@@ -110,8 +110,8 @@ function createCity(city) {
     citySpan.innerHTML = city.name;
 
     var cityDiv = document.createElement('div');
-    cityDiv.classList.add('city');
     cityDiv.classList.add(city.color);
+    cityDiv.classList.add('button');
     cityDiv.appendChild(citySpan);
 
     latestPhaseDiv.appendChild(cityDiv);
