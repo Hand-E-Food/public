@@ -1,3 +1,26 @@
+html {
+    --screen-width: calc(100vw - 20px);
+    --button-width: calc(var(--screen-width) / 3 - 8px);
+}
+
+@media screen and (min-width: 400px) {
+    html {
+        --button-width: calc(var(--screen-width) / 4 - 8px);
+    }    
+}
+
+@media screen and (min-width: 500px) {
+    html {
+        --button-width: calc(var(--screen-width) / 5 - 8px);
+    }    
+}
+
+@media screen and (min-width: 600px) {
+    html {
+        --button-width: calc(100px - 8px);
+    }    
+}
+
 .hidden {
     display: none;
 }
@@ -5,6 +28,7 @@
 body {
     background-color: black;
     font-family: sans-serif;
+    margin: 0px;
 }
 
 body>div {
@@ -12,9 +36,10 @@ body>div {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    margin: 0px;
     padding: 10px;
     vertical-align: baseline;
-    width: calc(100% - 26px);
+    width: var(--screen-width);
 }
 
 body>div:first-child {
@@ -39,6 +64,7 @@ input {
 
 .epidemic {
     color: #FF0000;
+    font-weight: bold;
 }
 
 span.label {
@@ -59,25 +85,23 @@ div.phase:nth-child(4) {
 
 div>div {
     align-items: center;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10%;
     color: white;
     display: flex;
-    font-size: 12pt;
-    height: 60px;
+    font-size: calc(var(--button-width) * 0.15);
+    height: calc(var(--button-width) * 0.6);
     justify-content: center;
     margin: 1px;
     padding: 2px;
-    width: 100px;
+    width: var(--button-width);
 }
 
 div>div>span {
     margin: 0px;
     text-align: center;
-}
-
-div.button {
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 10%;
 }
 
 div.black {
