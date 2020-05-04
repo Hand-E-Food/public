@@ -7,7 +7,7 @@
         <script src='pandemic.js'></script>
     </head>
     <body id="body">
-        <div id="newGameDiv">
+        <div id="newGameDiv" class="input section">
             <span class="label">Players:</span>
             <input id="pawnColorsInput" type="text" style="width: 22en;" value="blue,pink"/>
             <br/>
@@ -17,14 +17,14 @@
             <input id="fundingInput" type="number" min="0" max="10" style="width: 2em;" value="4"/>
             <input id="newGameButton" type="button" value="New Game"/>
         </div>
-        <div id="epidemicDiv" class="hidden">
-            <div id="epidemicButton" class="red epidemic button">
+        <div id="epidemicDiv" class="hidden section">
+            <div id="epidemicButton" class="red epidemic button cell">
                 <span>Epidemic!</span>
             </div>
-            <div id="newPhaseButton" class="yellow button">
+            <div id="newPhaseButton" class="yellow button cell">
                 <span>New Phase</span>
             </div>
-            <div id="nextTurnButton" class="blue button">
+            <div id="nextTurnButton" class="blue button cell">
                 <span>
                     Next Turn
                     <br/>
@@ -34,14 +34,13 @@
                     </svg>
                 </span>
             </div>
-            <p style="text-align: center; width: 100%;">
+            <p class="info">
                 <span class="label">Epidemic </span>
-                <span id="epidemicTurns" class="value"></span>
+                <span id="epidemicTurnsOutput" class="value"></span>
                 <br/>
                 <span class="label">Infection Rate: </span>
                 <span id="infectionRateOutput" class="value"></span>
             </p>
         </div>
-        <div></div>
     </body>
 </html>
