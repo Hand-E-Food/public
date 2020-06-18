@@ -22,32 +22,40 @@ html {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 body {
     background-color: black;
     font-family: sans-serif;
+    font-size: 20px;
     margin: 0px;
 }
 
-body>div {
-    border-top: 3px solid green;
+div.input {
+    align-items: center;
+    border-bottom: 3px solid green;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0px;
     padding: 10px;
-    vertical-align: baseline;
     width: var(--screen-width);
 }
 
-body>div:first-child {
-    border-top: 0px;
+div.br {
+    flex-basis: 100%;
+    height: 0px;
 }
 
-div, input {
-    font-size: 20px;
+div.section {
+    border-bottom: 3px solid green;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0px;
+    padding: 10px;
+    width: var(--screen-width);
 }
 
 input {
@@ -57,9 +65,17 @@ input {
     border-width: 2px;
     border-radius: 10%;
     color: lightgreen;
+    font-family: inherit;
+    font-size: inherit;
     margin-bottom: 5px;
     margin-top: 5px;
     text-align: center;
+    vertical-align: baseline;
+}
+
+input[type="text"] {
+    flex: 1;
+    text-align: left;
 }
 
 .epidemic {
@@ -69,6 +85,8 @@ input {
 
 span.label {
     color: green;
+    margin-right: 10px;
+    vertical-align: baseline;
 }
 
 span.value {
@@ -76,14 +94,19 @@ span.value {
     font-weight: bold;
 }
 
+p.info {
+    text-align: center;
+    width: 100%;
+}
+
 div.phase {
-    opacity: 0.5;
+    opacity: calc(2 / 3);
 }
 div.phase:nth-child(4) {
     opacity: 1.0;
 }
 
-div>div {
+div.cell {
     align-items: center;
     border-color: transparent;
     border-style: solid;
@@ -99,7 +122,7 @@ div>div {
     width: var(--button-width);
 }
 
-div>div>span {
+div.cell>span {
     margin: 0px;
     text-align: center;
 }

@@ -4,7 +4,7 @@ var currentPawn;
 var discardPileDiv;
 var epidemicButton;
 var epidemicDiv;
-var epidemicTurns;
+var epidemicTurnsOutput;
 var epidemicsInput;
 var fundingInput;
 var infectionRateOutput;
@@ -23,7 +23,7 @@ window.onload = () => {
     epidemicButton = document.getElementById('epidemicButton');
     epidemicsInput = document.getElementById('epidemicsInput');
     epidemicDiv = document.getElementById('epidemicDiv');
-    epidemicTurns = document.getElementById('epidemicTurns');
+    epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
     fundingInput = document.getElementById('fundingInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
     newGameButton = document.getElementById('newGameButton');
@@ -91,10 +91,12 @@ function nextPhase(epidemic) {
     countdownSpan.id = 'countdown';
 
     var countdownDiv = document.createElement('div');
+    countdownDiv.classList.add('cell');
     countdownDiv.appendChild(countdownSpan);
 
     discardPileDiv = document.createElement('div');
     discardPileDiv.classList.add('phase');
+    discardPileDiv.classList.add('section');
     discardPileDiv.appendChild(countdownDiv);
     
     body.insertBefore(discardPileDiv, epidemicDiv.nextSibling);
@@ -112,6 +114,7 @@ function createCity(city) {
     var cityDiv = document.createElement('div');
     cityDiv.classList.add(city.color);
     cityDiv.classList.add('button');
+    cityDiv.classList.add('cell');
     cityDiv.appendChild(citySpan);
 
     discardPileDiv.appendChild(cityDiv);
@@ -193,17 +196,15 @@ function recalculateEpidemicTurns() {
         safeCards = safeCards + stack.cards;
         return false;
     });
-    if (epidemicStack) {
-        var firstTurn = Math.ceil((safeCards + 1) / 2);
-        var lastTurn = Math.ceil((safeCards + epidemicStack.cards) / 2);
-        epidemicTurns.innerHTML
-            = lastTurn < 1    ? 'is late'
-            : lastTurn === 1  ? 'on this turn'
-            : firstTurn === 1 ? 'within ' + lastTurn + ' turns'
-                              : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
-    } else {
-        epidemicTurns.innerHTML = 'never again!';
-    }
+
+    var firstTurn = Math.ceil((safeCards + 1) / 2);
+    var lastTurn = Math.ceil((safeCards + epidemicStack.cards) / 2);
+    epidemicTurnsOutput.innerHTML
+        = !epidemicStack  ? 'never again!'
+        : lastTurn < 1    ? 'is late'
+        : lastTurn === 1  ? 'on this turn'
+        : firstTurn === 1 ? 'within ' + lastTurn + ' turns'
+                          : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
 }
 
 function recalculateCountdowns() {
