@@ -1,13 +1,14 @@
 ﻿using PsiFi.Models;
+using PsiFi.Models.Mapping;
 using PsiFi.Views;
-using System;
+using System.Linq;
 
 namespace PsiFi.Engines
 {
     class MapEngine
     {
-        private Map map;
-        private IMapView mapView;
+        private readonly Map map;
+        private readonly IMapView mapView;
 
         public MapEngine(Map map, IMapView mapView)
         {
@@ -15,10 +16,17 @@ namespace PsiFi.Engines
             this.mapView = mapView;
         }
 
-        internal void Begin()
+        public MapEndReasons Begin()
         {
             mapView.Map = map;
-            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
+            MapEndReasons endReasons;
+            do
+            {
+                new MapInterface(map, map.Actors.Next).Interact();
+                endReasons = new MapEndReasons(map.EndConditions.Select(condition => condition()));
+            }
+            while (endReasons.None);
+            return endReasons;
         }
     }
 }

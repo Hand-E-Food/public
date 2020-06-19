@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PsiFi.Models.Mapping.Actors.Mobs;
+using System.Collections.Generic;
 
 namespace PsiFi.Models
 {
@@ -10,8 +11,9 @@ namespace PsiFi.Models
         /// <summary>
         /// Returns a sequence of maps.
         /// </summary>
+        /// <param name="world">The world.</param>
         /// <returns>A sequence of maps.</returns>
         /// <remarks>Each map can be chosen and created at the time it is required, so prior decisions can affect future maps or even cause branching.</remarks>
-        IEnumerable<Map> GetMaps();
+        IEnumerable<Map> GetMaps(World world);
     }
 }

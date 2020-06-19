@@ -30,19 +30,21 @@ namespace PsiFi.Models.Mapping
         }
         private IItem item;
 
-        public IMob Mob 
+        public Mob Mob 
         {
             get => mob;
             set
             {
                 if (mob == value) return;
-                mob.Cell = null;
+                if (mob != null)
+                    mob.Cell = null;
                 mob = value;
-                mob.Cell = this;
+                if (mob != null)
+                    mob.Cell = this;
                 OnChanged();
             }
         }
-        private IMob mob;
+        private Mob mob;
 
         public Terrain Terrain
         {

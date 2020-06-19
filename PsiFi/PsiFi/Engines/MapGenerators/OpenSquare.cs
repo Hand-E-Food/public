@@ -10,6 +10,7 @@ namespace PsiFi.Engines.MapGenerators
         {
             var size = new Size(80, 40);
             var map = new Map(size);
+            map.Actors.Add(player);
 
             int x, y;
             for (y = 0; y < size.Height; y++)

@@ -37,7 +37,7 @@ namespace PsiFi.Engines
         private void StartMission(HomeMenuResponse response)
         {
             var mission = response.MissionOffer.CreateMission();
-            foreach (var map in mission.GetMaps())
+            foreach (var map in mission.GetMaps(world))
             {
                 var mapView = new MapView();
                 var mapEngine = new MapEngine(map, mapView);

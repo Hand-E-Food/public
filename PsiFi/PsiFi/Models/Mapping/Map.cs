@@ -1,12 +1,35 @@
 ﻿using PsiFi.Models.Mapping;
+using System;
+using System.Collections.Generic;
 
 namespace PsiFi.Models
 {
     class Map
     {
+        /// <summary>
+        /// This map's actors.
+        /// </summary>
+        public ActorQueue Actors { get; } = new ActorQueue(50);
+
+        /// <summary>
+        /// This map's cells.
+        /// </summary>
         public Cell[,] Cells { get; }
+
+        /// <summary>
+        /// The conditions that can end this map. Each element returns a non-null value if its condition is met.
+        /// </summary>
+        public List<Func<object>> EndConditions { get; } = new List<Func<object>>();
+
+        /// <summary>
+        /// This map's size.
+        /// </summary>
         public Size Size { get; }
 
+        /// <summary>
+        /// Initialises  a new instance of the <see cref="Map"/> class.
+        /// </summary>
+        /// <param name="size">This map's size.</param>
         public Map(Size size)
         {
             Size = size;

@@ -1,4 +1,4 @@
-﻿using PsiFi.Models.Mapping.Mobs;
+﻿using PsiFi.Models.Mapping.Actors.Mobs;
 using PsiFi.Models.Missions;
 using System.Collections.Generic;
 

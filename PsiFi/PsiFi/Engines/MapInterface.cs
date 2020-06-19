@@ -8,7 +8,7 @@ namespace PsiFi.Engines
     /// </summary>
     class MapInterface
     {
-        private readonly IActor actor;
+        private readonly Actor actor;
 
         /// <summary>
         /// The map.
@@ -20,10 +20,15 @@ namespace PsiFi.Engines
         /// </summary>
         /// <param name="map">The map.</param>
         /// <param name="actor">The actor interacting with the map.</param>
-        public MapInterface(Map map, IActor actor)
+        public MapInterface(Map map, Actor actor)
         {
             Map = map;
             this.actor = actor;
         }
+
+        /// <summary>
+        /// Requests the actor interacts with this interface.
+        /// </summary>
+        public void Interact() => actor.Interact(this);
     }
 }
