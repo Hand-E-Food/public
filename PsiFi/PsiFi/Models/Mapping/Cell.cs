@@ -1,7 +1,10 @@
-﻿using System;
+﻿using PsiFi.Models.Mapping.Geometry;
+using System;
+using System.Diagnostics;
 
 namespace PsiFi.Models.Mapping
 {
+    [DebuggerDisplay("{Location}")]
     class Cell
     {
         public Annotation Annotation {
@@ -36,11 +39,17 @@ namespace PsiFi.Models.Mapping
             set
             {
                 if (mob == value) return;
+                if (value?.Cell != null && value.Cell != this) throw new InvalidOperationException("Mob is already in a cell.");
+
                 if (mob != null)
-                    mob.Cell = null;
+                {
+                    var old = mob;
+                    mob = null;
+                    old.Cell = null;
+                }
+                if (value != null)
+                    value.Cell = this;
                 mob = value;
-                if (mob != null)
-                    mob.Cell = this;
                 OnChanged();
             }
         }
@@ -58,14 +67,11 @@ namespace PsiFi.Models.Mapping
         }
         private Terrain terrain;
 
-        public int X { get; }
+        public Location Location { get; }
 
-        public int Y { get; }
-
-        public Cell(int x, int y)
+        public Cell(Location location)
         {
-            X = x;
-            Y = y;
+            Location = location;
         }
 
         protected void OnChanged() => HasChanged = true;

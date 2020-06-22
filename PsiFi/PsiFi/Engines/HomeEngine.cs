@@ -40,6 +40,7 @@ namespace PsiFi.Engines
             foreach (var map in mission.GetMaps(world))
             {
                 var mapView = new MapView();
+                world.Player.MapView = mapView;
                 var mapEngine = new MapEngine(map, mapView);
                 mapEngine.Begin();
             }

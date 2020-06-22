@@ -5,9 +5,9 @@ namespace PsiFi.Models.Mapping
 {
     class MapEndReasons
     {
-        private readonly object[] endReasons;
+        private readonly MapEndReason[] endReasons;
 
-        public MapEndReasons(IEnumerable<object> endReasons)
+        public MapEndReasons(IEnumerable<MapEndReason> endReasons)
         {
             this.endReasons = endReasons
                 .Where(endReason => endReason != null)
@@ -16,6 +16,6 @@ namespace PsiFi.Models.Mapping
 
         public bool None => endReasons.Length == 0;
 
-        public bool Contains(object reason) => endReasons.Contains(reason);
+        public bool Contains(MapEndReason reason) => endReasons.Contains(reason);
     }
 }

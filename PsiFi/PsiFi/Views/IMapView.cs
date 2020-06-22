@@ -16,5 +16,11 @@ namespace PsiFi.Views
         /// Draws all cells that have changed since last being drawn.
         /// </summary>
         void Update();
+
+        /// <summary>
+        /// Gets input from the player.
+        /// </summary>
+        /// <returns>The player's input.</returns>
+        MapViewResponse GetPlayerInput();
     }
 }

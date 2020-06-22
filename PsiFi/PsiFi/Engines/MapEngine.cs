@@ -23,6 +23,7 @@ namespace PsiFi.Engines
             do
             {
                 new MapInterface(map, map.Actors.Next).Interact();
+                mapView.Update();
                 endReasons = new MapEndReasons(map.EndConditions.Select(condition => condition()));
             }
             while (endReasons.None);

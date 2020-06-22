@@ -1,5 +1,7 @@
 ﻿using PsiFi.Models;
 using PsiFi.Models.Mapping;
+using PsiFi.Models.Mapping.Actors.Mobs;
+using PsiFi.Models.Mapping.Geometry;
 using System;
 
 namespace PsiFi.Views.ColorConsole
@@ -45,6 +47,22 @@ namespace PsiFi.Views.ColorConsole
         }
 
         /// <summary>
+        /// Gets input from the player.
+        /// </summary>
+        /// <returns>The player's selected action.</returns>
+        public MapViewResponse GetPlayerInput()
+        {
+            return new KeyActionCollection<MapViewResponse>
+            {
+                { new ConsoleKeyInfo('w', ConsoleKey.W, false, false, false), () => MapViewResponse.Move(Direction.N) },
+                { new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false), () => MapViewResponse.Move(Direction.W) },
+                { new ConsoleKeyInfo('s', ConsoleKey.S, false, false, false), () => MapViewResponse.Move(Direction.S) },
+                { new ConsoleKeyInfo('d', ConsoleKey.D, false, false, false), () => MapViewResponse.Move(Direction.E) },
+                { new ConsoleKeyInfo('.', ConsoleKey.OemPeriod, false, false, false), () => MapViewResponse.Wait },
+            }.ReadKey();
+        }
+
+        /// <summary>
         /// Draws the entire map.
         /// </summary>
         private void Refresh()
@@ -74,7 +92,7 @@ namespace PsiFi.Views.ColorConsole
                     if (cell.HasChanged)
                     {
                         cell.HasChanged = false;
-                        Console.SetCursorPosition(cell.X, cell.Y);
+                        Console.SetCursorPosition(cell.Location.X, cell.Location.Y);
                         Draw(cell.Appearance);
                     }
                 }

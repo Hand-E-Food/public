@@ -17,7 +17,7 @@ namespace PsiFi.Models.Mapping
         /// <summary>
         /// The next actor in the queue.
         /// </summary>
-        public Actor Next => actors[0];
+        public Actor Next => actors.Count > 0 ? actors[0] : null;
 
         /// <inheritdoc/>
         public bool IsReadOnly => false;
@@ -42,6 +42,8 @@ namespace PsiFi.Models.Mapping
         /// <inheritdoc/>
         public void Add(Actor actor)
         {
+            if (actor == null)
+                throw new ArgumentNullException(nameof(actor));
             if (actors.Contains(actor))
                 throw new InvalidOperationException("Duplicate actor added to queue.");
             actor.NextTimeIndexChanged += Actor_NextTimeIndexChanged;

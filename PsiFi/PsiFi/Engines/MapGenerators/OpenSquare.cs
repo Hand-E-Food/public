@@ -1,6 +1,7 @@
 ﻿using PsiFi.Models;
 using PsiFi.Models.Mapping;
 using PsiFi.Models.Mapping.Actors.Mobs;
+using PsiFi.Models.Mapping.Geometry;
 
 namespace PsiFi.Engines.MapGenerators
 {

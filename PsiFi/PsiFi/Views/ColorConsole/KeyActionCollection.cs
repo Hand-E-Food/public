@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace PsiFi.Views
+namespace PsiFi.Views.ColorConsole
 {
     class KeyActionCollection : Dictionary<ConsoleKeyInfo, Action>
     {
@@ -10,7 +9,7 @@ namespace PsiFi.Views
         /// Reads keys until a valid key combination is pressed and performs its action.
         /// </summary>
         /// <param name="keyActions">The valid key combinations and their actions.</param>
-        /// <returns>The retunr value of the action.</returns>
+        /// <returns>The return value of the action.</returns>
         public void ConsoleActOnKey()
         {
             Action action;
@@ -26,12 +25,16 @@ namespace PsiFi.Views
         /// Reads keys until a valid key combination is pressed and performs its action.
         /// </summary>
         /// <param name="keyActions">The valid key combinations and their actions.</param>
-        /// <returns>The retunr value of the action.</returns>
+        /// <returns>The return value of the action.</returns>
         public T ReadKey()
         {
             Func<T> action;
-            while (!TryGetValue(Console.ReadKey(true), out action)) ;
-            return action();
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+                var valid = TryGetValue(key, out action);
+                if (valid) return action();
+            }
         }
     }
 }

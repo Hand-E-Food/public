@@ -6,7 +6,7 @@
     class MainMenuResponse
     {
         /// <summary>
-        /// The selected aciton.
+        /// The selected action.
         /// </summary>
         public MainMenuAction Action { get; private set; }
 
