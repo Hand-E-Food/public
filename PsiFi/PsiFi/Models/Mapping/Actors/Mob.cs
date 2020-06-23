@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace PsiFi.Models.Mapping
 {
@@ -11,7 +10,7 @@ namespace PsiFi.Models.Mapping
         /// <summary>
         /// This mob's appearance.
         /// </summary>
-        public Appearance Appearance { get; protected set; }
+        public abstract Appearance Appearance { get; }
 
         /// <summary>
         /// The cell this mob is currently in.
@@ -40,17 +39,6 @@ namespace PsiFi.Models.Mapping
         /// <summary>
         /// This mob's health.
         /// </summary>
-        public Range Health { get; }
-
-        /// <summary>
-        /// Initialises a new instance of a <see cref="Mob"/> class.
-        /// </summary>
-        /// <param name="appearance">This mob's appearance.</param>
-        /// <param name="maxHealth">This mob's maximum health.</param>
-        public Mob(Appearance appearance, int maxHealth)
-        {
-            Appearance = appearance;
-            Health = new Range(0, maxHealth);
-        }
+        public abstract Range Health { get; }
     }
 }

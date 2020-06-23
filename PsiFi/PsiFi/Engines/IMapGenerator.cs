@@ -1,5 +1,4 @@
 ﻿using PsiFi.Models;
-using PsiFi.Models.Mapping.Actors.Mobs;
 
 namespace PsiFi.Engines
 {
@@ -11,8 +10,7 @@ namespace PsiFi.Engines
         /// <summary>
         /// Creates a map.
         /// </summary>
-        /// <param name="player">The player.</param>
         /// <returns>The map.</returns>
-        Map CreateMap(Player player);
+        Map CreateMap();
     }
 }

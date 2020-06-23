@@ -12,19 +12,31 @@ namespace PsiFi.Engines
         private readonly Actor actor;
 
         /// <summary>
+        /// True if the player is quitting the game. Otherwise, false.
+        /// </summary>
+        public bool IsQuitting { get; private set; } = false;
+
+        /// <summary>
         /// The map.
         /// </summary>
         public Map Map { get; }
+
+        /// <summary>
+        /// The random number generator.
+        /// </summary>
+        public IRandom Random { get; }
 
         /// <summary>
         /// Initialises a new <see cref="MapInterface"/> object.
         /// </summary>
         /// <param name="map">The map.</param>
         /// <param name="actor">The actor interacting with the map.</param>
-        public MapInterface(Map map, Actor actor)
+        /// <param name="random">The random number generator.</param>
+        public MapInterface(Map map, Actor actor, IRandom random)
         {
             Map = map;
             this.actor = actor;
+            Random = random;
         }
 
         /// <summary>
@@ -48,6 +60,16 @@ namespace PsiFi.Engines
 
             mob.Cell = cell;
             return true;
+        }
+
+        /// <summary>
+        /// Quits the game.
+        /// </summary>
+        /// <returns>false</returns>
+        public bool Quit()
+        {
+            IsQuitting = true;
+            return false;
         }
     }
 }

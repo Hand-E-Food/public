@@ -35,6 +35,14 @@ namespace PsiFi.Views.ColorConsole
             Console.Clear();
         }
 
+        public void ClearMessage()
+        {
+            Console.SetCursorPosition(0, map.Size.Height + 1);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write(new string(' ', map.Size.Width));
+        }
+
         /// <summary>
         /// Draws a cell according to <paramref name="appearance"/> at the current cursor location.
         /// </summary>
@@ -46,20 +54,11 @@ namespace PsiFi.Views.ColorConsole
             Console.Write(appearance.Character);
         }
 
-        /// <summary>
-        /// Gets input from the player.
-        /// </summary>
-        /// <returns>The player's selected action.</returns>
-        public MapViewResponse GetPlayerInput()
+        public void Message(string message)
         {
-            return new KeyActionCollection<MapViewResponse>
-            {
-                { new ConsoleKeyInfo('w', ConsoleKey.W, false, false, false), () => MapViewResponse.Move(Direction.N) },
-                { new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false), () => MapViewResponse.Move(Direction.W) },
-                { new ConsoleKeyInfo('s', ConsoleKey.S, false, false, false), () => MapViewResponse.Move(Direction.S) },
-                { new ConsoleKeyInfo('d', ConsoleKey.D, false, false, false), () => MapViewResponse.Move(Direction.E) },
-                { new ConsoleKeyInfo('.', ConsoleKey.OemPeriod, false, false, false), () => MapViewResponse.Wait },
-            }.ReadKey();
+            ClearMessage();
+            Console.SetCursorPosition(0, map.Size.Height + 1);
+            Console.Write(message);
         }
 
         /// <summary>
@@ -97,6 +96,41 @@ namespace PsiFi.Views.ColorConsole
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets input from the player.
+        /// </summary>
+        /// <returns>The player's selected action.</returns>
+        public MapViewResponse GetPlayerInput()
+        {
+            MapViewResponse response;
+            do
+            {
+                response = new KeyActionCollection<MapViewResponse>
+                {
+                    { ConsoleKey.W, () => MapViewResponse.Move(Direction.N) },
+                    { ConsoleKey.A, () => MapViewResponse.Move(Direction.W) },
+                    { ConsoleKey.S, () => MapViewResponse.Move(Direction.S) },
+                    { ConsoleKey.D, () => MapViewResponse.Move(Direction.E) },
+                    { ConsoleKey.OemPeriod, () => MapViewResponse.Wait },
+                    { new KeyInfo(ConsoleModifiers.Shift, ConsoleKey.Q), ConfirmQuit }
+                }.ReadKey();
+            }
+            while (response == null);
+            return response;
+        }
+
+        private MapViewResponse ConfirmQuit()
+        {
+            Message("Really quit (y/n)?");
+            var response = new KeyActionCollection<MapViewResponse>
+            {
+                { ConsoleKey.Y, () => MapViewResponse.Quit },
+                { ConsoleKey.N, () => null },
+            }.ReadKey();
+            ClearMessage();
+            return response;
         }
     }
 }

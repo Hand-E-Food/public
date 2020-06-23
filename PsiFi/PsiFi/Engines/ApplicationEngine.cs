@@ -34,9 +34,9 @@ namespace PsiFi.Engines
 
         private void NewGame()
         {
-            var world = new World();
-            var homeMenu = new HomeMenu(world);
-            var gameEngine = new HomeEngine(world, homeMenu);
+            var campaign = new Campaign();
+            var homeMenu = new HomeMenu(campaign);
+            var gameEngine = new HomeEngine(campaign, homeMenu);
             gameEngine.Begin();
         }
     }

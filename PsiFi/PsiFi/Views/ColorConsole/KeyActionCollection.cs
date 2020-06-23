@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PsiFi.Views.ColorConsole
 {
-    class KeyActionCollection : Dictionary<ConsoleKeyInfo, Action>
+    class KeyActionCollection : Dictionary<KeyInfo, Action>
     {
         /// <summary>
         /// Reads keys until a valid key combination is pressed and performs its action.
@@ -16,10 +16,9 @@ namespace PsiFi.Views.ColorConsole
             while (!TryGetValue(Console.ReadKey(true), out action)) ;
             action();
         }
-
     }
 
-    class KeyActionCollection<T> : Dictionary<ConsoleKeyInfo, Func<T>>
+    class KeyActionCollection<T> : Dictionary<KeyInfo, Func<T>>
     {
         /// <summary>
         /// Reads keys until a valid key combination is pressed and performs its action.
@@ -29,12 +28,8 @@ namespace PsiFi.Views.ColorConsole
         public T ReadKey()
         {
             Func<T> action;
-            while (true)
-            {
-                var key = Console.ReadKey(true);
-                var valid = TryGetValue(key, out action);
-                if (valid) return action();
-            }
+            while (!TryGetValue(Console.ReadKey(true), out action)) ;
+            return action();
         }
     }
 }

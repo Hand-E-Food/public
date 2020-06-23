@@ -6,10 +6,11 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
 {
     class Player : Mob
     {
-        public IMapView MapView { get; set; }
+        public override Appearance Appearance { get; } = new Appearance('@', ConsoleColor.White);
 
-        public Player() : base(new Appearance('@', ConsoleColor.White), 100)
-        { }
+        public override Range Health { get; } = new Range(10);
+
+        public IMapView MapView { get; set; }
 
         public override void Interact(MapInterface mapInterface)
         {
@@ -22,11 +23,17 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
         {
             switch (response.Action)
             {
-                case MapViewAction.Quit: return false;
+                case MapViewAction.Quit: return mapInterface.Quit();
                 case MapViewAction.Wait: return true;
                 case MapViewAction.Move: return mapInterface.Move(response.Direction);
                 default: return false;
             }
         }
+
+        /// <summary>
+        /// Changes <see cref="NextTimeIndex"/> for the specified action.
+        /// </summary>
+        /// <param name="action">The action being performed.</param>
+        public virtual void SetNextTimeIndexFor(object action) => NextTimeIndex += 1000;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PsiFi.Models
+namespace PsiFi
 {
     class Range
     {
@@ -24,6 +24,12 @@ namespace PsiFi.Models
 
         public event EventHandler Changed;
         protected virtual void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+
+        public Range(int maximum)
+        {
+            value = maximum;
+            SetRange(0, maximum);
+        }
 
         public Range(int minimum, int maximum)
         {

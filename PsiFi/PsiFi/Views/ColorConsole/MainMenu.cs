@@ -9,8 +9,8 @@ namespace PsiFi.Views.ColorConsole
         public MainMenu()
         {
             keyActions = new KeyActionCollection<MainMenuResponse> {
-                { new ConsoleKeyInfo('n', ConsoleKey.N, false, false, false), () => MainMenuResponse.NewGame },
-                { new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, false), () => MainMenuResponse.Quit },
+                { ConsoleKey.N, () => MainMenuResponse.NewGame },
+                { ConsoleKey.Q, () => MainMenuResponse.Quit },
             };
             Console.CursorVisible = false;
             Console.SetWindowSize(80, 50);

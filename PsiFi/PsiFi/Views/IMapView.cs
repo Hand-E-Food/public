@@ -13,6 +13,16 @@ namespace PsiFi.Views
         Map Map { get; set; }
 
         /// <summary>
+        /// Clears the message.
+        /// </summary>
+        void ClearMessage();
+
+        /// <summary>
+        /// Displays a message.
+        /// </summary>
+        void Message(string message);
+
+        /// <summary>
         /// Draws all cells that have changed since last being drawn.
         /// </summary>
         void Update();

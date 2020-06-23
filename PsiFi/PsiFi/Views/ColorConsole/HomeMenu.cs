@@ -5,11 +5,11 @@ namespace PsiFi.Views.ColorConsole
 {
     class HomeMenu : IUserInterface<HomeMenuResponse>
     {
-        private readonly World world;
+        private readonly Campaign campaign;
 
-        public HomeMenu(World world)
+        public HomeMenu(Campaign campaign)
         {
-            this.world = world;
+            this.campaign = campaign;
         }
 
         public HomeMenuResponse GetInput()
@@ -23,19 +23,18 @@ namespace PsiFi.Views.ColorConsole
             Console.WriteLine("Missions");
             Console.WriteLine("--------");
             Console.WriteLine();
-            for (int i = 0; i < world.MissionOffers.Count; i++)
+            int max = Math.Min(9, campaign.MissionOffers.Count);
+            for (int i = 0; i < max; i++)
             {
-                var mission = world.MissionOffers[i];
-                var key = new ConsoleKeyInfo((char)('0' + i), ConsoleKey.D0 + i, false, false, false);
-                Func<HomeMenuResponse> action = () => HomeMenuResponse.StartMission(mission);
-                keyActions.Add(key, action);
-                Console.WriteLine($"{key.KeyChar}. {mission.Name}");
+                var mission = campaign.MissionOffers[i];
+                keyActions.Add(ConsoleKey.D1 + i, () => HomeMenuResponse.StartMission(mission));
+                Console.WriteLine($"{(char)('1' + i)}. {mission.Name}");
             }
             Console.WriteLine();
             Console.WriteLine("System");
             Console.WriteLine("------");
             Console.WriteLine("q. Quit");
-            keyActions.Add(new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, false), () => HomeMenuResponse.Quit);
+            keyActions.Add(ConsoleKey.Q, () => HomeMenuResponse.Quit);
             return keyActions.ReadKey();
         }
     }
