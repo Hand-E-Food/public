@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using PsiFi.Models.Mapping;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace PsiFi.Engines
@@ -21,10 +22,17 @@ namespace PsiFi.Engines
         int Next(int min, int max);
 
         /// <summary>
+        /// Gets a damage amount from the specified potential damage.
+        /// </summary>
+        /// <param name="damage">The potential damage.</param>
+        /// <returns>A specific damage within the potential damage's range.</returns>
+        Damage Next(PotentialDamage damage) => new Damage(Next(damage.Range), damage.Type);
+
+        /// <summary>
         /// Gets a random number within the range's minimum and maximum, inclusive.
         /// </summary>
         /// <param name="range">The range.</param>
-        /// <returns>A random number.</returns>
+        /// <returns>A random number within the range.</returns>
         int Next(Range range);
 
         /// <summary>

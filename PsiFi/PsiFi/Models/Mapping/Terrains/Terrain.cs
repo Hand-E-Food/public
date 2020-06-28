@@ -1,7 +1,6 @@
-﻿using PsiFi.Models.Mapping.Terrains;
-using System;
+﻿using System;
 
-namespace PsiFi.Models.Mapping
+namespace PsiFi.Models.Mapping.Terrains
 {
     class Terrain
     {

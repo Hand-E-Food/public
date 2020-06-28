@@ -1,4 +1,6 @@
 ﻿using PsiFi.Models.Mapping.Geometry;
+using PsiFi.Models.Mapping.Items;
+using PsiFi.Models.Mapping.Terrains;
 using System;
 using System.Diagnostics;
 
@@ -22,7 +24,7 @@ namespace PsiFi.Models.Mapping
 
         public bool HasChanged { get; set; } = true;
 
-        public IItem Item {
+        public Item Item {
             get => item;
             set
             {
@@ -31,7 +33,7 @@ namespace PsiFi.Models.Mapping
                 OnChanged();
             }
         }
-        private IItem item;
+        private Item item;
 
         public Mob Mob 
         {

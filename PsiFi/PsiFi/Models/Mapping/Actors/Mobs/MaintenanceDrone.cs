@@ -10,7 +10,9 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
     {
         public override Appearance Appearance { get; } = new Appearance('r', ConsoleColor.White);
 
-        public override Range Health { get; } = new Range(1);
+        public override RangeValue Health { get; } = new RangeValue(1);
+
+        public override AvailableSlots Slots { get; } = AvailableSlots.None();
 
         public override void Interact(MapInterface mapInterface)
         {

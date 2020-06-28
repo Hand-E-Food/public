@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PsiFi.Models.Mapping;
+using System.Collections.Generic;
 
 namespace PsiFi.Engines
 {
@@ -21,6 +22,9 @@ namespace PsiFi.Engines
 
         /// <inheritdoc/>
         public int Next(int minValue, int maxValue) => random.Next(minValue, maxValue);
+
+        /// <inheritdoc/>
+        public Damage Next(PotentialDamage damage) => new Damage(Next(damage.Range), damage.Type);
 
         /// <inheritdoc/>
         public int Next(Range range) => random.Next(range.Minimum, range.Maximum + 1);

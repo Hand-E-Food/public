@@ -39,6 +39,11 @@ namespace PsiFi.Models.Mapping
         /// <summary>
         /// This mob's health.
         /// </summary>
-        public abstract Range Health { get; }
+        public abstract RangeValue Health { get; }
+
+        /// <summary>
+        /// This mob's available item slots.
+        /// </summary>
+        public abstract AvailableSlots Slots { get; }
     }
 }
