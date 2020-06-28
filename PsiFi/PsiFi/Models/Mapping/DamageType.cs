@@ -6,5 +6,6 @@
         Heat,
         Electric,
         Toxic,
+        Psionic,
     }
 }
