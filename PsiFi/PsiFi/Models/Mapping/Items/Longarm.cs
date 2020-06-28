@@ -15,6 +15,6 @@ namespace PsiFi.Models.Mapping.Items
 
         public override string Name { get; } = "Longarm";
 
-        public override OccupiedSlots Slots => OccupiedSlots.TwoHanded;
+        public override ItemSlots Slots => ItemSlots.TwoHanded;
     }
 }

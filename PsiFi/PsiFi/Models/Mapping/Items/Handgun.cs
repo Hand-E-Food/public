@@ -15,6 +15,6 @@ namespace PsiFi.Models.Mapping.Items
 
         public override string Name { get; } = "Handgun";
 
-        public override OccupiedSlots Slots => OccupiedSlots.OneHanded;
+        public override ItemSlots Slots => ItemSlots.OneHanded;
     }
 }

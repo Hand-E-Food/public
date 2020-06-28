@@ -12,7 +12,9 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
 
         public override RangeValue Health { get; } = new RangeValue(1);
 
-        public override AvailableSlots Slots { get; } = AvailableSlots.None();
+        public override string Name { get; } = "Maintenance Drone";
+
+        public override WieldedItems Slots { get; } = WieldedItems.None();
 
         public override void Interact(MapInterface mapInterface)
         {

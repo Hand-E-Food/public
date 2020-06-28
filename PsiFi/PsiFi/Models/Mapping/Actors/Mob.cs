@@ -44,6 +44,6 @@ namespace PsiFi.Models.Mapping
         /// <summary>
         /// This mob's available item slots.
         /// </summary>
-        public abstract AvailableSlots Slots { get; }
+        public abstract WieldedItems Slots { get; }
     }
 }

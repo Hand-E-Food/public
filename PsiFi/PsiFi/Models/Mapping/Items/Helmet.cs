@@ -8,6 +8,6 @@ namespace PsiFi.Models.Mapping.Items
 
         public override string Name { get; } = "Helmet";
 
-        public override OccupiedSlots Slots { get; } = OccupiedSlots.Head;
+        public override ItemSlots Slots { get; } = ItemSlots.Head;
     }
 }

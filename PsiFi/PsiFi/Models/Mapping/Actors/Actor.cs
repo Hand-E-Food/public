@@ -9,6 +9,11 @@ namespace PsiFi.Models.Mapping
     abstract class Actor
     {
         /// <summary>
+        /// This actor's name.
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
         /// The time index when this actor can next act.
         /// </summary>
         public int NextTimeIndex 

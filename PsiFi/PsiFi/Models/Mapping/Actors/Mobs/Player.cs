@@ -12,7 +12,9 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
 
         public IMapView MapView { get; set; }
 
-        public override AvailableSlots Slots { get; } = AvailableSlots.Humanoid();
+        public override string Name { get; } = "Player";
+
+        public override WieldedItems Slots { get; } = WieldedItems.Humanoid();
 
         public override void Interact(MapInterface mapInterface)
         {
