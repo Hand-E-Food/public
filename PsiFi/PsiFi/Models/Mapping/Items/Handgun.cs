@@ -5,8 +5,8 @@ namespace PsiFi.Models.Mapping.Items
     class Handgun : Weapon
     {
         public override Appearance Appearance { get; } = new Appearance('⌐', ConsoleColor.Gray);
-     
-        public override int AttackRange { get; } = 12;
+
+        public override Range AttackRange { get; } = new Range(1, 9);
 
         public override PotentialDamage[] Damage { get; } = new[] {
             new PotentialDamage(1, 6, DamageType.Kinetic),

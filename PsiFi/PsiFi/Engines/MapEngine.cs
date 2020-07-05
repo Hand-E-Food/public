@@ -24,8 +24,8 @@ namespace PsiFi.Engines
             MapEndReasons endReasons;
             do
             {
-                var mapInterface = new MapInterface(map, map.Actors.Next, random);
-                mapInterface.Interact();
+                var actor = map.Actors.Next;
+                var mapInterface = MapInterface.Interact(actor, map, random);
                 if (mapInterface.IsQuitting)
                 {
                     endReasons = MapEndReasons.Quit;

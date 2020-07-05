@@ -27,13 +27,25 @@ namespace PsiFi.Models.Mapping
         /// <param name="type">The type of damage applied.</param>
         public Damage(int amount, DamageType type)
         {
-            Amount = amount;
+            Amount = Math.Max(0, amount);
             Type = type;
         }
 
-        public static Damage operator +(Damage damage, int amount) => new Damage(Math.Max(0, damage.Amount + amount), damage.Type);
+        /// <summary>
+        /// Returns a new <see cref="Damage"/> with the <paramref name="amount"/> added to the <paramref name="damage"/>.
+        /// </summary>
+        /// <param name="damage">The damage to add to.</param>
+        /// <param name="amount">The amount of damage to add.</param>
+        /// <returns>The resulting damage.</returns>
+        public static Damage operator +(Damage damage, int amount) => new Damage(damage.Amount + amount, damage.Type);
 
-        public static Damage operator -(Damage damage, int amount) => new Damage(Math.Max(0, damage.Amount - amount), damage.Type);
+        /// <summary>
+        /// Returns a new <see cref="Damage"/> with the <paramref name="amount"/> subtracted from the <paramref name="damage"/>, minimum zero.
+        /// </summary>
+        /// <param name="damage">The damage to subtract from.</param>
+        /// <param name="amount">The amount of damage to subtract.</param>
+        /// <returns>The resulting damage.</returns>
+        public static Damage operator -(Damage damage, int amount) => new Damage(damage.Amount - amount, damage.Type);
 
         /// <summary>
         /// Applies damage resistance to received damage.

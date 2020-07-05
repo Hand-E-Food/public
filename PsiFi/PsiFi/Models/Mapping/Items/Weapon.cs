@@ -8,7 +8,7 @@
         /// <summary>
         /// The distance over which this weapon can attack.
         /// </summary>
-        public abstract int AttackRange { get; }
+        public abstract Range AttackRange { get; }
 
         /// <summary>
         /// This weapon's damage.

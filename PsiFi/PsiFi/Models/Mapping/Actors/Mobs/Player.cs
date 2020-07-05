@@ -1,6 +1,8 @@
 ﻿using PsiFi.Engines;
+using PsiFi.Models.Mapping.Items;
 using PsiFi.Views;
 using System;
+using System.Collections.Generic;
 
 namespace PsiFi.Models.Mapping.Actors.Mobs
 {
@@ -9,6 +11,8 @@ namespace PsiFi.Models.Mapping.Actors.Mobs
         public override Appearance Appearance { get; } = new Appearance('@', ConsoleColor.White);
 
         public override RangeValue Health { get; } = new RangeValue(10);
+
+        public override List<Item> Inventory { get; } = new List<Item>();
 
         public IMapView MapView { get; set; }
 

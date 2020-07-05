@@ -6,7 +6,7 @@ namespace PsiFi.Models.Mapping.Items
     {
         public override Appearance Appearance { get; } = new Appearance('|', ConsoleColor.Gray);
 
-        public override int AttackRange { get; } = 1;
+        public override Range AttackRange { get; } = new Range(1, 1);
 
         public override PotentialDamage[] Damage { get; } = new[]
         {
