@@ -59,11 +59,13 @@ function startNewGame() {
     var resourceCards = parseInt(resourcesInput.value);
     var fundingCards = parseInt(fundingInput.value);
     var epidemicCards = calculateEpidemicCards(cityCards);
+    var startingCards = calculateStartingCards(pawnColors.length);
+    var totalCards = cityCards + resourceCards + fundingCards + epidemicCards - startingCards;
     cardStacks = new Array(epidemicCards);
     for(var i = 0; i < epidemicCards; i++) {
         cardStacks[i] = 0;
     }
-    for (var playerCards = cityCards + resourceCards + fundingCards + epidemicCards - 1; playerCards >= 0; playerCards--) {
+    for (var playerCards = totalCards - 1; playerCards >= 0; playerCards--) {
         cardStacks[playerCards % epidemicCards]++;
     }
     cardStacks = [0, ...cardStacks].map(cards => ({ cards: cards, epidemic: true }));
@@ -89,6 +91,18 @@ function calculateEpidemicCards(cityCards) {
         return 9;
     } else {
         return 10;
+    }
+}
+
+function calculateStartingCards(playerCount) {
+    if (playerCount === 2) {
+        return 8;
+    } else if (playerCount === 3) {
+        return 9;
+    } else if (playerCount === 4) {
+        return 8;
+    } else {
+        throw new Error('Invalid number of players.');
     }
 }
 
