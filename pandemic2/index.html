@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>Pandemic Card Counter</title>
+        <link rel='stylesheet' type='text/css' href='pandemic.css'/>
+        <meta name='viewport' content='width=device-width, height=device-height' />
+        <script src='cities.js'></script>
+        <script src='pandemic.js'></script>
+    </head>
+    <body id="body">
+        <div id="newGameDiv" class="input">
+            <span class="label">Players:</span>
+            <input id="pawnColorsInput" type="text" value="blue,pink"/>
+            <div class="br"></div>
+            <span class="label">City cards: </span>
+            <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;" value="47"/>
+            <div class="br"></div>
+            <span class="label">Resources: </span>
+            <input id="resourcesInput" type="number" min="0" max="99" style="width: 3em;" value="13"/>
+            <div class="br"></div>
+            <span class="label">Funding: </span>
+            <input id="fundingInput" type="number" min="0" max="10" style="width: 3em;" value="0"/>
+            <div class="br"></div>
+            <input id="newGameButton" type="button" value="New Game"/>
+        </div>
+        <div id="epidemicDiv" class="hidden section">
+            <div id="epidemicButton" class="red epidemic button cell">
+                <span>Epidemic!</span>
+            </div>
+            <div id="newPhaseButton" class="yellow button cell">
+                <span>New Phase</span>
+            </div>
+            <div id="nextTurnButton" class="blue button cell">
+                <span>
+                    Next Turn
+                    <br/>
+                    <svg id="pawn" viewbox="0 0 4 4" fill="white" stroke="transparent" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4 L2 0 L3 4 Z"/>
+                        <circle cx="2" cy="1" r="1"/>
+                    </svg>
+                </span>
+            </div>
+            <p class="info">
+                <span class="label">Epidemic </span>
+                <span id="epidemicTurnsOutput" class="value"></span>
+                <br/>
+                <span class="label">Infection Rate: </span>
+                <span id="infectionRateOutput" class="value"></span>
+            </p>
+        </div>
+    </body>
+</html>
