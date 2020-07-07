@@ -99,8 +99,9 @@ p.info {
     width: 100%;
 }
 
-i {
+span.effect {
     font-size: smaller;
+    font-style: italic;
 }
 
 div.phase {

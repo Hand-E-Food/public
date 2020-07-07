@@ -5,6 +5,7 @@ var currentPawn;
 var discardPileDiv;
 var epidemicButton;
 var epidemicDiv;
+var epidemicsInput;
 var epidemicTurnsOutput;
 var fundingInput;
 var infectionRateOutput;
@@ -24,6 +25,7 @@ window.onload = () => {
     cityCardsInput = document.getElementById('cityCardsInput');
     epidemicButton = document.getElementById('epidemicButton');
     epidemicDiv = document.getElementById('epidemicDiv');
+    epidemicsInput = document.getElementById('epidemicsInput');
     epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
     fundingInput = document.getElementById('fundingInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
@@ -35,10 +37,24 @@ window.onload = () => {
     pawnColorsInput = document.getElementById('pawnColorsInput');
     resourcesInput = document.getElementById('resourcesInput');
 
+    cityCardsInput.onchange = e => refreshEpidemicsInput();
     epidemicButton.onclick = e => nextPhase(true);
     newGameButton.onclick = e => newGameButtonOnClick();
     newPhaseButton.onclick = e => nextPhase(false);
     nextTurnButton.onclick = e => nextTurn();
+
+    cityCardsInput.value = defaultCityCards;
+    fundingInput.value = defaultFunding;
+    resourcesInput.value = defaultResources;
+    
+    refreshEpidemicsInput();
+}
+
+function refreshEpidemicsInput() {
+    var cityCards = parseInt(cityCardsInput.value);
+    epidemicsInput.value = cityCards
+        ? calculateEpidemicCards(cityCards)
+        : null;
 }
 
 function newGameButtonOnClick() {
@@ -96,11 +112,11 @@ function calculateEpidemicCards(cityCards) {
 
 function calculateStartingCards(playerCount) {
     if (playerCount === 2) {
-        return 8;
+        return 2 * 4;
     } else if (playerCount === 3) {
-        return 9;
+        return 3 * 3;
     } else if (playerCount === 4) {
-        return 8;
+        return 4 * 2;
     } else {
         throw new Error('Invalid number of players.');
     }
@@ -144,7 +160,7 @@ function nextPhase(epidemic) {
 
 function createCity(city) {
     var citySpan = document.createElement('span');
-    citySpan.innerHTML = city.name + (city.modifier ? `<br/><i>${city.modifier}</i>` : '');
+    citySpan.innerHTML = city.name + (city.modifier ? `<br/><span class="effect">${city.modifier}</span>` : '');
 
     var cityDiv = document.createElement('div');
     cityDiv.classList.add(city.color);
