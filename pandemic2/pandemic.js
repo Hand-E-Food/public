@@ -7,9 +7,10 @@ var epidemicButton;
 var epidemicDiv;
 var epidemicsInput;
 var epidemicTurnsOutput;
-var fundingInput;
+var fundingCardsInput;
 var infectionRateOutput;
 var infectionRates;
+var innoculatedDiv;
 var newGameButton;
 var newGameDiv;
 var newPhaseButton;
@@ -17,17 +18,19 @@ var nextTurnButton;
 var pawn;
 var pawnColors;
 var pawnColorsInput;
-var resourcesInput;
+var resourceCardsInput;
+var selectedDiv;
 
 window.onload = () => {
     window.onload = undefined;
+
     body = document.getElementById('body');
     cityCardsInput = document.getElementById('cityCardsInput');
     epidemicButton = document.getElementById('epidemicButton');
     epidemicDiv = document.getElementById('epidemicDiv');
     epidemicsInput = document.getElementById('epidemicsInput');
     epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
-    fundingInput = document.getElementById('fundingInput');
+    fundingCardsInput = document.getElementById('fundingCardsInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
     newGameButton = document.getElementById('newGameButton');
     newGameDiv = document.getElementById('newGameDiv');
@@ -35,17 +38,17 @@ window.onload = () => {
     nextTurnButton = document.getElementById('nextTurnButton');
     pawn = document.getElementById('pawn');
     pawnColorsInput = document.getElementById('pawnColorsInput');
-    resourcesInput = document.getElementById('resourcesInput');
+    resourceCardsInput = document.getElementById('resourceCardsInput');
 
     cityCardsInput.onchange = e => refreshEpidemicsInput();
-    epidemicButton.onclick = e => nextPhase(true);
+    epidemicButton.onclick = e => nextPhase(true, true);
     newGameButton.onclick = e => newGameButtonOnClick();
-    newPhaseButton.onclick = e => nextPhase(false);
+    newPhaseButton.onclick = e => nextPhase(false, false);
     nextTurnButton.onclick = e => nextTurn();
 
-    cityCardsInput.value = defaultCityCards;
-    fundingInput.value = defaultFunding;
-    resourcesInput.value = defaultResources;
+    cityCardsInput.value =  window.localStorage.getItem('cityCards');
+    fundingCardsInput.value =  window.localStorage.getItem('fundingCards');
+    resourceCardsInput.value =  window.localStorage.getItem('resourceCards');
     
     refreshEpidemicsInput();
 }
@@ -72,8 +75,12 @@ function startNewGame() {
     recalculatePawnColor();
 
     var cityCards = parseInt(cityCardsInput.value);
-    var resourceCards = parseInt(resourcesInput.value);
-    var fundingCards = parseInt(fundingInput.value);
+    var resourceCards = parseInt(resourceCardsInput.value);
+    var fundingCards = parseInt(fundingCardsInput.value);
+    window.localStorage.setItem('cityCards', cityCards);
+    window.localStorage.setItem('resourceCards', resourceCards);
+    window.localStorage.setItem('fundingCards', fundingCards);
+
     var epidemicCards = calculateEpidemicCards(cityCards);
     var startingCards = calculateStartingCards(pawnColors.length);
     var totalCards = cityCards + resourceCards + fundingCards + epidemicCards - startingCards;
@@ -87,9 +94,21 @@ function startNewGame() {
     cardStacks = [0, ...cardStacks].map(cards => ({ cards: cards, epidemic: true }));
     
     infectionRates = [2, 2, 2, 3, 3, 4, 4, 5];
-    nextPhase(false);
-    cities.sort((a, b) => a.name < b.name ? -1 : 1).forEach(createCity);
-    nextPhase(true);
+
+    innoculatedDiv = createPhase();
+    discardPileDiv = createPhase();
+
+    cities
+        .filter(city => city.infection)
+        .sort((a, b) => a.name < b.name ? -1 : 1)
+        .forEach(createCity);
+
+    nextPhase(true, true);
+
+    cities
+        .filter(city => !city.infection)
+        .sort((a, b) => a.name < b.name ? -1 : 1)
+        .forEach(createCity);
 
     epidemicDiv.classList.remove('hidden');
 }
@@ -122,8 +141,8 @@ function calculateStartingCards(playerCount) {
     }
 }
 
-function nextPhase(epidemic) {
-    if (discardPileDiv && discardPileDiv.querySelector('.button').length === 0) {
+function nextPhase(epidemic, accelerate) {
+    if (discardPileDiv.querySelector('.button').length === 0) {
         return;
     }
 
@@ -133,11 +152,23 @@ function nextPhase(epidemic) {
             return;
         }
         cardStack.epidemic = false;
+    }
+    if (accelerate) {
         if (infectionRates.length > 0)
             infectionRateOutput.innerHTML = infectionRates.shift();
         recalculateEpidemicTurns();
     }
 
+    discardPileDiv = createPhase();
+    selectPhase(discardPileDiv);
+    
+    recalculateCountdowns();
+
+    epidemicButton.disabled = true;
+    newPhaseButton.disabled = true;
+}
+
+function createPhase() {
     var countdownSpan = document.createElement('span');
     countdownSpan.id = 'countdown';
 
@@ -145,17 +176,28 @@ function nextPhase(epidemic) {
     countdownDiv.classList.add('cell');
     countdownDiv.appendChild(countdownSpan);
 
-    discardPileDiv = document.createElement('div');
-    discardPileDiv.classList.add('phase');
-    discardPileDiv.classList.add('section');
-    discardPileDiv.appendChild(countdownDiv);
+    var phaseDiv = document.createElement('div');
+    phaseDiv.classList.add('phase');
+    phaseDiv.classList.add('section');
+    phaseDiv.appendChild(countdownDiv);
+
+    var onclick = e => selectPhase(phaseDiv);
+    countdownSpan.onclick = onclick;
+    countdownDiv.onclick = onclick;
     
-    body.insertBefore(discardPileDiv, epidemicDiv.nextSibling);
+    body.insertBefore(phaseDiv, epidemicDiv.nextSibling);
 
-    recalculateCountdowns();
+    return phaseDiv;
+}
 
-    epidemicButton.disabled = true;
-    newPhaseButton.disabled = true;
+function selectPhase(phase) {
+    if (selectedDiv) {
+        selectedDiv.classList.remove('selected');
+    }
+
+    selectedDiv = phase;
+    
+    selectedDiv.classList.add('selected');
 }
 
 function createCity(city) {
@@ -163,6 +205,9 @@ function createCity(city) {
     citySpan.innerHTML = city.name + (city.modifier ? `<br/><span class="effect">${city.modifier}</span>` : '');
 
     var cityDiv = document.createElement('div');
+    if (city.infection) {
+        cityDiv.dataset.infection = true;
+    }
     cityDiv.classList.add(city.color);
     cityDiv.classList.add('button');
     cityDiv.classList.add('cell');
@@ -171,7 +216,7 @@ function createCity(city) {
     discardPileDiv.appendChild(cityDiv);
 
     var onclick = e => infectCity(cityDiv);
-    var oncontextmenu = e => { immunizeCity(cityDiv); return false; }
+    var oncontextmenu = e => { destroyInfection(cityDiv); return false; }
     citySpan.onclick = onclick;
     citySpan.oncontextmenu = oncontextmenu;
     cityDiv.onclick = onclick;
@@ -181,22 +226,26 @@ function createCity(city) {
 function infectCity(cityDiv) {
     var phaseDiv = cityDiv.parentNode
 
-    if (phaseDiv === discardPileDiv) {
+    if (phaseDiv === selectedDiv) {
         return;
     }
 
     phaseDiv.removeChild(cityDiv);
-    if (phaseDiv.childNodes.length === 1) {
+    if (phaseDiv !== discardPileDiv && phaseDiv !== innoculatedDiv && phaseDiv.childNodes.length === 1) {
         phaseDiv.parentNode.removeChild(phaseDiv);
     }
     var existingCityDiv;
-    for(var i = 1; i < discardPileDiv.childNodes.length; i++) {
-        if (discardPileDiv.childNodes[i].firstChild.innerHTML > cityDiv.firstChild.innerHTML) {
-            existingCityDiv = discardPileDiv.childNodes[i];
+    for(var i = 1; i < selectedDiv.childNodes.length; i++) {
+        if (selectedDiv.childNodes[i].firstChild.innerHTML > cityDiv.firstChild.innerHTML) {
+            existingCityDiv = selectedDiv.childNodes[i];
             break;
         }
     }
-    discardPileDiv.insertBefore(cityDiv, existingCityDiv);
+    selectedDiv.insertBefore(cityDiv, existingCityDiv);
+
+    if (getAllPhases().length === 2) {
+        nextPhase(false, true);
+    }
 
     epidemicButton.disabled = false;
     newPhaseButton.disabled = false;
@@ -204,7 +253,7 @@ function infectCity(cityDiv) {
     recalculateCountdowns();
 }
 
-function immunizeCity(cityDiv) {
+function destroyInfection(cityDiv) {
     var phaseDiv = cityDiv.parentNode
 
     phaseDiv.removeChild(cityDiv);
@@ -259,19 +308,21 @@ function recalculateEpidemicTurns() {
 }
 
 function recalculateCountdowns() {
-    var cities = 0;
+    var totalInfections = 0;
     var rate = parseInt(infectionRateOutput.innerHTML);
-    getAllPhases().forEach((phase, index) => {
-        var countdown = phase.firstChild.firstChild;
-        if (index === 0) {
-            countdown.innerHTML = 'Dicard<br/>Pile';
+    var allPhases = getAllPhases();
+    allPhases.forEach((phase, index) => {
+        if (phase === discardPileDiv) {
+            getCountdown(phase).innerHTML = 'Dicard<br/>Pile';
+        } else if (phase === innoculatedDiv) {
+            getCountdown(phase).innerHTML = 'Innoculated';
         } else {
-            cities = cities + 1;
-            var firstTurn = Math.ceil(cities / rate);
-            cities = cities + phase.childNodes.length - 2;
-            var lastTurn = Math.ceil(cities / rate);
+            totalInfections = totalInfections + 1;
+            var firstTurn = Math.ceil(totalInfections / rate);
+            totalInfections = totalInfections + [...phase.childNodes].filter(node => node.dataset.infection).length - 1;
+            var lastTurn = Math.ceil(totalInfections / rate);
 
-            countdown.innerHTML =
+            getCountdown(phase).innerHTML =
                   lastTurn === 1 ? lastTurn + '<br/>turn'
                 : firstTurn === lastTurn ? firstTurn + '<br/>turns'
                 : firstTurn + ' - ' + lastTurn + '<br/>turns'
@@ -281,4 +332,8 @@ function recalculateCountdowns() {
 
 function getAllPhases() {
     return [...document.getElementsByClassName('phase')];
+}
+
+function getCountdown(phase) {
+    return phase.firstChild.firstChild;
 }

@@ -104,11 +104,8 @@ span.effect {
     font-style: italic;
 }
 
-div.phase {
-    opacity: calc(2 / 3);
-}
-div.phase:nth-child(4) {
-    opacity: 1.0;
+div.selected {
+    background-color: #002000;
 }
 
 div.cell {
@@ -133,22 +130,27 @@ div.cell>span {
 }
 
 div.black {
-    background-color: #00000055;
-    border-color: #555555;
+    background-color: #000000;
+    border-color: #202020;
 }
 
 div.blue {
-    background-color: #0000FF55;
+    background-color: #000055;
     border-color: #0000FF;
 }
 
+div.gray {
+    background-color: #1C1C1C;
+    border-color: #555555;
+}
+
 div.red {
-    background-color: #FF000055;
+    background-color: #550000;
     border-color: #FF0000;
 }
 
 div.yellow {
-    background-color: #80800055;
+    background-color: #2B2B00;
     border-color: #808000;
 }
 
