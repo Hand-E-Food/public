@@ -287,7 +287,8 @@ function createCard(card) {
     cardDiv.classList.add('cell');
     cardDiv.appendChild(cardSpan);
 
-    var pileDiv = getAllPhases().find(phase => phase.dataset.deck === card.deck) ?? discardPileDiv;
+    var pileDiv = getAllPhases().find(phase => phase.dataset.deck === card.deck);
+    if (!pileDiv) { pileDiv = discardPileDiv; }
     pileDiv.appendChild(cardDiv);
 
     var onclick = e => moveCard(cardDiv);
@@ -394,7 +395,7 @@ function recalculateEpidemicTurns() {
 function recalculateCountdowns() {
     var totalInfections = 0;
     var rate = parseInt(infectionRateOutput.innerHTML);
-    getAllInfectionPhases().forEach((phase, index) => {
+    getAllInfectionPhases().forEach(phase => {
         if (phase === discardPileDiv) {
             getCountdown(phase).innerHTML = 'Dicard<br/>Pile';
         } else {
