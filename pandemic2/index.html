@@ -60,5 +60,25 @@
                 <span id="infectionRateOutput" class="value"></span>
             </p>
         </div>
+        <div id="addCardDiv" class="hidden input">
+            <span class="label">Name: </span>
+            <input id="cardNameInput" type="text"/>
+            <div class="br"></div>
+            <span class="label">Color: </span>
+            <select id="cardColorInput">
+                <option value="black">Black</option>
+                <option value="blue">Blue</option>
+                <option value="gray">Gray</option>
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+            </select>
+            <span class="label">&nbsp; Infection: </span>
+            <input id="cardInfectionInput" type="checkbox" checked/>
+            <div class="br"></div>
+            <span class="label">Upgrade: </span>
+            <input id="cardUpgradeInput" type="text"/>
+            <div class="br"></div>
+            <input id="addCardButton" type="button" value="Add Card"/>
+        </div>
     </body>
 </html>

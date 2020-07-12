@@ -58,8 +58,8 @@ div.section {
     width: var(--screen-width);
 }
 
-input {
-    background-color: transparent;
+input, select {
+    background-color: black;
     border-color: darkgreen;
     border-style: solid;
     border-width: 2px;
