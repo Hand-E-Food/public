@@ -2,6 +2,7 @@
     <head>
         <title>Pandemic Card Counter</title>
         <link rel='stylesheet' type='text/css' href='pandemic.css'/>
+        <meta charset="utf-8">
         <meta name='viewport' content='width=device-width, height=device-height' />
         <script src='cities.js'></script>
         <script src='pandemic.js'></script>
@@ -9,7 +10,16 @@
     <body id="body">
         <div id="newGameDiv" class="input">
             <span class="label">Players:</span>
-            <input id="pawnColorsInput" type="text" value="blue,pink"/>
+            <input id="pawnColorsInput" type="text" value="blue,pink" readonly/>
+            <div class="br"></div>
+            <input id="pawnInput1" name="pawnInput" type="checkbox" value="blue" checked/>
+            <span class="label">Blue </span>
+            <input id="pawnInput2" name="pawnInput" type="checkbox" value="brown"/>
+            <span class="label">Brown </span>
+            <input id="pawnInput3" name="pawnInput" type="checkbox" value="pink" checked/>
+            <span class="label">Pink </span>
+            <input id="pawnInput4" name="pawnInput" type="checkbox" value="white"/>
+            <span class="label">White </span>
             <div class="br"></div>
             <span class="label">City cards: </span>
             <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
