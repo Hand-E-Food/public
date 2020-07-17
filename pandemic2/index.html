@@ -9,28 +9,28 @@
     </head>
     <body id="body">
         <div id="newGameDiv" class="input">
-            <span class="label">Players:</span>
+            <label for="pawnColorsInput" class="label">Players:</label>
             <input id="pawnColorsInput" type="text" value="blue,pink" readonly/>
             <div class="br"></div>
             <input id="pawnInput1" name="pawnInput" type="checkbox" value="blue" checked/>
-            <span class="label">Blue </span>
+            <label for="pawnInput1" class="label">Blue </label>
             <input id="pawnInput2" name="pawnInput" type="checkbox" value="brown"/>
-            <span class="label">Brown </span>
+            <label for="pawnInput2" class="label">Brown </label>
             <input id="pawnInput3" name="pawnInput" type="checkbox" value="pink" checked/>
-            <span class="label">Pink </span>
+            <label for="pawnInput3" class="label">Pink </label>
             <input id="pawnInput4" name="pawnInput" type="checkbox" value="white"/>
-            <span class="label">White </span>
+            <label for="pawnInput4" class="label">White </label>
             <div class="br"></div>
-            <span class="label">City cards: </span>
+            <label for="cityCardsInput" class="label">City cards: </label>
             <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
             <div class="br"></div>
-            <span class="label">Resources: </span>
+            <label for="resourceCardsInput" class="label">Resources: </label>
             <input id="resourceCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
             <div class="br"></div>
-            <span class="label">Funding: </span>
+            <label for="fundingCardsInput" class="label">Funding: </label>
             <input id="fundingCardsInput" type="number" min="0" max="10" style="width: 3em;"/>
             <div class="br"></div>
-            <span class="label">Epidemics: </span>
+            <label for="epidemicsInput" class="label">Epidemics: </label>
             <input id="epidemicsInput" type="number" min="5" max="10" style="width: 3em;" readonly/>
             <div class="br"></div>
             <input id="newGameButton" type="button" value="New Game"/>
@@ -61,10 +61,10 @@
             </p>
         </div>
         <div id="addCardDiv" class="hidden input">
-            <span class="label">Name: </span>
+            <label for="cardNameInput" class="label">Name: </label>
             <input id="cardNameInput" type="text"/>
             <div class="br"></div>
-            <span class="label">Color: </span>
+            <label for="cardColorInput" class="label">Color: </label>
             <select id="cardColorInput">
                 <option value="black">Black</option>
                 <option value="blue">Blue</option>
@@ -72,10 +72,10 @@
                 <option value="red">Red</option>
                 <option value="yellow">Yellow</option>
             </select>
-            <span class="label">&nbsp; Infection: </span>
+            <label for="cardInfectionInput" class="label">&nbsp; Infection: </label>
             <input id="cardInfectionInput" type="checkbox" checked/>
             <div class="br"></div>
-            <span class="label">Upgrade: </span>
+            <label for="cardUpgradeInput" class="label">Upgrade: </label>
             <input id="cardUpgradeInput" type="text"/>
             <div class="br"></div>
             <input id="addCardButton" type="button" value="Add Card"/>
