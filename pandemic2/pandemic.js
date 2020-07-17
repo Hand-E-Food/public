@@ -339,7 +339,7 @@ function saveCards() {
         .map(card => {
             return {
                 color: card.color,
-                deck: card.deck,
+                deck: getSaveDeck(card.deck),
                 infection: card.infection === 'true',
                 name: card.name,
                 upgrade: card.upgrade,
@@ -347,6 +347,14 @@ function saveCards() {
         });
     
     window.localStorage.setItem('cards', JSON.stringify(cards));
+}
+
+function getSaveDeck(deckName) {
+    if (deckName === deck.gameEnd) {
+        return deck.infection;
+    } else {
+        return deckName;
+    }
 }
 
 function nextTurn() {
