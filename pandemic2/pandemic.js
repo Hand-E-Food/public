@@ -16,6 +16,7 @@ var epidemicTurnsOutput;
 var fundingCardsInput;
 var infectionRateOutput;
 var infectionRates;
+var inoculatedDiv;
 var newGameButton;
 var newGameDiv;
 var newPhaseButton;
@@ -32,7 +33,7 @@ const deck = {
     destroyed: 'Destroyed',
     gameEnd: 'Game End',
     infection: 'Infection',
-    innoculated: 'Innoculated',
+    inoculated: 'Inoculated',
     reserve: 'Reserve',
 };
 
@@ -132,7 +133,7 @@ function startNewGame() {
     createPhase(deck.destroyed);
     createPhase(deck.reserve);
     createPhase(deck.gameEnd);
-    createPhase(deck.innoculated);
+    inoculatedDiv = createPhase(deck.inoculated);
     discardPileDiv = createPhase(deck.infection);
 
     var cards = loadCards();
@@ -422,10 +423,12 @@ function recalculateCountdowns() {
         }
     });
 
+    var inoculatedCards = inoculatedDiv.childNodes.length - 1;
+    getCountdown(inoculatedDiv).innerHTML = `Inoculated<br/>(${inoculatedCards})`
 
-    var noCardsInDiscardPile = discardPileDiv.childNodes.length === 1;
-    epidemicButton.disabled = noCardsInDiscardPile;
-    newPhaseButton.disabled = noCardsInDiscardPile;
+    var zeroCardsInDiscardPile = discardPileDiv.childNodes.length === 1;
+    epidemicButton.disabled = zeroCardsInDiscardPile;
+    newPhaseButton.disabled = zeroCardsInDiscardPile;
 }
 
 function getAllInfectionPhases() {
