@@ -1,5 +1,4 @@
 var addCardButton;
-var addCardDiv;
 var body;
 var cardColorInput;
 var cardInfectionInput;
@@ -17,6 +16,8 @@ var fundingCardsInput;
 var infectionRateOutput;
 var infectionRates;
 var inoculatedDiv;
+var manageCardDiv;
+var manageCardHeaderDiv;
 var newGameButton;
 var newGameDiv;
 var newPhaseButton;
@@ -41,7 +42,6 @@ window.onload = () => {
     window.onload = undefined;
 
     addCardButton = document.getElementById('addCardButton');
-    addCardDiv = document.getElementById('addCardDiv');
     body = document.getElementById('body');
     cardColorInput = document.getElementById('cardColorInput');
     cardInfectionInput = document.getElementById('cardInfectionInput');
@@ -54,6 +54,8 @@ window.onload = () => {
     epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
     fundingCardsInput = document.getElementById('fundingCardsInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
+    manageCardDiv = document.getElementById('manageCardDiv');
+    manageCardHeaderDiv = document.getElementById('manageCardHeaderDiv');
     newGameButton = document.getElementById('newGameButton');
     newGameDiv = document.getElementById('newGameDiv');
     newPhaseButton = document.getElementById('newPhaseButton');
@@ -66,6 +68,7 @@ window.onload = () => {
     addCardButton.onclick = e => addCard();
     cityCardsInput.onchange = e => refreshEpidemicsInput();
     epidemicButton.onclick = e => nextPhase(true, true);
+    manageCardHeaderDiv.onclick = e => selectPhase(manageCardDiv);
     newGameButton.onclick = e => newGameButtonOnClick();
     newPhaseButton.onclick = e => nextPhase(false, false);
     nextTurnButton.onclick = e => nextTurn();
@@ -76,6 +79,7 @@ window.onload = () => {
     resourceCardsInput.value =  window.localStorage.getItem('resourceCards');
     
     refreshEpidemicsInput();
+    startNewGame();
 }
 
 function refreshEpidemicsInput() {
@@ -96,14 +100,13 @@ function setPawn(pawnInput) {
 }
 
 function newGameButtonOnClick() {
-    if (epidemicDiv.classList.contains('hidden') || confirm('Start a new game?')) {
+    if (confirm('Start a new game?')) {
         startNewGame();
     }
 }
 
 function startNewGame() {
-    newGameDiv.classList.add('hidden');
-    getAllInfectionPhases().forEach(phase => body.removeChild(phase));
+    getAllPhases().forEach(phase => body.removeChild(phase));
 
     pawnColors = pawnColorsInput.value.split(',');
     currentPawn = 0;
@@ -137,7 +140,6 @@ function startNewGame() {
     discardPileDiv = createPhase(deck.infection);
 
     var cards = loadCards();
-    console.log(cards);
 
     cards
         .filter(city => city.infection)
@@ -150,9 +152,8 @@ function startNewGame() {
         .filter(city => !city.infection)
         .sort((a, b) => a.name < b.name ? -1 : 1)
         .forEach(createCard);
-
-    epidemicDiv.classList.remove('hidden');
-    addCardDiv.classList.remove('hidden');
+    
+    recalculateCountdowns();
 }
 
 function calculateEpidemicCards(cityCards) {
@@ -235,9 +236,7 @@ function createPhase(deck) {
     phaseDiv.dataset.deck = deck;
     phaseDiv.appendChild(countdownDiv);
 
-    var onclick = e => selectPhase(phaseDiv);
-    countdownSpan.onclick = onclick;
-    countdownDiv.onclick = onclick;
+    countdownDiv.onclick = e => selectPhase(phaseDiv);
     
     body.insertBefore(phaseDiv, epidemicDiv.nextSibling);
 
@@ -292,9 +291,7 @@ function createCard(card) {
     if (!pileDiv) { pileDiv = discardPileDiv; }
     pileDiv.appendChild(cardDiv);
 
-    var onclick = e => moveCard(cardDiv);
-    cardSpan.onclick = onclick;
-    cardDiv.onclick = onclick;
+    cardDiv.onclick = e => moveCard(cardDiv);
 }
 
 function moveCard(cityDiv) {
@@ -311,18 +308,27 @@ function moveCard(cityDiv) {
         phaseDiv.parentNode.removeChild(phaseDiv);
     }
     
-    var existingCityDiv;
-    for(var i = 1; i < selectedDiv.childNodes.length; i++) {
-        if (selectedDiv.childNodes[i].firstChild.innerHTML > cityDiv.firstChild.innerHTML) {
-            existingCityDiv = selectedDiv.childNodes[i];
-            break;
-        }
-    }
-    selectedDiv.insertBefore(cityDiv, existingCityDiv);
-
-    if (cityDiv.dataset.deck !== selectedDiv.dataset.deck) {
-        cityDiv.dataset.deck = selectedDiv.dataset.deck;
+    if (selectedDiv === manageCardDiv) {
+        cardNameInput.value = cityDiv.dataset.name;
+        cardColorInput.value = cityDiv.dataset.color;
+        cardInfectionInput.checked = cityDiv.dataset.infection == 'true';
+        cardUpgradeInput.value = cityDiv.dataset.upgrade ? cityDiv.dataset.upgrade : '';
         saveCards();
+        selectPhase(phaseDiv);
+    } else {
+        var existingCityDiv;
+        for(var i = 1; i < selectedDiv.childNodes.length; i++) {
+            if (selectedDiv.childNodes[i].dataset.name > cityDiv.dataset.name) {
+                existingCityDiv = selectedDiv.childNodes[i];
+                break;
+            }
+        }
+        selectedDiv.insertBefore(cityDiv, existingCityDiv);
+
+        if (cityDiv.dataset.deck !== selectedDiv.dataset.deck) {
+            cityDiv.dataset.deck = selectedDiv.dataset.deck;
+            saveCards();
+        }
     }
 
     if (getAllInfectionPhases().length === 1) {
@@ -405,8 +411,9 @@ function recalculateCountdowns() {
     var totalInfections = 0;
     var rate = parseInt(infectionRateOutput.innerHTML);
     getAllInfectionPhases().forEach(phase => {
+        var cardCount = phase.childNodes.length - 1;
         if (phase === discardPileDiv) {
-            getCountdown(phase).innerHTML = 'Dicard<br/>Pile';
+            getCountdown(phase).innerHTML = `Dicard Pile<br/>(${cardCount})`;
         } else {
             totalInfections = totalInfections + 1;
             var firstTurn = Math.ceil(totalInfections / rate);
@@ -416,10 +423,11 @@ function recalculateCountdowns() {
                 lastTurn = firstTurn;
             }
 
-            getCountdown(phase).innerHTML =
-                  lastTurn === 1 ? lastTurn + '<br/>turn'
-                : firstTurn === lastTurn ? firstTurn + '<br/>turns'
-                : firstTurn + ' - ' + lastTurn + '<br/>turns'
+            getCountdown(phase).innerHTML = (
+                  lastTurn === 1 ? lastTurn + ' turn'
+                : firstTurn === lastTurn ? firstTurn + ' turns'
+                : firstTurn + ' - ' + lastTurn + ' turns'
+                ) + `<br/>(${cardCount})`;
         }
     });
 

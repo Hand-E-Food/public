@@ -21,21 +21,22 @@
             <input id="pawnInput4" name="pawnInput" type="checkbox" value="white"/>
             <label for="pawnInput4" class="label">White </label>
             <div class="br"></div>
-            <label for="cityCardsInput" class="label">City cards: </label>
             <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
+            <label for="cityCardsInput" class="label">city cards</label>
+            <div id="newGameButton" class="green button cell" style="position: absolute; right: 10px;">
+                <span>New Game</span>
+            </div>
             <div class="br"></div>
-            <label for="resourceCardsInput" class="label">Resources: </label>
             <input id="resourceCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
+            <label for="resourceCardsInput" class="label">resources</label>
             <div class="br"></div>
-            <label for="fundingCardsInput" class="label">Funding: </label>
             <input id="fundingCardsInput" type="number" min="0" max="10" style="width: 3em;"/>
+            <label for="fundingCardsInput" class="label">funding</label>
             <div class="br"></div>
-            <label for="epidemicsInput" class="label">Epidemics: </label>
             <input id="epidemicsInput" type="number" min="5" max="10" style="width: 3em;" readonly/>
-            <div class="br"></div>
-            <input id="newGameButton" type="button" value="New Game"/>
+            <label for="epidemicsInput" class="label">epidemics</label>
         </div>
-        <div id="epidemicDiv" class="hidden section">
+        <div id="epidemicDiv" class="section">
             <div id="epidemicButton" class="red epidemic button cell">
                 <span>Epidemic!</span>
             </div>
@@ -60,7 +61,15 @@
                 <span id="infectionRateOutput" class="value"></span>
             </p>
         </div>
-        <div id="addCardDiv" class="hidden input">
+        <div id="manageCardDiv" class="input">
+            <div id="manageCardHeaderDiv" class="cell">
+                <span>Manage Card</span>
+            </div>
+            <div class="cell"></div>
+            <div id="addCardButton" class="green cell button">
+                <span>Add Card</span>
+            </div>
+            <div class="br"></div>
             <label for="cardNameInput" class="label">Name: </label>
             <input id="cardNameInput" type="text"/>
             <div class="br"></div>
@@ -77,8 +86,6 @@
             <div class="br"></div>
             <label for="cardUpgradeInput" class="label">Upgrade: </label>
             <input id="cardUpgradeInput" type="text"/>
-            <div class="br"></div>
-            <input id="addCardButton" type="button" value="Add Card"/>
         </div>
     </body>
 </html>
