@@ -1,4 +1,3 @@
-var addCardButton;
 var body;
 var cardColorInput;
 var cardInfectionInput;
@@ -17,18 +16,12 @@ var infectionRateOutput;
 var infectionRates;
 var inoculatedDiv;
 var manageCardDiv;
-var manageCardHeaderDiv;
-var newGameButton;
-var newGameDiv;
 var newPhaseButton;
-var nextTurnButton;
 var pawn;
 var pawnColors;
 var pawnColorsInput;
-var pawnInputs;
 var playerCardsSpan;
 var resourceCardsInput;
-var selectedCard;
 var selectedDiv;
 
 const deck = {
@@ -42,14 +35,12 @@ const deck = {
 window.onload = () => {
     window.onload = undefined;
 
-    addCardButton = document.getElementById('addCardButton');
     body = document.getElementById('body');
     cardColorInput = document.getElementById('cardColorInput');
     cardInfectionInput = document.getElementById('cardInfectionInput');
     cardNameInput = document.getElementById('cardNameInput');
     cardUpgradeInput = document.getElementById('cardUpgradeInput');
     cityCardsInput = document.getElementById('cityCardsInput');
-    drawPlayerCardButton = document.getElementById('drawPlayerCardButton');
     epidemicButton = document.getElementById('epidemicButton');
     epidemicDiv = document.getElementById('epidemicDiv');
     epidemicsInput = document.getElementById('epidemicsInput');
@@ -57,30 +48,24 @@ window.onload = () => {
     fundingCardsInput = document.getElementById('fundingCardsInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
     manageCardDiv = document.getElementById('manageCardDiv');
-    manageCardHeaderDiv = document.getElementById('manageCardHeaderDiv');
-    newGameButton = document.getElementById('newGameButton');
-    newGameDiv = document.getElementById('newGameDiv');
     newPhaseButton = document.getElementById('newPhaseButton');
-    nextTurnButton = document.getElementById('nextTurnButton');
     pawn = document.getElementById('pawn');
     pawnColorsInput = document.getElementById('pawnColorsInput');
-    pawnInputs = [...document.getElementsByName('pawnInput')];
     playerCardsSpan = document.getElementById('playerCardsSpan');
     resourceCardsInput = document.getElementById('resourceCardsInput');
-    skipEpidemicButton = document.getElementById('skipEpidemicButton');
 
-    addCardButton.onclick = e => addCard();
+    document.getElementById('addCardButton').onclick = e => addCard();
+    document.getElementById('drawPlayerCardButton').onclick = e => drawPlayerCards(1);
+    document.getElementById('manageCardHeaderDiv').onclick = e => selectPhase(manageCardDiv);
+    document.getElementById('newGameButton').onclick = e => newGameButtonOnClick();
+    document.getElementById('nextTurnButton').onclick = e => nextTurn();
+    document.getElementById('skipEpidemicButton').onclick = e => nextEpidemic();
+    [...document.getElementsByName('pawnInput')].forEach(pawnInput => pawnInput.onchange = e => setPawn(pawnInput));
     cityCardsInput.onchange = e => savePlayerDeck();
-    drawPlayerCardButton.onclick = e => drawPlayerCards(1);
     epidemicButton.onclick = e => nextPhase(true, true);
     fundingCardsInput.onchange = e => savePlayerDeck();
-    manageCardHeaderDiv.onclick = e => selectPhase(manageCardDiv);
-    newGameButton.onclick = e => newGameButtonOnClick();
     newPhaseButton.onclick = e => nextPhase(false, false);
-    nextTurnButton.onclick = e => nextTurn();
-    pawnInputs.forEach(pawnInput => pawnInput.onchange = e => setPawn(pawnInput));
     resourceCardsInput.onchange = e => savePlayerDeck();
-    skipEpidemicButton.onclick = e => nextEpidemic();
 
     cityCardsInput.value =  window.localStorage.getItem('cityCards');
     fundingCardsInput.value =  window.localStorage.getItem('fundingCards');
