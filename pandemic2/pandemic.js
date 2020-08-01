@@ -39,6 +39,11 @@ const deck = {
     reserve: 'Reserve',
 };
 
+window.addEventListener("beforeunload", function(e) {
+    e.preventDefault();
+    e.returnValue = '';
+});
+
 window.onload = () => {
     window.onload = undefined;
 
