@@ -33,12 +33,12 @@
             <input id="fundingCardsInput" type="number" min="0" max="10" style="width: 3em;"/>
             <label for="fundingCardsInput" class="label">funding</label>
             <div class="br"></div>
-            <input id="epidemicsInput" type="number" min="5" max="10" style="width: 3em;" readonly/>
-            <label for="epidemicsInput" class="label">epidemics</label>
+            <input id="epidemicCardsInput" type="number" min="5" max="10" style="width: 3em;"/>
+            <label for="epidemicCardsInput" class="label">escalations</label>
         </div>
         <div id="epidemicDiv" class="section">
             <div id="epidemicButton" class="red epidemic button cell">
-                <span>Epidemic!</span>
+                <span>Escalation!</span>
             </div>
             <div id="newPhaseButton" class="yellow button cell">
                 <span>New Phase</span>
@@ -60,42 +60,16 @@
                 <span id="playerCardsSpan" style="font-size: larger;">0</span>
             </div>
             <div id="skipEpidemicButton" class="blue button cell">
-                <span>Skip Epidemic</span>
+                <span>Skip Escalation</span>
             </div>
 
             <p class="info">
-                <span class="label">Epidemic </span>
+                <span class="label">Escalation </span>
                 <span id="epidemicTurnsOutput" class="value"></span>
                 <br/>
-                <span class="label">Infection Rate: </span>
+                <span class="label">Threat Level: </span>
                 <span id="infectionRateOutput" class="value"></span>
             </p>
-        </div>
-        <div id="manageCardDiv" class="input">
-            <div id="manageCardHeaderDiv" class="cell">
-                <span>Manage Card</span>
-            </div>
-            <div class="cell"></div>
-            <div id="addCardButton" class="green cell button">
-                <span>Add Card</span>
-            </div>
-            <div class="br"></div>
-            <label for="cardNameInput" class="label">Name: </label>
-            <input id="cardNameInput" type="text"/>
-            <div class="br"></div>
-            <label for="cardColorInput" class="label">Color: </label>
-            <select id="cardColorInput">
-                <option value="black">Black</option>
-                <option value="blue">Blue</option>
-                <option value="gray">Gray</option>
-                <option value="red">Red</option>
-                <option value="yellow">Yellow</option>
-            </select>
-            <label for="cardInfectionInput" class="label">&nbsp; Infection: </label>
-            <input id="cardInfectionInput" type="checkbox" checked/>
-            <div class="br"></div>
-            <label for="cardUpgradeInput" class="label">Upgrade: </label>
-            <input id="cardUpgradeInput" type="text"/>
         </div>
     </body>
 </html>

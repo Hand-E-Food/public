@@ -1,21 +1,15 @@
 var body;
-var cardColorInput;
-var cardInfectionInput;
-var cardNameInput;
 var cardStacks;
-var cardUpgradeInput;
 var cityCardsInput;
 var currentPawn;
 var discardPileDiv;
 var epidemicButton;
 var epidemicDiv;
-var epidemicsInput;
+var epidemicCardsInput;
 var epidemicTurnsOutput;
 var fundingCardsInput;
 var infectionRateOutput;
 var infectionRates;
-var inoculatedDiv;
-var manageCardDiv;
 var newPhaseButton;
 var pawn;
 var pawnColors;
@@ -25,11 +19,8 @@ var resourceCardsInput;
 var selectedDiv;
 
 const deck = {
-    destroyed: 'Destroyed',
     gameEnd: 'Game End',
-    infection: 'Infection',
-    inoculated: 'Inoculated',
-    reserve: 'Reserve',
+    infection: 'Threat',
 };
 
 window.addEventListener("beforeunload", function(e) {
@@ -41,57 +32,44 @@ window.onload = () => {
     window.onload = undefined;
 
     body = document.getElementById('body');
-    cardColorInput = document.getElementById('cardColorInput');
-    cardInfectionInput = document.getElementById('cardInfectionInput');
-    cardNameInput = document.getElementById('cardNameInput');
-    cardUpgradeInput = document.getElementById('cardUpgradeInput');
     cityCardsInput = document.getElementById('cityCardsInput');
     epidemicButton = document.getElementById('epidemicButton');
     epidemicDiv = document.getElementById('epidemicDiv');
-    epidemicsInput = document.getElementById('epidemicsInput');
+    epidemicCardsInput = document.getElementById('epidemicCardsInput');
     epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
     fundingCardsInput = document.getElementById('fundingCardsInput');
     infectionRateOutput = document.getElementById('infectionRateOutput');
-    manageCardDiv = document.getElementById('manageCardDiv');
     newPhaseButton = document.getElementById('newPhaseButton');
     pawn = document.getElementById('pawn');
     pawnColorsInput = document.getElementById('pawnColorsInput');
     playerCardsSpan = document.getElementById('playerCardsSpan');
     resourceCardsInput = document.getElementById('resourceCardsInput');
 
-    document.getElementById('addCardButton').onclick = e => addCard();
     document.getElementById('drawPlayerCardButton').onclick = e => drawPlayerCards(1);
-    document.getElementById('manageCardHeaderDiv').onclick = e => selectPhase(manageCardDiv);
     document.getElementById('newGameButton').onclick = e => newGameButtonOnClick();
     document.getElementById('nextTurnButton').onclick = e => nextTurn();
     document.getElementById('skipEpidemicButton').onclick = e => nextEpidemic();
     [...document.getElementsByName('pawnInput')].forEach(pawnInput => pawnInput.onchange = e => setPawn(pawnInput));
     cityCardsInput.onchange = e => savePlayerDeck();
     epidemicButton.onclick = e => nextPhase(true, true);
+    epidemicCardsInput.onchange = e => savePlayerDeck();
     fundingCardsInput.onchange = e => savePlayerDeck();
     newPhaseButton.onclick = e => nextPhase(false, false);
     resourceCardsInput.onchange = e => savePlayerDeck();
 
-    cityCardsInput.value =  window.localStorage.getItem('cityCards');
-    fundingCardsInput.value =  window.localStorage.getItem('fundingCards');
-    resourceCardsInput.value =  window.localStorage.getItem('resourceCards');
+    cityCardsInput.value = window.localStorage.getItem('pandemic0/cityCards') || defaultCityCards;
+    epidemicCardsInput.value = window.localStorage.getItem('pandemic0/epidemicCards') || defaultEpidemicCards;
+    fundingCardsInput.value = window.localStorage.getItem('pandemic0/fundingCards') || defaultFundingCards;
+    resourceCardsInput.value = window.localStorage.getItem('pandemic0/resourceCards') || defaultResourceCards;
     
-    refreshEpidemicsInput();
     startNewGame();
 }
 
 function savePlayerDeck() {
-    window.localStorage.setItem('cityCards', cityCardsInput.value);
-    window.localStorage.setItem('resourceCards', resourceCardsInput.value);
-    window.localStorage.setItem('fundingCards', fundingCardsInput.value);
-    refreshEpidemicsInput();
-}
-
-function refreshEpidemicsInput() {
-    var cityCards = parseInt(cityCardsInput.value);
-    epidemicsInput.value = cityCards
-        ? calculateEpidemicCards(cityCards)
-        : null;
+    window.localStorage.setItem('pandemic0/cityCards', cityCardsInput.value);
+    window.localStorage.setItem('pandemic0/resourceCards', resourceCardsInput.value);
+    window.localStorage.setItem('pandemic0/fundingCards', fundingCardsInput.value);
+    window.localStorage.setItem('pandemic0/epidemicCards', epidemicCardsInput.value);
 }
 
 function setPawn(pawnInput) {
@@ -120,8 +98,8 @@ function startNewGame() {
     var cityCards = parseInt(cityCardsInput.value);
     var resourceCards = parseInt(resourceCardsInput.value);
     var fundingCards = parseInt(fundingCardsInput.value);
+    var epidemicCards = parseInt(epidemicCardsInput.value);
 
-    var epidemicCards = calculateEpidemicCards(cityCards);
     var startingCards = calculateStartingCards(pawnColors.length);
     var totalCards = cityCards + resourceCards + fundingCards + epidemicCards - startingCards;
     cardStacks = new Array(epidemicCards);
@@ -133,30 +111,46 @@ function startNewGame() {
     }
     cardStacks = [0, ...cardStacks].map(cards => ({ cards: cards, epidemic: true }));
     
-    infectionRates = [2, 2, 2, 3, 3, 4, 4, 5];
+    infectionRates = [2, 2, 2, 3, 3, 4];
 
-    createPhase(deck.destroyed);
-    createPhase(deck.reserve);
     createPhase(deck.gameEnd);
-    inoculatedDiv = createPhase(deck.inoculated);
     discardPileDiv = createPhase(deck.infection);
 
     var cards = loadCards();
 
     cards
-        .filter(city => city.infection)
         .sort((a, b) => a.name < b.name ? -1 : 1)
         .forEach(createCard);
 
     nextPhase(true, true);
-
-    cards
-        .filter(city => !city.infection)
-        .sort((a, b) => a.name < b.name ? -1 : 1)
-        .forEach(createCard);
-    
     recalculatePlayerCards();
     recalculateCountdowns();
+}
+
+function calculateStartingCards(playerCount) {
+    if (playerCount === 2) {
+        return 2 * 4;
+    } else if (playerCount === 3) {
+        return 3 * 3;
+    } else if (playerCount === 4) {
+        return 4 * 2;
+    } else {
+        throw new Error('Invalid number of players.');
+    }
+}
+
+function loadCards() {
+    return defaultCards;
+    var cards = window.localStorage.getItem('pandemic0/cards');
+    if (!cards) {
+        return defaultCards;
+    }
+    try {
+        return JSON.parse(cards);
+    }
+    catch {
+        return defaultCards;
+    }
 }
 
 function nextPhase(epidemic, accelerate) {
@@ -221,36 +215,18 @@ function selectPhase(phase) {
     selectedDiv.classList.add('selected');
 }
 
-function addCard() {
-    var card = {
-        color: cardColorInput.value,
-        deck: selectedDiv.dataset.deck,
-        infection: cardInfectionInput.checked,
-        name: cardNameInput.value,
-        upgrade: cardUpgradeInput.value,
-    };
-    createCard(card);
-    saveCards();
-}
-
 function createCard(card) {
     var cardSpan = document.createElement('span');
     cardSpan.appendChild(document.createTextNode(card.name));
-    if (card.upgrade) {
-        cardSpan.appendChild(document.createElement('br'));
-        var cardUpgrade = document.createElement('span');
-        cardUpgrade.classList.add('upgrade');
-        cardUpgrade.appendChild(document.createTextNode(card.upgrade));
-        cardSpan.appendChild(cardUpgrade);
-    }
 
     var cardDiv = document.createElement('div');
-    cardDiv.dataset.color = card.color;
+    cardDiv.dataset.affiliation = card.affiliation;
     cardDiv.dataset.deck = card.deck;
-    cardDiv.dataset.infection = card.infection;
+    cardDiv.dataset.incident = card.incident;
     cardDiv.dataset.name = card.name;
-    if (card.upgrade) { cardDiv.dataset.upgrade = card.upgrade; }
-    cardDiv.classList.add(card.color);
+    cardDiv.dataset.region = card.region;
+    cardDiv.classList.add(card.affiliation.toLowerCase());
+    cardDiv.classList.add(card.region.toLowerCase().replace(' ', '-'));
     cardDiv.classList.add('button');
     cardDiv.classList.add('cell');
     cardDiv.appendChild(cardSpan);
@@ -276,16 +252,7 @@ function moveCard(cityDiv) {
         phaseDiv.parentNode.removeChild(phaseDiv);
     }
     
-    if (selectedDiv === manageCardDiv) {
-        cardNameInput.value = cityDiv.dataset.name;
-        cardColorInput.value = cityDiv.dataset.color;
-        cardInfectionInput.checked = cityDiv.dataset.infection == 'true';
-        cardUpgradeInput.value = cityDiv.dataset.upgrade ? cityDiv.dataset.upgrade : '';
-        saveCards();
-        selectPhase(phaseDiv);
-    } else {
-        putCard(cityDiv, selectedDiv);
-    }
+    putCard(cityDiv, selectedDiv);
 
     if (getAllInfectionPhases().length === 1) {
         nextPhase(false, true);
@@ -298,11 +265,7 @@ function putCard(cityDiv, phaseDiv) {
     var existingCityDiv;
     for(var i = 1; i < phaseDiv.childNodes.length; i++) {
         var thisCityDiv = phaseDiv.childNodes[i];
-        if (cityDiv.dataset.infection < thisCityDiv.dataset.infection) {
-            existingCityDiv = thisCityDiv;
-            break;
-        } else if (cityDiv.dataset.infection > thisCityDiv.dataset.infection) {
-        } else if (cityDiv.dataset.name < thisCityDiv.dataset.name) {
+        if (cityDiv.dataset.name < thisCityDiv.dataset.name) {
             existingCityDiv = thisCityDiv;
             break;
         }
@@ -313,6 +276,24 @@ function putCard(cityDiv, phaseDiv) {
         cityDiv.dataset.deck = phaseDiv.dataset.deck;
         saveCards();
     }
+}
+
+function saveCards() {
+    var cards = getAllPhases()
+        .map(phase => [...phase.childNodes].slice(1))
+        .flat()
+        .map(card => card.dataset)
+        .map(card => {
+            return {
+                deck: getSaveDeck(card.deck),
+                name: card.name,
+                affiliation: card.affiliation,
+                region: card.region,
+                incident: card.incident,
+            };
+        });
+    
+    window.localStorage.setItem('pandemic0/cards', JSON.stringify(cards));
 }
 
 function getSaveDeck(deckName) {
@@ -386,7 +367,7 @@ function recalculateCountdowns() {
         } else {
             totalInfections = totalInfections + 1;
             var firstTurn = Math.ceil(totalInfections / rate);
-            totalInfections = totalInfections + [...phase.childNodes].filter(node => node.dataset.infection == 'true').length - 1;
+            totalInfections = totalInfections + [...phase.childNodes].filter(node => isCountedCard(node.dataset)).length - 1;
             var lastTurn = Math.ceil(totalInfections / rate);
             if (lastTurn < firstTurn) {
                 lastTurn = firstTurn;
@@ -400,12 +381,14 @@ function recalculateCountdowns() {
         }
     });
 
-    var inoculatedCards = inoculatedDiv.childNodes.length - 1;
-    getCountdown(inoculatedDiv).innerHTML = `Inoculated<br/>(${inoculatedCards})`
-
     var zeroCardsInDiscardPile = discardPileDiv.childNodes.length === 1;
     epidemicButton.disabled = zeroCardsInDiscardPile;
     newPhaseButton.disabled = zeroCardsInDiscardPile;
+}
+
+function isCountedCard(card) {
+    return true;
+    // return card.infection == 'true'
 }
 
 function getAllInfectionPhases() {
