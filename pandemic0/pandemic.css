@@ -96,11 +96,6 @@ p.info {
     width: 100%;
 }
 
-span.upgrade {
-    font-size: smaller;
-    font-style: italic;
-}
-
 div.selected {
     background-color: #002000;
 }

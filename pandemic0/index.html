@@ -4,28 +4,30 @@
         <link rel='stylesheet' type='text/css' href='pandemic.css'/>
         <meta charset="utf-8">
         <meta name='viewport' content='width=device-width, height=device-height' />
-        <script src='cities.js'></script>
         <script src='pandemic.js'></script>
     </head>
     <body id="body">
         <div class="input">
-            <label for="pawnColorsInput" class="label">Players:</label>
-            <input id="pawnColorsInput" type="text" value="blue,pink" readonly/>
+            <label for="playersInput" class="label">Players:</label>
+            <input id="playersInput" type="text" value="blue,pink" readonly/>
             <div class="br"></div>
-            <input id="pawnInput1" name="pawnInput" type="checkbox" value="blue" checked/>
-            <label for="pawnInput1" class="label">Blue </label>
-            <input id="pawnInput2" name="pawnInput" type="checkbox" value="brown"/>
-            <label for="pawnInput2" class="label">Brown </label>
-            <input id="pawnInput3" name="pawnInput" type="checkbox" value="pink" checked/>
-            <label for="pawnInput3" class="label">Pink </label>
-            <input id="pawnInput4" name="pawnInput" type="checkbox" value="white"/>
-            <label for="pawnInput4" class="label">White </label>
+            <input id="playerInput1" name="playerInput" type="checkbox" value="blue"/>
+            <label for="playerInput1" class="label">Blue </label>
+            <input id="playerInput2" name="playerInput" type="checkbox" value="brown"/>
+            <label for="playerInput2" class="label">Brown </label>
+            <input id="playerInput3" name="playerInput" type="checkbox" value="pink"/>
+            <label for="playerInput3" class="label">Pink </label>
+            <input id="playerInput4" name="playerInput" type="checkbox" value="white"/>
+            <label for="playerInput4" class="label">White </label>
             <div class="br"></div>
-            <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
-            <label for="cityCardsInput" class="label">city cards</label>
             <div id="newGameButton" class="green button cell" style="position: absolute; right: 10px;">
                 <span>New Game</span>
             </div>
+            <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
+            <label for="cityCardsInput" class="label">city cards</label>
+            <div class="br"></div>
+            <input id="objectiveCardsInput" type="number" min="0" max="9" style="width: 3em;"/>
+            <label for="objectiveCardsInput" class="label">unknown objectives</label>
             <div class="br"></div>
             <input id="resourceCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
             <label for="resourceCardsInput" class="label">resources</label>
@@ -33,11 +35,11 @@
             <input id="fundingCardsInput" type="number" min="0" max="10" style="width: 3em;"/>
             <label for="fundingCardsInput" class="label">funding</label>
             <div class="br"></div>
-            <input id="epidemicCardsInput" type="number" min="5" max="10" style="width: 3em;"/>
-            <label for="epidemicCardsInput" class="label">escalations</label>
+            <input id="escalationCardsInput" type="number" min="5" max="10" style="width: 3em;"/>
+            <label for="escalationCardsInput" class="label">escalations</label>
         </div>
-        <div id="epidemicDiv" class="section">
-            <div id="epidemicButton" class="red epidemic button cell">
+        <div id="escalationDiv" class="section">
+            <div id="escalationButton" class="red epidemic button cell">
                 <span>Escalation!</span>
             </div>
             <div id="newPhaseButton" class="yellow button cell">
@@ -57,18 +59,18 @@
                 <span>Draw extra Player Card</span>
             </div>
             <div class="cell">
-                <span id="playerCardsSpan" style="font-size: larger;">0</span>
+                <span id="playerCardsSpan" style="font-size: larger;"></span>
             </div>
-            <div id="skipEpidemicButton" class="blue button cell">
+            <div id="skipEscalationButton" class="blue button cell">
                 <span>Skip Escalation</span>
             </div>
 
             <p class="info">
                 <span class="label">Escalation </span>
-                <span id="epidemicTurnsOutput" class="value"></span>
+                <span id="escalationTurnsOutput" class="value"></span>
                 <br/>
                 <span class="label">Threat Level: </span>
-                <span id="infectionRateOutput" class="value"></span>
+                <span id="threatLevelOutput" class="value"></span>
             </p>
         </div>
     </body>

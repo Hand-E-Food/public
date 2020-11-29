@@ -1,27 +1,651 @@
-var body;
-var cardStacks;
-var cityCardsInput;
-var currentPawn;
-var discardPileDiv;
-var epidemicButton;
-var epidemicDiv;
-var epidemicCardsInput;
-var epidemicTurnsOutput;
-var fundingCardsInput;
-var infectionRateOutput;
-var infectionRates;
-var newPhaseButton;
-var pawn;
-var pawnColors;
-var pawnColorsInput;
-var playerCardsSpan;
-var resourceCardsInput;
-var selectedDiv;
-
-const deck = {
-    gameEnd: 'Game End',
-    infection: 'Threat',
+const LOCAL_STORAGE_KEY = 'pandemic0';
+const PURPOSE = {
+    DISCARD: 'Discard Pile',
+    GAME_END: 'Game End',
+    THREAT: 'Threat',
 };
+
+class ThreatCard {
+    _affiliation;
+    _deck;
+    deckName;
+    _div;
+    _incident;
+    _name;
+    _region;
+    _span;
+
+    onclick;
+
+    constructor(data) {
+        this._span = document.createElement('span');
+        this._div = document.createElement('div');
+        this._div.classList.add('button');
+        this._div.classList.add('cell');
+        this._div.appendChild(this._span);
+        this._div.onclick = (e) => this.onclick ? this.onclick(e) : true;
+
+        this.affiliation = data.affiliation;
+        this.deckName = data.deck;
+        this.incident = data.incident;
+        this.name = data.name;
+        this.region = data.region;
+    }
+
+    get affiliation() { return this._affiliation; }
+    set affiliation(value) {
+        if (this._affiliation === value) {
+            return;
+        }
+        if (this._affiliation) {
+            this._div.classList.remove(this._affiliation.toLowerCase());
+        }
+        this._affiliation = value;
+        if (this._affiliation) {
+            this._div.classList.add(this._affiliation.toLowerCase());
+        }
+    }
+
+    get deck() { return this._deck; }
+    set deck(value)
+    {
+        if (this._deck === value) {
+            return;
+        }
+        if (this._deck) {
+            this._deck.removeCard(this);
+        }
+        this._deck = value;
+        this.deckName = this._deck.saveName;
+        if (this._deck) {
+            this._deck.addCard(this);
+        }
+    }
+
+    get incident() { return this._incident; }
+    set incident(value) {
+        if (this._incident === value) {
+            return;
+        }
+        this._incident = value;
+    }
+
+    get name() { return this._name; }
+    set name(value) {
+        if (this._name === value) {
+            return;
+        }
+        this._name = value;
+        this.refreshText();
+    }
+
+    get node() { return this._div; }
+
+    get region() { return this._region; }
+    set region(value) {
+        if (this._region === value) {
+            return;
+        }
+        if (this._region) {
+            this._div.classList.remove(this._region.replace(' ', '-').toLowerCase());
+        }
+        this._region = value;
+        if (this._region) {
+            this._div.classList.add(this._region.replace(' ', '-').toLowerCase());
+        }
+    }
+
+    get saveData() {
+        return {
+            affiliation: this.affiliation,
+            deck: this.deckName,
+            incident: this.incident,
+            name: this.name,
+            region: this.region,
+        };
+    }
+
+    refreshText() {
+        while (this._span.firstChild) {
+            this._span.firstChild.remove();
+        }
+        this._span.appendChild(document.createTextNode(this._name));
+    }
+}
+
+class ThreatDeck {
+    _cards = new Array();
+    _displayName;
+    _div;
+    _name;
+    parent = null;
+    purpose;
+    _selected = false;
+    _span;
+
+    onselected = null;
+
+    constructor(purpose) {
+        this._span = document.createElement('span');
+        this._span.innerHTML = purpose;
+    
+        var countdownDiv = document.createElement('div');
+        countdownDiv.classList.add('cell');
+        countdownDiv.appendChild(this._span);
+        countdownDiv.onclick = (e) => this.onselected ? this.onselected() : true;
+    
+        this._div = document.createElement('div');
+        this._div.classList.add('phase');
+        this._div.classList.add('section');
+        this._div.appendChild(countdownDiv);
+
+        this.purpose = purpose;
+    }
+
+    get count() { return this._cards.length; }
+
+    get displayHTML() { return this._span.innerHTML; }
+    set displayHTML(value) { this._span.innerHTML = value; }
+
+    get node() { return this._div; }
+
+    get saveName() {
+        switch(this.purpose) {
+            case PURPOSE.DISCARD:
+            case PURPOSE.GAME_END:
+                return PURPOSE.THREAT;
+            default:
+                return this.purpose;
+        }
+    }
+
+    get selected() { return this._selected; }
+    set selected(value) {
+        if (this._selected === value) {
+            return;
+        }
+        this._selected = value;
+        if (this._selected) {
+            this._div.classList.add('selected');
+        } else {
+            this._div.classList.remove('selected');
+        }
+    }
+
+    addCard(card) {
+        var sibling = null;
+        var i = 0;
+        for (; i < this._cards.length; i++) {
+            var other = this._cards[i];
+            if (card.name < other.name) {
+                sibling = other;
+                break;
+            }
+        }
+
+        this._cards.splice(i, 0, card);
+        if (sibling) {
+            this._div.insertBefore(card.node, sibling.node);
+        } else {
+            this._div.appendChild(card.node);
+        }
+        card.parent = this;
+    }
+
+    removeCard(card) {
+        for (var i = this._cards.length - 1; i >= 0; i--) {``
+            if (this._cards[i] === card) {
+                this._cards.splice(i, 1);
+                break;
+            }
+        }
+        card.node.remove();
+        card.parent = null;
+    }
+}
+
+class ThreatDecks {
+    _decks = new Array();
+    _div;
+    _selectedDeck = null;
+
+    constructor() {
+        this._div = document.createElement('div');
+    }
+
+    get count() { return this._decks.length; }
+
+    get discardPile() { return this._decks.find(deck => deck.purpose === PURPOSE.DISCARD); }
+
+    get drawPile() { return this._decks.filter(deck => deck.purpose === PURPOSE.THREAT); }
+
+    get node() { return this._div; }
+
+    get saveData() {
+        return this._decks.map(deck => deck.saveData);
+    }
+
+    get selectedDeck() { return this._selectedDeck; }
+    set selectedDeck(value) {
+        if (this._selectedDeck === value) {
+            return;
+        }
+        if (this._selectedDeck) {
+            this._selectedDeck.selected = false;
+        }
+        this._selectedDeck = value;
+        if (this._selectedDeck) {
+            this._selectedDeck.selected = true;
+        }
+    }
+
+    startNewGame(cards) {
+        while(this._decks.length > 0) {
+            this.remove(this._decks[0]);
+        }
+
+        [ PURPOSE.DISCARD, PURPOSE.THREAT, PURPOSE.GAME_END ]
+            .forEach(purpose => this.addToBottom(new ThreatDeck(purpose)), this);
+
+        this.selectedDeck = this._decks[0];
+
+        cards.forEach(card => card.deck = this._decks.find(deck => deck.purpose === card.deckName), this);
+    }
+
+    addToBottom(deck) {
+        deck.parent = this;
+        this._decks.push(deck);
+        this._div.appendChild(deck.node);
+        deck.onselected = e => this.selectedDeck = deck;
+    }
+
+    addToTop(deck) {
+        deck.parent = this;
+        this._decks.unshift(deck);
+        this._div.prepend(deck.node);
+        deck.onselected = e => this.selectedDeck = deck;
+    }
+
+    refreshText() {
+        this._decks.forEach(deck => deck.refreshText());
+    }
+
+    remove(deck) {
+        var i = this._decks.indexOf(deck);
+        if (i < 0) {
+            return;
+        }
+        deck.node.remove();
+        this._decks.splice(i, 1);
+        deck.parent = null;
+        delete deck.onselected;
+        if (deck.selected) {
+            this.selectedDeck = null;
+        }
+    }
+}
+
+class PlayerDeck {
+    _cardStacks;
+    _cityCards;
+    _cityCardsInput;
+    _currentPlayer;
+    _escalationCards;
+    _escalationCardsInput;
+    _escalationTurnsOutput;
+    _fundingCards;
+    _fundingCardsInput;
+    _newGameButton;
+    _objectiveCards;
+    _objectiveCardsInput;
+    _pawn;
+    _playerCardsSpan;
+    _playerInputs;
+    _playersInput;
+    _players = new Array();
+    _resourceCards;
+    _resourceCardsInput;
+
+    constructor() {
+        this._cityCardsInput = document.getElementById('cityCardsInput');
+        this._escalationCardsInput = document.getElementById('escalationCardsInput');
+        this._escalationTurnsOutput = document.getElementById('escalationTurnsOutput');
+        this._fundingCardsInput = document.getElementById('fundingCardsInput');
+        this._newGameButton = document.getElementById('newGameButton');
+        this._objectiveCardsInput = document.getElementById('objectiveCardsInput');
+        this._pawn = document.getElementById('pawn');
+        this._playersInput = document.getElementById('playersInput');
+        this._playerCardsSpan = document.getElementById('playerCardsSpan');
+        this._resourceCardsInput = document.getElementById('resourceCardsInput');
+        this._playerInputs = [...document.getElementsByName('playerInput')];
+
+        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput      );
+        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput);
+        this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput   );
+        this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput );
+        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput  );
+        this._playerInputs.forEach(playerInput => playerInput.onchange = e => this.playerInputChanged(playerInput), this);
+    }
+
+    get cityCards() { return this._cityCards; }
+    set cityCards(value) {
+        if (this._cityCards === value) {
+            return;
+        }
+        this._cityCardsInput.value = value;
+        this._cityCards = value;
+    }
+
+    get escalationCards() { return this._escalationCards; }
+    set escalationCards(value) {
+        if (this._escalationCards === value) {
+            return;
+        }
+        this._escalationCardsInput.value = value;
+        this._escalationCards = value;
+    }
+
+    get fundingCards() { return this._fundingCards }
+    set fundingCards(value) {
+        if (this._fundingCards === value) {
+            return;
+        }
+        this._fundingCardsInput.value = value;
+        this._fundingCards = value;
+    }
+
+    get isValid() { return this.startingCards && this.totalCards > 0; }
+
+    get objectiveCards() { return this._objectiveCards }
+    set objectiveCards(value) {
+        if (this._objectiveCards === value) {
+            return;
+        }
+        this._objectiveCardsInput.value = value;
+        this._objectiveCards = value;
+    }
+
+    get players() { return this._players; }
+
+    get resourceCards() { return this._resourceCards }
+    set resourceCards(value) {
+        if (this._resourceCards === value) {
+            return;
+        }
+        this._resourceCardsInput.value = value;
+        this._resourceCards = value;
+    }
+
+    get saveData() {
+        return {
+            players: this._players,
+            cityCards: this.cityCards,
+            objectiveCards: this.objectiveCards,
+            resourceCards: this.resourceCards,
+            fundingCards: this.fundingCards,
+            escalationCards: this.escalationCards,
+        };
+    }
+
+    get startingCards() {
+        switch(this.players.length) {
+            case 2:  return 2 * 4;
+            case 3:  return 3 * 3;
+            case 4:  return 4 * 2;
+            default: return undefined;
+        }
+    }
+
+    get totalCards() {
+        return this.cityCards - this.objectiveCards + this.resourceCards + this.fundingCards - this.startingCards + this.escalationCards;
+    }
+
+    loadFrom(data) {
+        this.cityCards = data.cityCards;
+        this.escalationCards = data.escalationCards;
+        this.fundingCards = data.fundingCards;
+        this.objectiveCards = data.objectiveCards;
+        this.resourceCards = data.resourceCards;
+        this._players = data.players;
+        this.updatePlayersInput();
+    }
+
+    playerInputChanged(playerInput) {
+        if (playerInput.checked) {
+            this.addPlayer(playerInput.value);
+        } else {
+            this.removePlayer(playerInput.value);
+        }
+    }
+
+    addPlayer(color) {
+        this._players.push(color);
+        this.updatePlayersInput();
+    }
+
+    removePlayer(color) {
+        var i = this._players.indexOf(color);
+        if (i < 0) {
+            return;
+        }
+        this._players = this._players.splice(i, 1);
+        this.updatePlayersInput();
+    }
+
+    updatePlayersInput() {
+        this._playersInput.value = this._players.join(',');
+    }
+
+    startNewGame() {
+        this._currentPlayer = 0;
+        this.recalculatePawnColor();
+
+        this._cardStacks = new Array(this.escalationCards);
+        for(var i = 0; i < this.escalationCards; i++) {
+            this._cardStacks[i] = 0;
+        }
+        for (var playerCards = this.totalCards - 1; playerCards >= 0; playerCards--) {
+            this._cardStacks[playerCards % this.escalationCards]++;
+        }
+        this._cardStacks = this._cardStacks.map(cards => ({ cards: cards, escalation: true }));
+
+        this.recalculatePlayerCards();
+        this.recalculateEscalationTurns();
+    }
+
+    nextTurn() {
+        this._currentPlayer = (this._currentPlayer + 1) % this._players.length;
+        this.recalculatePawnColor();
+        this.drawPlayerCards(2);
+    }
+    
+    recalculatePawnColor() {
+        this._pawn.style.fill = this._players[this._currentPlayer];
+    }
+
+    drawPlayerCards(drawCards) {
+        while (drawCards > 0) {
+            var cardStack = this._cardStacks.find(stack => stack.cards > 0);
+            if (!cardStack) { break; }
+            if (cardStack.cards > drawCards) {
+                cardStack.cards = cardStack.cards - drawCards;
+                drawCards = 0;
+            } else {
+                drawCards = drawCards - cardStack.cards;
+                cardStack.cards = 0;
+            }
+        }
+        this.recalculatePlayerCards();
+        this.recalculateEscalationTurns();
+    }
+    
+    recalculatePlayerCards() {
+        var count = 0;
+        this._cardStacks.forEach(stack => count = count + stack.cards);
+        this._playerCardsSpan.innerHTML = `${count} cards`;
+    }
+    
+    nextEscalation() {
+        var cardStack = this._cardStacks.find(stack => stack.escalation);
+        if (!cardStack) {
+            return;
+        }
+        cardStack.escalation = false;
+        this.recalculateEscalationTurns();
+    }
+    
+    recalculateEscalationTurns() {
+        var safeCards = 0;
+        var escalationStack = this._cardStacks.find(stack => {
+            if (stack.escalation) {
+                return true;
+            }
+            safeCards = safeCards + stack.cards;
+            return false;
+        });
+    
+        var firstTurn = Math.ceil((safeCards + 1) / 2);
+        var lastTurn = Math.ceil((safeCards + escalationStack.cards) / 2);
+        this._escalationTurnsOutput.innerHTML
+            = !escalationStack ? 'never again!'
+            : lastTurn < 1     ? 'is late'
+            : lastTurn === 1   ? 'on this turn'
+            : firstTurn === 1  ? 'within ' + lastTurn + ' turns'
+                               : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
+    }
+}
+
+class Game {
+    cards;
+    _drawPlayerCardButton;
+    _escalationButton;
+    _newGameButton;
+    _newPhaseButton;
+    _nextTurnButton;
+    playerDeck = new PlayerDeck();
+    _skipEscalationButton;
+    threatDecks = new ThreatDecks();
+    _threatLevel;
+    _threatLevels;
+    _threatLevelOutput;
+
+    constructor() {
+        this._drawPlayerCardButton = document.getElementById('drawPlayerCardButton')
+        this._escalationButton = document.getElementById('escalationButton');
+        this._newGameButton = document.getElementById('newGameButton');
+        this._newPhaseButton = document.getElementById('newPhaseButton');
+        this._nextTurnButton = document.getElementById('nextTurnButton');
+        this._skipEscalationButton = document.getElementById('skipEscalationButton');
+        this._threatLevelOutput = document.getElementById('threatLevelOutput');
+
+        this._drawPlayerCardButton.onclick = e => this.playerDeck.drawPlayerCards(1);
+        this._escalationButton.onclick = e => this.nextPhase(true, true); //TODO
+        this._newGameButton.onclick = e => this.newGameButtonClicked();
+        this._newPhaseButton.onclick = e => this.nextPhase(false, false); //TODO
+        this._nextTurnButton.onclick = e => this.playerDeck.nextTurn();
+        this._skipEscalationButton.onclick = e => this.playerDeck.nextEscalation();
+
+        const body = document.getElementById('body');
+        body.appendChild(this.threatDecks.node);
+    }
+
+    get saveData() {
+        return {
+            playerDeck: this.playerDeck.saveData,
+            cards: this.cards.map(card => card.saveData),
+        };
+    }
+
+    get threatLevel() { return this._threatLevel; }
+    set threatLevel(value) {
+        if (this._threatLevel === value) {
+            return;
+        }
+        this._threatLevel = value;
+        this._threatLevelOutput.innerHTML = this.threatLevel;
+    }
+
+    loadFrom(data) {
+        this.playerDeck.loadFrom(data.playerDeck);
+        this.cards = data.cards.map(cardData => {
+            const card = new ThreatCard(cardData);
+            card.onclick = e => this.cardClicked(card)
+            return card;
+        }, this);
+    }
+
+    newGameButtonClicked() {
+        if (!this.playerDeck.isValid) {
+            alert('Game settings are invalid.');
+        } else if (confirm('Start a new game?')) {
+            this.startNewGame();
+        }
+    }
+
+    startNewGame() {
+        this.playerDeck.startNewGame();
+        this.threatDecks.startNewGame(this.cards);
+        this._threatLevels = [2, 2, 2, 3, 3, 4];
+        this.threatLevel = this._threatLevels.shift();
+    }
+
+    nextPhase(escalation, accelerate) {
+        if (this.threatDecks.discardPile.count === 0) {
+            return;
+        }
+        if (escalation) {
+            this.playerDeck.nextEscalation();
+        }
+        if (accelerate) {
+            if (this._threatLevels.length > 0) {
+                this.threatLevel = this._threatLevels.shift();
+            }
+        }
+    
+        this.threatDecks.discardPile.purpose = PURPOSE.THREAT;
+        const discardPile = new ThreatDeck(PURPOSE.DISCARD);
+        this.threatDecks.addToTop(discardPile);
+        this.threatDecks.selectedDeck = discardPile;
+
+        this.recalculateCountdowns();
+    }
+    
+    cardClicked(card) {
+        if (card.deck.purpose === PURPOSE.THREAT && card.deck.count === 1) {
+            this.threatDecks.remove(card.deck);
+        }
+        card.deck = this.threatDecks.selectedDeck;
+        this.recalculateCountdowns();
+    }
+
+    recalculateCountdowns() {
+        const discardPile = this.threatDecks.discardPile;
+        discardPile.displayHTML = discardPile.purpose + `<br/>(${discardPile.count})`;
+
+        var totalThreats = 0;
+        this.threatDecks.drawPile.forEach(deck => {
+            totalThreats = totalThreats + 1;
+            var firstTurn = Math.ceil(totalThreats / this.threatLevel);
+            totalThreats = totalThreats + deck.count - 1;
+            var lastTurn = Math.ceil(totalThreats / this.threatLevel);
+            if (lastTurn < firstTurn) {
+                lastTurn = firstTurn;
+            }
+
+            deck.displayHTML = (
+                lastTurn === 1 ? lastTurn + ' turn'
+                : firstTurn === lastTurn ? firstTurn + ' turns'
+                : firstTurn + ' - ' + lastTurn + ' turns'
+                ) + `<br/>(${deck.count})`;
+        });
+
+        var zeroCardsInDiscardPile = this.threatDecks.discardPile.count === 0;
+        escalationButton.disabled = zeroCardsInDiscardPile;
+        newPhaseButton.disabled = zeroCardsInDiscardPile;
+    }
+}
+
+var game;
 
 window.addEventListener("beforeunload", function(e) {
     e.preventDefault();
@@ -30,376 +654,88 @@ window.addEventListener("beforeunload", function(e) {
 
 window.onload = () => {
     window.onload = undefined;
+    game = new Game();
+    loadGame();
+};
 
-    body = document.getElementById('body');
-    cityCardsInput = document.getElementById('cityCardsInput');
-    epidemicButton = document.getElementById('epidemicButton');
-    epidemicDiv = document.getElementById('epidemicDiv');
-    epidemicCardsInput = document.getElementById('epidemicCardsInput');
-    epidemicTurnsOutput = document.getElementById('epidemicTurnsOutput');
-    fundingCardsInput = document.getElementById('fundingCardsInput');
-    infectionRateOutput = document.getElementById('infectionRateOutput');
-    newPhaseButton = document.getElementById('newPhaseButton');
-    pawn = document.getElementById('pawn');
-    pawnColorsInput = document.getElementById('pawnColorsInput');
-    playerCardsSpan = document.getElementById('playerCardsSpan');
-    resourceCardsInput = document.getElementById('resourceCardsInput');
-
-    document.getElementById('drawPlayerCardButton').onclick = e => drawPlayerCards(1);
-    document.getElementById('newGameButton').onclick = e => newGameButtonOnClick();
-    document.getElementById('nextTurnButton').onclick = e => nextTurn();
-    document.getElementById('skipEpidemicButton').onclick = e => nextEpidemic();
-    [...document.getElementsByName('pawnInput')].forEach(pawnInput => pawnInput.onchange = e => setPawn(pawnInput));
-    cityCardsInput.onchange = e => savePlayerDeck();
-    epidemicButton.onclick = e => nextPhase(true, true);
-    epidemicCardsInput.onchange = e => savePlayerDeck();
-    fundingCardsInput.onchange = e => savePlayerDeck();
-    newPhaseButton.onclick = e => nextPhase(false, false);
-    resourceCardsInput.onchange = e => savePlayerDeck();
-
-    cityCardsInput.value = window.localStorage.getItem('pandemic0/cityCards') || defaultCityCards;
-    epidemicCardsInput.value = window.localStorage.getItem('pandemic0/epidemicCards') || defaultEpidemicCards;
-    fundingCardsInput.value = window.localStorage.getItem('pandemic0/fundingCards') || defaultFundingCards;
-    resourceCardsInput.value = window.localStorage.getItem('pandemic0/resourceCards') || defaultResourceCards;
-    
-    startNewGame();
-}
-
-function savePlayerDeck() {
-    window.localStorage.setItem('pandemic0/cityCards', cityCardsInput.value);
-    window.localStorage.setItem('pandemic0/resourceCards', resourceCardsInput.value);
-    window.localStorage.setItem('pandemic0/fundingCards', fundingCardsInput.value);
-    window.localStorage.setItem('pandemic0/epidemicCards', epidemicCardsInput.value);
-}
-
-function setPawn(pawnInput) {
-    var pawnColors = pawnColorsInput.value.split(',');
-    if (pawnInput.checked) {
-        pawnColors.push(pawnInput.value);
-    } else {
-        pawnColors = pawnColors.filter(pawnColor => pawnColor != pawnInput.value);
-    }
-    pawnColorsInput.value = pawnColors.join(',');
-}
-
-function newGameButtonOnClick() {
-    if (confirm('Start a new game?')) {
-        startNewGame();
-    }
-}
-
-function startNewGame() {
-    getAllPhases().forEach(phase => body.removeChild(phase));
-
-    pawnColors = pawnColorsInput.value.split(',');
-    currentPawn = 0;
-    recalculatePawnColor();
-
-    var cityCards = parseInt(cityCardsInput.value);
-    var resourceCards = parseInt(resourceCardsInput.value);
-    var fundingCards = parseInt(fundingCardsInput.value);
-    var epidemicCards = parseInt(epidemicCardsInput.value);
-
-    var startingCards = calculateStartingCards(pawnColors.length);
-    var totalCards = cityCards + resourceCards + fundingCards + epidemicCards - startingCards;
-    cardStacks = new Array(epidemicCards);
-    for(var i = 0; i < epidemicCards; i++) {
-        cardStacks[i] = 0;
-    }
-    for (var playerCards = totalCards - 1; playerCards >= 0; playerCards--) {
-        cardStacks[playerCards % epidemicCards]++;
-    }
-    cardStacks = [0, ...cardStacks].map(cards => ({ cards: cards, epidemic: true }));
-    
-    infectionRates = [2, 2, 2, 3, 3, 4];
-
-    createPhase(deck.gameEnd);
-    discardPileDiv = createPhase(deck.infection);
-
-    var cards = loadCards();
-
-    cards
-        .sort((a, b) => a.name < b.name ? -1 : 1)
-        .forEach(createCard);
-
-    nextPhase(true, true);
-    recalculatePlayerCards();
-    recalculateCountdowns();
-}
-
-function calculateStartingCards(playerCount) {
-    if (playerCount === 2) {
-        return 2 * 4;
-    } else if (playerCount === 3) {
-        return 3 * 3;
-    } else if (playerCount === 4) {
-        return 4 * 2;
-    } else {
-        throw new Error('Invalid number of players.');
-    }
-}
-
-function loadCards() {
-    return defaultCards;
-    var cards = window.localStorage.getItem('pandemic0/cards');
-    if (!cards) {
-        return defaultCards;
-    }
-    try {
-        return JSON.parse(cards);
-    }
-    catch {
-        return defaultCards;
-    }
-}
-
-function nextPhase(epidemic, accelerate) {
-    if (discardPileDiv.querySelector('.button').length === 0) {
-        return;
-    }
-    if (epidemic) {
-        nextEpidemic();
-    }
-
-    if (accelerate) {
-        if (infectionRates.length > 0) {
-            infectionRateOutput.innerHTML = infectionRates.shift();
+function loadGame() {
+    var json = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (json) {
+        try {
+            game.loadFrom(JSON.parse(json));
+            return;
         }
-        recalculateEpidemicTurns();
+        catch { }
     }
 
-    discardPileDiv = createPhase(deck.infection);
-    selectPhase(discardPileDiv);
-    
-    recalculateCountdowns();
-}
-
-function nextEpidemic() {
-    var cardStack = cardStacks.find(stack => stack.epidemic);
-    if (!cardStack) {
-        return;
-    }
-    cardStack.epidemic = false;
-    recalculateEpidemicTurns();
-}
-
-function createPhase(deck) {
-    var countdownSpan = document.createElement('span');
-    countdownSpan.id = 'countdown';
-    countdownSpan.innerHTML = deck;
-
-    var countdownDiv = document.createElement('div');
-    countdownDiv.classList.add('cell');
-    countdownDiv.appendChild(countdownSpan);
-
-    var phaseDiv = document.createElement('div');
-    phaseDiv.classList.add('phase');
-    phaseDiv.classList.add('section');
-    phaseDiv.dataset.deck = deck;
-    phaseDiv.appendChild(countdownDiv);
-
-    countdownDiv.onclick = e => selectPhase(phaseDiv);
-    
-    body.insertBefore(phaseDiv, epidemicDiv.nextSibling);
-
-    return phaseDiv;
-}
-
-function selectPhase(phase) {
-    if (selectedDiv) {
-        selectedDiv.classList.remove('selected');
-    }
-
-    selectedDiv = phase;
-    
-    selectedDiv.classList.add('selected');
-}
-
-function createCard(card) {
-    var cardSpan = document.createElement('span');
-    cardSpan.appendChild(document.createTextNode(card.name));
-
-    var cardDiv = document.createElement('div');
-    cardDiv.dataset.affiliation = card.affiliation;
-    cardDiv.dataset.deck = card.deck;
-    cardDiv.dataset.incident = card.incident;
-    cardDiv.dataset.name = card.name;
-    cardDiv.dataset.region = card.region;
-    cardDiv.classList.add(card.affiliation.toLowerCase());
-    cardDiv.classList.add(card.region.toLowerCase().replace(' ', '-'));
-    cardDiv.classList.add('button');
-    cardDiv.classList.add('cell');
-    cardDiv.appendChild(cardSpan);
-
-    var phaseDiv = getAllPhases().find(phase => phase.dataset.deck === card.deck);
-    if (!phaseDiv) { phaseDiv = discardPileDiv; }
-    putCard(cardDiv, phaseDiv);
-
-    cardDiv.onclick = e => moveCard(cardDiv);
-}
-
-function moveCard(cityDiv) {
-    var phaseDiv = cityDiv.parentNode
-    if (phaseDiv === selectedDiv) {
-        return;
-    }
-
-    phaseDiv.removeChild(cityDiv);
-    if (phaseDiv.dataset.deck === deck.infection
-        && phaseDiv !== discardPileDiv
-        && phaseDiv.childNodes.length === 1
-    ) {
-        phaseDiv.parentNode.removeChild(phaseDiv);
-    }
-    
-    putCard(cityDiv, selectedDiv);
-
-    if (getAllInfectionPhases().length === 1) {
-        nextPhase(false, true);
-    }
-
-    recalculateCountdowns();
-}
-
-function putCard(cityDiv, phaseDiv) {
-    var existingCityDiv;
-    for(var i = 1; i < phaseDiv.childNodes.length; i++) {
-        var thisCityDiv = phaseDiv.childNodes[i];
-        if (cityDiv.dataset.name < thisCityDiv.dataset.name) {
-            existingCityDiv = thisCityDiv;
-            break;
-        }
-    }
-    phaseDiv.insertBefore(cityDiv, existingCityDiv);
-
-    if (cityDiv.dataset.deck !== phaseDiv.dataset.deck) {
-        cityDiv.dataset.deck = phaseDiv.dataset.deck;
-        saveCards();
-    }
-}
-
-function saveCards() {
-    var cards = getAllPhases()
-        .map(phase => [...phase.childNodes].slice(1))
-        .flat()
-        .map(card => card.dataset)
-        .map(card => {
-            return {
-                deck: getSaveDeck(card.deck),
-                name: card.name,
-                affiliation: card.affiliation,
-                region: card.region,
-                incident: card.incident,
-            };
-        });
-    
-    window.localStorage.setItem('pandemic0/cards', JSON.stringify(cards));
-}
-
-function getSaveDeck(deckName) {
-    if (deckName === deck.gameEnd) {
-        return deck.infection;
-    } else {
-        return deckName;
-    }
-}
-
-function nextTurn() {
-    currentPawn = (currentPawn + 1) % pawnColors.length;
-    recalculatePawnColor();
- 
-    drawPlayerCards(2);
-}
-
-function recalculatePawnColor() {
-    pawn.style.fill = pawnColors[currentPawn];
-}
-
-function drawPlayerCards(drawCards) {
-    while (drawCards > 0) {
-        var cardStack = cardStacks.find(stack => stack.cards > 0);
-        if (!cardStack) { break; }
-        if (cardStack.cards > drawCards) {
-            cardStack.cards = cardStack.cards - drawCards;
-            drawCards = 0;
-        } else {
-            drawCards = drawCards - cardStack.cards;
-            cardStack.cards = 0;
-        }
-    }
-    recalculatePlayerCards();
-    recalculateEpidemicTurns();
-}
-
-function recalculatePlayerCards() {
-    var count = 0;
-    cardStacks.forEach(stack => count = count + stack.cards);
-    playerCardsSpan.innerHTML = `${count} cards`;
-}
-
-function recalculateEpidemicTurns() {
-    var safeCards = 0;
-    var epidemicStack = cardStacks.find(stack => {
-        if (stack.epidemic) {
-            return true;
-        }
-        safeCards = safeCards + stack.cards;
-        return false;
+    game.loadFrom({
+        playerDeck: {
+            cityCards: 48,
+            escalationCards: 5,
+            fundingCards: 5,
+            objectiveCards: 1,
+            resourceCards: 0,
+            players: [],
+        },
+        cards: [
+            { deck:'Threat', name:'Algiers'      , affiliation:'Allied' , region:'Africa'       , incident:'Sleeper Cells Activate: North America' },
+            { deck:'Threat', name:'Atlanta'      , affiliation:'Allied' , region:'North America', incident:'Sleeper Cells Activate: Asia' },
+            { deck:'Threat', name:'Baghdad'      , affiliation:'Soviet' , region:'Asia'         , incident:'Sleeper Cells Activate: Pacific Rim' },
+            { deck:'Threat', name:'Bangkok'      , affiliation:'Neutral', region:'Asia'         , incident:'Teams Compromised' },
+            { deck:'Threat', name:'Bogotá'       , affiliation:'Neutral', region:'South America', incident:'Sleeper Cells Activate: North America' },
+            { deck:'Threat', name:'Bombay'       , affiliation:'Neutral', region:'Asia'         , incident:'Sleeper Cells Activate: Pacific Rim' },
+            { deck:'Threat', name:'Buenos Aires' , affiliation:'Neutral', region:'South America', incident:'Recognized: South America, Europe' },
+            { deck:'Threat', name:'Cairo'        , affiliation:'Soviet' , region:'Africa'       , incident:'Sleeper Cells Activate: Europe' },
+            { deck:'Threat', name:'Calcutta'     , affiliation:'Neutral', region:'Asia'         , incident:'Sleeper Cells Activate: Africa' },
+            { deck:'Threat', name:'Delhi'        , affiliation:'Neutral', region:'Asia'         , incident:'Sleeper Cells Activate: Africa' },
+            { deck:'Threat', name:'East Berlin'  , affiliation:'Soviet' , region:'Europe'       , incident:'Sleeper Cells Activate: South America' },
+            { deck:'Threat', name:'Hanoi'        , affiliation:'Soviet' , region:'Asia'         , incident:'Sleeper Cells Activate: South America' },
+            { deck:'Threat', name:'Havana'       , affiliation:'Soviet' , region:'North America', incident:'Safehouse Compromised: Asia' },
+            { deck:'Threat', name:'Istanbul'     , affiliation:'Allied' , region:'Europe'       , incident:'Safehouse Compromised: Africa' },
+            { deck:'Threat', name:'Jakarta'      , affiliation:'Neutral', region:'Pacific Rim'  , incident:'Sleeper Cells Activate: Europe' },
+            { deck:'Threat', name:'Johannesburg' , affiliation:'Allied' , region:'Africa'       , incident:'Safehouse Compromised: South America' },
+            { deck:'Threat', name:'Karachi'      , affiliation:'Neutral', region:'Asia'         , incident:'Sleeper Cells Activate: South America' },
+            { deck:'Threat', name:'Khartoum'     , affiliation:'Neutral', region:'Africa'       , incident:'Sleeper Cells Activate: Asia' },
+            { deck:'Threat', name:'Kiev'         , affiliation:'Neutral', region:'Europe'       , incident:'Safehouse Compromised: Pacific Rim' },
+            { deck:'Threat', name:'Lagos'        , affiliation:'Neutral', region:'Africa'       , incident:'Sleeper Cells Activate: South America' },
+            { deck:'Threat', name:'Leningrad'    , affiliation:'Soviet' , region:'Europe'       , incident:'Teams Compromised' },
+            { deck:'Threat', name:'Leopoldville' , affiliation:'Neutral', region:'Africa'       , incident:'Recognized: Africa, Asia' },
+            { deck:'Threat', name:'Lima'         , affiliation:'Neutral', region:'South America', incident:'Sleeper Cells Activate: Europe' },
+            { deck:'Threat', name:'London'       , affiliation:'Allied' , region:'Europe'       , incident:'Sleeper Cells Activate: Asia' },
+            { deck:'Threat', name:'Los Angeles'  , affiliation:'Allied' , region:'North America', incident:'Sleeper Cells Activate: Europe' },
+            { deck:'Threat', name:'Madrid'       , affiliation:'Neutral', region:'Europe'       , incident:'Sleeper Cells Activate: Pacific Rim' },
+            { deck:'Threat', name:'Manila'       , affiliation:'Neutral', region:'Pacific Rim'  , incident:'Sleeper Cells Activate: Asia' },
+            { deck:'Threat', name:'Mexico City'  , affiliation:'Neutral', region:'North America', incident:'Sleeper Cells Activate: Pacific Rim' },
+            { deck:'Threat', name:'Moscow'       , affiliation:'Soviet' , region:'Europe'       , incident:'Recognized: Europe, Asia' },
+            { deck:'Threat', name:'New York'     , affiliation:'Allied' , region:'North America', incident:'Recognized: North America, South America' },
+            { deck:'Threat', name:'Novosibirisk' , affiliation:'Soviet' , region:'Asia'         , incident:'Sleeper Cells Activate: Europe' },
+            { deck:'Threat', name:'Osaka'        , affiliation:'Neutral', region:'Pacific Rim'  , incident:'Recognized: Pacific Rim, North America' },
+            { deck:'Threat', name:'Paris'        , affiliation:'Allied' , region:'Europe'       , incident:'Sleeper Cells Activate: North America' },
+            { deck:'Threat', name:'Peking'       , affiliation:'Soviet' , region:'Asia'         , incident:'Safehouse Compromised: North America' },
+            { deck:'Threat', name:'Prague'       , affiliation:'Soviet' , region:'Europe'       , incident:'Sleeper Cells Activate: Asia' },
+            { deck:'Threat', name:'Pyongyang'    , affiliation:'Soviet' , region:'Asia'         , incident:'Safehouse Compromised: Europe' },
+            { deck:'Threat', name:'Riyadh'       , affiliation:'Neutral', region:'Asia'         , incident:'Sleeper Cells Activate: North America' },
+            { deck:'Threat', name:'Rome'         , affiliation:'Allied' , region:'Europe'       , incident:'Sleeper Cells Activate: Africa' },
+            { deck:'Threat', name:'Saigon'       , affiliation:'Allied' , region:'Asia'         , incident:'Recognized: Asia, Pacific Rim' },
+            { deck:'Threat', name:'San Francisco', affiliation:'Allied' , region:'North America', incident:'Sleeper Cells Activate: South America' },
+            { deck:'Threat', name:'Santiago'     , affiliation:'Neutral', region:'South America', incident:'Sleeper Cells Activate: Africa' },
+            { deck:'Threat', name:'São Paulo'    , affiliation:'Neutral', region:'South America', incident:'Teams Compromised' },
+            { deck:'Threat', name:'Shanghai'     , affiliation:'Soviet' , region:'Asia'         , incident:'Teams Compromised' },
+            { deck:'Threat', name:'Sydney'       , affiliation:'Allied' , region:'Pacific Rim'  , incident:'Teams Compromised' },
+            { deck:'Threat', name:'Tokyo'        , affiliation:'Neutral', region:'Pacific Rim'  , incident:'Sleeper Cells Activate: North America' },
+            { deck:'Threat', name:'Toronto'      , affiliation:'Allied' , region:'North America', incident:'Sleeper Cells Activate: Africa' },
+            { deck:'Threat', name:'Warsaw'       , affiliation:'Soviet' , region:'Europe'       , incident:'Sleeper Cells Activate: Pacific Rim' },
+            { deck:'Threat', name:'Washington'   , affiliation:'Allied' , region:'North America', incident:'Teams Compromised' },
+        ],
     });
-
-    var firstTurn = Math.ceil((safeCards + 1) / 2);
-    var lastTurn = Math.ceil((safeCards + epidemicStack.cards) / 2);
-    epidemicTurnsOutput.innerHTML
-        = !epidemicStack  ? 'never again!'
-        : lastTurn < 1    ? 'is late'
-        : lastTurn === 1  ? 'on this turn'
-        : firstTurn === 1 ? 'within ' + lastTurn + ' turns'
-                          : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
+    saveGame();
 }
 
-function recalculateCountdowns() {
-    var totalInfections = 0;
-    var rate = parseInt(infectionRateOutput.innerHTML);
-    getAllInfectionPhases().forEach(phase => {
-        var cardCount = phase.childNodes.length - 1;
-        if (phase === discardPileDiv) {
-            getCountdown(phase).innerHTML = `Dicard Pile<br/>(${cardCount})`;
-        } else {
-            totalInfections = totalInfections + 1;
-            var firstTurn = Math.ceil(totalInfections / rate);
-            totalInfections = totalInfections + [...phase.childNodes].filter(node => isCountedCard(node.dataset)).length - 1;
-            var lastTurn = Math.ceil(totalInfections / rate);
-            if (lastTurn < firstTurn) {
-                lastTurn = firstTurn;
-            }
-
-            getCountdown(phase).innerHTML = (
-                  lastTurn === 1 ? lastTurn + ' turn'
-                : firstTurn === lastTurn ? firstTurn + ' turns'
-                : firstTurn + ' - ' + lastTurn + ' turns'
-                ) + `<br/>(${cardCount})`;
-        }
-    });
-
-    var zeroCardsInDiscardPile = discardPileDiv.childNodes.length === 1;
-    epidemicButton.disabled = zeroCardsInDiscardPile;
-    newPhaseButton.disabled = zeroCardsInDiscardPile;
+function resetGame() {
+    window.localStorage.removeItem(LOCAL_STORAGE_KEY);
+    loadGame();
 }
 
-function isCountedCard(card) {
-    return true;
-    // return card.infection == 'true'
-}
-
-function getAllInfectionPhases() {
-    return getAllPhases()
-        .filter(phase => phase.dataset.deck === deck.infection);
-}
-
-function getAllPhases() {
-    return [...document.getElementsByClassName('phase')];
-}
-
-function getCountdown(phase) {
-    return phase.firstChild.firstChild;
+function saveGame() {
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(game.saveData));
 }
