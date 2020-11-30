@@ -75,7 +75,7 @@ input[type="text"] {
     text-align: left;
 }
 
-.epidemic {
+.escalation {
     color: #FF0000;
     font-weight: bold;
 }
@@ -152,7 +152,7 @@ div.yellow {
 }
 
 div.allied {
-    color: #8888FF
+    color: #7799FF
 }
 
 div.neutral {

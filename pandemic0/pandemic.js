@@ -115,37 +115,54 @@ class ThreatCard {
 
 class ThreatDeck {
     _cards = new Array();
+    _countNode;
     _displayName;
     _div;
+    _heading;
+    _headingNode;
     _name;
     parent = null;
     purpose;
     _selected = false;
-    _span;
 
     onselected = null;
 
     constructor(purpose) {
-        this._span = document.createElement('span');
-        this._span.innerHTML = purpose;
-    
-        var countdownDiv = document.createElement('div');
-        countdownDiv.classList.add('cell');
-        countdownDiv.appendChild(this._span);
-        countdownDiv.onclick = (e) => this.onselected ? this.onselected() : true;
+        this._headingNode = document.createElement('span');
+
+        this._countNode = document.createElement('span');
+        this._countNode.style.fontSize = 'smaller';
+
+        var titleSpan = document.createElement('span');
+        titleSpan.appendChild(this._headingNode);
+        titleSpan.appendChild(document.createElement('br'));
+        titleSpan.appendChild(this._countNode);
+
+        var titleDiv = document.createElement('div');
+        titleDiv.classList.add('cell');
+        titleDiv.appendChild(titleSpan);
+        titleDiv.onclick = (e) => this.onselected ? this.onselected() : true;
     
         this._div = document.createElement('div');
         this._div.classList.add('phase');
         this._div.classList.add('section');
-        this._div.appendChild(countdownDiv);
+        this._div.appendChild(titleDiv);
 
         this.purpose = purpose;
+        this.heading = purpose;
+        this.updateCount();
     }
 
     get count() { return this._cards.length; }
 
-    get displayHTML() { return this._span.innerHTML; }
-    set displayHTML(value) { this._span.innerHTML = value; }
+    get heading() { return this._heading; }
+    set heading(value) {
+        if (this._heading === value) {
+            return;
+        }
+        this._heading = value;
+        this._headingNode.innerHTML = value;
+    }
 
     get node() { return this._div; }
 
@@ -190,6 +207,7 @@ class ThreatDeck {
             this._div.appendChild(card.node);
         }
         card.parent = this;
+        this.updateCount();
     }
 
     removeCard(card) {
@@ -201,6 +219,11 @@ class ThreatDeck {
         }
         card.node.remove();
         card.parent = null;
+        this.updateCount();
+    }
+
+    updateCount() {
+        this._countNode.innerHTML = `(${this.count})`;
     }
 }
 
@@ -378,7 +401,6 @@ class PlayerDeck {
 
     get saveData() {
         return {
-            players: this._players,
             cityCards: this.cityCards,
             objectiveCards: this.objectiveCards,
             resourceCards: this.resourceCards,
@@ -406,7 +428,8 @@ class PlayerDeck {
         this.fundingCards = data.fundingCards;
         this.objectiveCards = data.objectiveCards;
         this.resourceCards = data.resourceCards;
-        this._players = data.players;
+        this._players = new Array();
+        this._playerInputs.forEach(playerInput => playerInput.checked = false);
         this.updatePlayersInput();
     }
 
@@ -615,13 +638,11 @@ class Game {
             this.threatDecks.remove(card.deck);
         }
         card.deck = this.threatDecks.selectedDeck;
+        saveGame();
         this.recalculateCountdowns();
     }
 
     recalculateCountdowns() {
-        const discardPile = this.threatDecks.discardPile;
-        discardPile.displayHTML = discardPile.purpose + `<br/>(${discardPile.count})`;
-
         var totalThreats = 0;
         this.threatDecks.drawPile.forEach(deck => {
             totalThreats = totalThreats + 1;
@@ -632,11 +653,10 @@ class Game {
                 lastTurn = firstTurn;
             }
 
-            deck.displayHTML = (
-                lastTurn === 1 ? lastTurn + ' turn'
+            deck.heading
+                = lastTurn === 1 ? lastTurn + ' turn'
                 : firstTurn === lastTurn ? firstTurn + ' turns'
-                : firstTurn + ' - ' + lastTurn + ' turns'
-                ) + `<br/>(${deck.count})`;
+                : firstTurn + ' - ' + lastTurn + ' turns';
         });
 
         var zeroCardsInDiscardPile = this.threatDecks.discardPile.count === 0;
