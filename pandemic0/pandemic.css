@@ -163,6 +163,12 @@ div.soviet {
     color: #FF8888;
 }
 
+div.infection {
+    background-color: #114411;
+    border-color: #33AA33;
+    color: #88FF88;
+}
+
 div.north-america {
     background-color: #221133;
     border-color: #993366;

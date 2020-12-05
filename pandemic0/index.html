@@ -7,9 +7,9 @@
         <script src='pandemic.js'></script>
     </head>
     <body id="body">
-        <div class="input">
+        <div id="playerDeckDiv" class="input">
             <label for="playersInput" class="label">Players:</label>
-            <input id="playersInput" type="text" value="blue,pink" readonly/>
+            <input id="playersInput" type="text" readonly/>
             <div class="br"></div>
             <input id="playerInput1" name="playerInput" type="checkbox" value="blue"/>
             <label for="playerInput1" class="label">Blue </label>
@@ -20,14 +20,14 @@
             <input id="playerInput4" name="playerInput" type="checkbox" value="white"/>
             <label for="playerInput4" class="label">White </label>
             <div class="br"></div>
-            <div id="newGameButton" class="green button cell" style="position: absolute; right: 10px; top: 185px">
+            <div id="newGameButton" class="green cell" style="position: absolute; right: 10px; top: 185px">
                 <span>New Game</span>
             </div>
             <input id="cityCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
             <label for="cityCardsInput" class="label">city cards</label>
             <div class="br"></div>
             <input id="objectiveCardsInput" type="number" min="0" max="9" style="width: 3em;"/>
-            <label for="objectiveCardsInput" class="label">unknown objectives</label>
+            <label for="objectiveCardsInput" class="label">objective cards</label>
             <div class="br"></div>
             <input id="resourceCardsInput" type="number" min="0" max="99" style="width: 3em;"/>
             <label for="resourceCardsInput" class="label">resources</label>
@@ -39,13 +39,13 @@
             <label for="escalationCardsInput" class="label">escalations</label>
         </div>
         <div id="escalationDiv" class="section">
-            <div id="escalationButton" class="red escalation button cell">
+            <div id="escalationButton" class="red escalation cell">
                 <span>Escalation!</span>
             </div>
-            <div id="newPhaseButton" class="yellow button cell">
+            <div id="newPhaseButton" class="yellow cell">
                 <span>New Phase</span>
             </div>
-            <div id="nextTurnButton" class="green button cell">
+            <div id="nextTurnButton" class="green cell">
                 <span>
                     Next Turn
                     <br/>
@@ -55,13 +55,13 @@
                     </svg>
                 </span>
             </div>
-            <div id="drawPlayerCardButton" class="blue button cell">
+            <div id="drawPlayerCardButton" class="blue cell">
                 <span>Draw extra Player Card</span>
             </div>
             <div class="cell">
                 <span id="playerCardsSpan" style="font-size: larger;"></span>
             </div>
-            <div id="skipEscalationButton" class="blue button cell">
+            <div id="skipEscalationButton" class="blue cell">
                 <span>Skip Escalation</span>
             </div>
 

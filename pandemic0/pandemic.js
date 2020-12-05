@@ -1,5 +1,6 @@
 const LOCAL_STORAGE_KEY = 'pandemic0';
 const PURPOSE = {
+    DESTROYED: 'Destroyed',
     DISCARD: 'Discard Pile',
     GAME_END: 'Game End',
     THREAT: 'Threat',
@@ -144,8 +145,7 @@ class ThreatDeck {
         titleDiv.onclick = (e) => this.onselected ? this.onselected() : true;
     
         this._div = document.createElement('div');
-        this._div.classList.add('phase');
-        this._div.classList.add('section');
+        this._div.classList.add('phase', 'section');
         this._div.appendChild(titleDiv);
 
         this.purpose = purpose;
@@ -197,6 +197,10 @@ class ThreatDeck {
             if (card.name < other.name) {
                 sibling = other;
                 break;
+            } else if (card.name > other.name) {
+            } else if (card.incident && !other.incident) {
+                sibling = other;
+                break;
             }
         }
 
@@ -244,10 +248,6 @@ class ThreatDecks {
 
     get node() { return this._div; }
 
-    get saveData() {
-        return this._decks.map(deck => deck.saveData);
-    }
-
     get selectedDeck() { return this._selectedDeck; }
     set selectedDeck(value) {
         if (this._selectedDeck === value) {
@@ -267,7 +267,7 @@ class ThreatDecks {
             this.remove(this._decks[0]);
         }
 
-        [ PURPOSE.DISCARD, PURPOSE.THREAT, PURPOSE.GAME_END ]
+        [ PURPOSE.DISCARD, PURPOSE.THREAT, PURPOSE.GAME_END, PURPOSE.DESTROYED ]
             .forEach(purpose => this.addToBottom(new ThreatDeck(purpose)), this);
 
         this.selectedDeck = this._decks[0];
@@ -308,6 +308,65 @@ class ThreatDecks {
     }
 }
 
+class AddCardPanel {
+    _div;
+    _name = '';
+    _nameInput;
+
+    onAddCard;
+    
+    constructor() {
+        this._nameInput = document.createElement('input');
+        this._nameInput.id = 'addCardNameInput';
+        this._nameInput.type = 'text';
+        this._nameInput.onchange = e => this._name = this._nameInput.value;
+        
+        const nameLabel = document.createElement('label');
+        nameLabel.for = this._nameInput.id;
+        nameLabel.classList.add('label');
+        nameLabel.appendChild(document.createTextNode('Name: '));
+
+        const addCardSpan = document.createElement('span');
+        addCardSpan.appendChild(document.createTextNode('Add Card'));
+
+        const addCardDiv = document.createElement('div');
+        addCardDiv.classList.add('green', 'cell');
+        addCardDiv.style.float = 'right';
+        addCardDiv.appendChild(addCardSpan);
+        addCardDiv.onclick = e => this.addCard();
+
+        this._div = document.createElement('div');
+        this._div.classList.add('input');
+        this._div.appendChild(nameLabel);
+        this._div.appendChild(this._nameInput);
+        this._div.appendChild(document.createElement('br'));
+        this._div.appendChild(addCardDiv);
+    }
+
+    get name() { return this._name; }
+    set name(value) {
+        if (this._name === value) {
+            return;
+        }
+        this._name = value;
+        this._nameInput.value = value;
+    }
+
+    get node() { return this._div; }
+
+    addCard() {
+        if (!this.name || !this.onAddCard) {
+            return;
+        }
+        const card = new ThreatCard({
+            name: this.name,
+            affiliation: 'Infection',
+        });
+        this.onAddCard(card);
+        this.name = '';
+    }
+}
+
 class PlayerDeck {
     _cardStacks;
     _cityCards;
@@ -342,11 +401,11 @@ class PlayerDeck {
         this._resourceCardsInput = document.getElementById('resourceCardsInput');
         this._playerInputs = [...document.getElementsByName('playerInput')];
 
-        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput      );
-        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput);
-        this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput   );
-        this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput );
-        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput  );
+        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput.value      );
+        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput.value);
+        this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput.value   );
+        this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput.value );
+        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput.value  );
         this._playerInputs.forEach(playerInput => playerInput.onchange = e => this.playerInputChanged(playerInput), this);
     }
 
@@ -539,13 +598,16 @@ class PlayerDeck {
 }
 
 class Game {
+    addCardPanel = new AddCardPanel();
     cards;
     _drawPlayerCardButton;
     _escalationButton;
+    _escalationDiv;
     _newGameButton;
     _newPhaseButton;
     _nextTurnButton;
     playerDeck = new PlayerDeck();
+    _playerDeckDiv;
     _skipEscalationButton;
     threatDecks = new ThreatDecks();
     _threatLevel;
@@ -555,12 +617,15 @@ class Game {
     constructor() {
         this._drawPlayerCardButton = document.getElementById('drawPlayerCardButton')
         this._escalationButton = document.getElementById('escalationButton');
+        this._escalationDiv = document.getElementById('escalationDiv');
         this._newGameButton = document.getElementById('newGameButton');
         this._newPhaseButton = document.getElementById('newPhaseButton');
         this._nextTurnButton = document.getElementById('nextTurnButton');
+        this._playerDeckDiv = document.getElementById('playerDeckDiv');
         this._skipEscalationButton = document.getElementById('skipEscalationButton');
         this._threatLevelOutput = document.getElementById('threatLevelOutput');
 
+        this.addCardPanel.onAddCard = card => this.addCard(card);
         this._drawPlayerCardButton.onclick = e => this.playerDeck.drawPlayerCards(1);
         this._escalationButton.onclick = e => this.nextPhase(true, true); //TODO
         this._newGameButton.onclick = e => this.newGameButtonClicked();
@@ -568,14 +633,13 @@ class Game {
         this._nextTurnButton.onclick = e => this.playerDeck.nextTurn();
         this._skipEscalationButton.onclick = e => this.playerDeck.nextEscalation();
 
-        const body = document.getElementById('body');
-        body.appendChild(this.threatDecks.node);
+        this._escalationDiv.remove();
     }
 
     get saveData() {
         return {
-            playerDeck: this.playerDeck.saveData,
             cards: this.cards.map(card => card.saveData),
+            playerDeck: this.playerDeck.saveData,
         };
     }
 
@@ -597,19 +661,32 @@ class Game {
         }, this);
     }
 
+    addCard(card) {
+        card.onclick = e => this.cardClicked(card)
+        this.cards.push(card);
+        card.deck = this.threatDecks.selectedDeck;
+        saveGame();
+    }
+
     newGameButtonClicked() {
-        if (!this.playerDeck.isValid) {
-            alert('Game settings are invalid.');
-        } else if (confirm('Start a new game?')) {
-            this.startNewGame();
-        }
+        this.startNewGame();
     }
 
     startNewGame() {
+        if (!this.playerDeck.isValid) {
+            alert('Game settings are invalid.');
+        }
+
         this.playerDeck.startNewGame();
         this.threatDecks.startNewGame(this.cards);
         this._threatLevels = [2, 2, 2, 3, 3, 4];
         this.threatLevel = this._threatLevels.shift();
+
+        const body = document.getElementById('body');
+        body.appendChild(this._escalationDiv);
+        body.appendChild(this.threatDecks.node);
+        body.appendChild(this.addCardPanel.node);
+        this._playerDeckDiv.remove();
     }
 
     nextPhase(escalation, accelerate) {
@@ -689,14 +766,6 @@ function loadGame() {
     }
 
     game.loadFrom({
-        playerDeck: {
-            cityCards: 48,
-            escalationCards: 5,
-            fundingCards: 5,
-            objectiveCards: 1,
-            resourceCards: 0,
-            players: [],
-        },
         cards: [
             { deck:'Threat', name:'Algiers'      , affiliation:'Allied' , region:'Africa'       , incident:'Sleeper Cells Activate: North America' },
             { deck:'Threat', name:'Atlanta'      , affiliation:'Allied' , region:'North America', incident:'Sleeper Cells Activate: Asia' },
@@ -747,13 +816,20 @@ function loadGame() {
             { deck:'Threat', name:'Warsaw'       , affiliation:'Soviet' , region:'Europe'       , incident:'Sleeper Cells Activate: Pacific Rim' },
             { deck:'Threat', name:'Washington'   , affiliation:'Allied' , region:'North America', incident:'Teams Compromised' },
         ],
+        playerDeck: {
+            cityCards: 48,
+            escalationCards: 5,
+            fundingCards: 5,
+            objectiveCards: 1,
+            resourceCards: 0,
+        },
     });
     saveGame();
 }
 
 function resetGame() {
     window.localStorage.removeItem(LOCAL_STORAGE_KEY);
-    loadGame();
+    location.reload();
 }
 
 function saveGame() {
