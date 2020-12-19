@@ -99,11 +99,23 @@ class ThreatCard {
     get saveData() {
         return {
             affiliation: this.affiliation,
-            deck: this.deckName,
+            deck: this.saveDeckName,
             incident: this.incident,
             name: this.name,
             region: this.region,
         };
+    }
+
+    get saveDeckName() {
+        if (!this.deck) { return this.deckName; }
+        switch(this.deck.purpose) {
+            case PURPOSE.DISCARD:
+            case PURPOSE.THREAT:
+            case PURPOSE.GAME_END:
+                return this.affiliation === 'Infection' ? PURPOSE.DISCARD : PURPOSE.THREAT;
+            default:
+                return this.deck.purpose;
+        }
     }
 
     refreshText() {
@@ -165,16 +177,6 @@ class ThreatDeck {
     }
 
     get node() { return this._div; }
-
-    get saveName() {
-        switch(this.purpose) {
-            case PURPOSE.DISCARD:
-            case PURPOSE.GAME_END:
-                return PURPOSE.THREAT;
-            default:
-                return this.purpose;
-        }
-    }
 
     get selected() { return this._selected; }
     set selected(value) {
@@ -675,6 +677,7 @@ class Game {
     startNewGame() {
         if (!this.playerDeck.isValid) {
             alert('Game settings are invalid.');
+            return;
         }
 
         this.playerDeck.startNewGame();
