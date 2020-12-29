@@ -24,42 +24,58 @@ const ICON = {
 };
 
 const SUBURBS = [
+    // Falls catchment
     'Asandale',
     'Barrish',
+    'Falls',
+    'Falls',
+    'Gallant',
+    'Kingside',
+    'Kingside',
+    'Kingside',
+    // Diamond catchment
     'Cadbridge',
     'Diamond',
     'Diamond',
     'East Diamond',
-    'Falls',
-    'Falls',
-    'Gallant',
     'Houston',
     'Ington',
     'Ington',
     'Ington',
     'Jewel Beach',
-    'Kingside',
-    'Kingside',
-    'Kingside',
-    'Lower Rilden',
-    'Lower Rilden',
-    'Metro Centre',
-    'Metro Centre',
-    'Metro Centre',
     'North Tuskan',
     'North Tuskan',
     'Port Pelican',
+    'Upper Zenith',
+    'Zenith',
+    // Xenia catchment
+    'Lower Rilden',
+    'Lower Rilden',
+    'Metro Centre',
+    'Metro Centre',
+    'Metro Centre',
     'Queenside',
     'Rilden Park',
     'Rilden Park',
     'Soulville',
     'Tuskan',
-    'Upper Zenith',
     'West Xenia',
     'Xenia',
     'Xenia',
     'Yellowmoose',
-    'Zenith',
+    // 48 cards
+    //'Asandale',
+    //'East Diamond',
+    //'Falls',
+    //'Jewel Beach',
+    //'Metro Centre',
+    //'North Tuskan',
+    //'Queenside',
+    //'Tuskan',
+    //'Upper Zenith',
+    //'West Xenia',
+    //'Xenia',
+    //'Zenith',
 ];
 
 class Button {
@@ -97,21 +113,23 @@ class Card {
 }
 
 class Deck {
-    _cards = [];
-    _cardsNode;
+    _deckCards = [];
+    _drawnCards = [];
+    _drawnCardsNode;
     drawCount = 1;
     _cardCountTextNode;
     _node;
 
-    get cards() { return this._cards; }
+    get cards() { return this._deckCards; }
     set cards(value) {
-        this._cards = value;
-        this._cardCountTextNode.nodeValue = value.length;
+        this._deckCards = value;
+        this._clearDrawnCards();
+        this._refreshCount();
     }
 
     get node() { return this._node; }
 
-    constructor(title) {
+    constructor(title, canRecycle) {
         let titleSpan = document.createElement('span');
         titleSpan.appendChild(document.createTextNode(title));
 
@@ -119,8 +137,8 @@ class Deck {
         titleDiv.classList.add('cell', 'title');
         titleDiv.appendChild(titleSpan);
 
-        let button = new Button(`Draw card`);
-        button.onclick = (e) => this.drawCards(this.drawCount); 
+        let drawCardButton = new Button('Draw');
+        drawCardButton.onclick = (e) => this.drawCards(this.drawCount); 
 
         this._cardCountTextNode = document.createTextNode('0');
 
@@ -133,39 +151,67 @@ class Deck {
 
         let controls = document.createElement('div');
         controls.classList.add('game');
-        controls.appendChild(button.node);
+        controls.appendChild(drawCardButton.node);
         controls.appendChild(cardCountDiv);
 
-        this._cardsNode = document.createElement('div');
+        this._drawnCardsNode = document.createElement('div');
 
         this._node = document.createElement('div');
         this._node.classList.add('deck');
         this._node.appendChild(titleDiv);
         this._node.appendChild(controls);
-        this._node.appendChild(this._cardsNode);
+
+        if (canRecycle) {
+            let recycleDeckButton = new Button('Recycle');
+            recycleDeckButton.onclick = (e) => this.recycleDeck();
+            this._node.appendChild(recycleDeckButton.node);
+        }
+
+        this._node.appendChild(this._drawnCardsNode);
     }
 
     drawCards(count) {
         if (count <= 0) {
             return;
         }
-        if (this._cards.length === 0) {
+        if (this._deckCards.length === 0) {
             alert('Deck is empty.');
             return;
         }
-        if (count > this._cards.length) {
-            count = this._cards.length;
+        if (count > this._deckCards.length) {
+            count = this._deckCards.length;
         }
 
         while (count > 0) {
             count--;
-            let card = this._cards.shift();
-            this._cardsNode.insertBefore(card.node, this._cardsNode.firstChild);
+            let card = this._deckCards.shift();
+            this._drawnCards.push(card);
+            this._drawnCardsNode.insertBefore(card.node, this._drawnCardsNode.firstChild);
         }
-        this._cardCountTextNode.nodeValue = this._cards.length;
+        this._refreshCount();
 
         let line = new HorizontalLine();
-        this._cardsNode.insertBefore(line.node, this._cardsNode.firstChild);
+        this._drawnCardsNode.insertBefore(line.node, this._drawnCardsNode.firstChild);
+    }
+
+    recycleDeck() {
+        this._deckCards = [ this._deckCards, this._drawnCards ]
+            .flat()
+            .shuffle();
+
+        this._clearDrawnCards();
+        this._refreshCount();
+    }
+
+    _clearDrawnCards() {
+        this._drawnCards = [];
+        while (this._drawnCardsNode.firstChild) {
+            this._drawnCardsNode.firstChild.remove();
+        }
+    }
+
+    _refreshCount() {
+        this._cardCountTextNode.nodeValue = this._deckCards.length;
     }
 }
 
@@ -176,7 +222,7 @@ class Game {
 
     constructor() {
 
-        let evacueeDeck = new Deck('Evacuee');
+        let evacueeDeck = new Deck('Evacuee', true);
         evacueeDeck.cards = this._generateEvacueeCards();
 
         let dangerDeck = new Deck('Danger');
@@ -224,10 +270,10 @@ class Game {
     }
 
     _generateCards(type, ...actions) {
-        const count = SUBURBS.length / actions.length;
+        const COUNT = SUBURBS.length / actions.length;
         
         actions = actions
-            .map(action => new Array(count).fill(action))
+            .map(action => new Array(COUNT).fill(action))
             .flat()
             .shuffle();
 
