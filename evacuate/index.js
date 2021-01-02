@@ -14,68 +14,46 @@ Array.prototype.shuffle = function() {
     return this;
 }
 
-const ICON = {
-    AMBULANCE: '🟥',
-    BOOST: '➕',
-    CARD: '🃏',
-    EVACUEE: '🚘',
-    FIRE: '🟡',
-    POLICE: '🔷',
-};
-
 const SUBURBS = [
     // Falls catchment
     'Asandale',
+    'Asandale',
+    'Barrish',
     'Barrish',
     'Falls',
-    'Falls',
     'Gallant',
-    'Kingside',
     'Kingside',
     'Kingside',
     // Diamond catchment
     'Cadbridge',
     'Diamond',
-    'Diamond',
+    'East Diamond',
     'East Diamond',
     'Houston',
-    'Ington',
-    'Ington',
-    'Ington',
+    'Irvington',
+    'Irvington',
     'Jewel Beach',
     'North Tuskan',
     'North Tuskan',
     'Port Pelican',
     'Upper Zenith',
+    'Upper Zenith',
     'Zenith',
-    // Xenia catchment
+    // Xavier catchment
     'Lower Rilden',
     'Lower Rilden',
-    'Metro Centre',
-    'Metro Centre',
-    'Metro Centre',
+    'Metro Central',
+    'Metro Central',
+    'Metro Central',
     'Queenside',
     'Rilden Park',
     'Rilden Park',
     'Soulville',
     'Tuskan',
-    'West Xenia',
-    'Xenia',
-    'Xenia',
+    'West Xavier',
+    'Xavier',
+    'Xavier',
     'Yellowmoose',
-    // 48 cards
-    //'Asandale',
-    //'East Diamond',
-    //'Falls',
-    //'Jewel Beach',
-    //'Metro Centre',
-    //'North Tuskan',
-    //'Queenside',
-    //'Tuskan',
-    //'Upper Zenith',
-    //'West Xenia',
-    //'Xenia',
-    //'Zenith',
 ];
 
 class Button {
@@ -129,7 +107,7 @@ class Deck {
 
     get node() { return this._node; }
 
-    constructor(title, canRecycle) {
+    constructor(title) {
         let titleSpan = document.createElement('span');
         titleSpan.appendChild(document.createTextNode(title));
 
@@ -160,13 +138,6 @@ class Deck {
         this._node.classList.add('deck');
         this._node.appendChild(titleDiv);
         this._node.appendChild(controls);
-
-        if (canRecycle) {
-            let recycleDeckButton = new Button('Recycle');
-            recycleDeckButton.onclick = (e) => this.recycleDeck();
-            this._node.appendChild(recycleDeckButton.node);
-        }
-
         this._node.appendChild(this._drawnCardsNode);
     }
 
@@ -194,15 +165,6 @@ class Deck {
         this._drawnCardsNode.insertBefore(line.node, this._drawnCardsNode.firstChild);
     }
 
-    recycleDeck() {
-        this._deckCards = [ this._deckCards, this._drawnCards ]
-            .flat()
-            .shuffle();
-
-        this._clearDrawnCards();
-        this._refreshCount();
-    }
-
     _clearDrawnCards() {
         this._drawnCards = [];
         while (this._drawnCardsNode.firstChild) {
@@ -222,46 +184,37 @@ class Game {
 
     constructor() {
 
-        let evacueeDeck = new Deck('Evacuee', true);
-        evacueeDeck.cards = this._generateEvacueeCards();
+        let emergencyDeck = new Deck('Emergency');
+        emergencyDeck.cards = this._generateEmergencyCards();
+        emergencyDeck.drawCount = 3;
 
-        let dangerDeck = new Deck('Danger');
-        dangerDeck.cards = this._generateDangerCards();
-        dangerDeck.drawCount = 3;
+        let evacueeDeck = new Deck('Evacuee');
+        evacueeDeck.cards = this._generateEvacueeCards();
 
         this._node = document.createElement('div');
         this._node.classList.add('game');
+        this._node.appendChild(emergencyDeck.node);
         this._node.appendChild(evacueeDeck.node);
-        this._node.appendChild(dangerDeck.node);
     }
 
     _generateEvacueeCards() {
-        return this._generateCards('evacuee',
-            ICON.EVACUEE,
-        ).shuffle();
+        return [
+            this._generateCards('evacuee', '🚘').shuffle(),
+            this._generateCards('evacuee', '🚘').shuffle()
+        ].flat();
     }
 
-    _generateDangerCards() {
+    _generateEmergencyCards() {
         let decks = [
-            this._generateCards('danger1',
-                ICON.AMBULANCE,
-                ICON.FIRE,
-                ICON.POLICE,
-            ).divide(3),
-            this._generateCards('danger2',
-                ICON.AMBULANCE + ICON.FIRE,
-                ICON.AMBULANCE + ICON.POLICE,
-                ICON.FIRE      + ICON.POLICE,
-                ICON.BOOST     + ICON.AMBULANCE,
-                ICON.BOOST     + ICON.FIRE,
-                ICON.BOOST     + ICON.POLICE,
-            ).divide(3),
+            this._generateCards('emergency1', '🎲').divide(6),
+            this._generateCards('emergency2', '🎲🎲').divide(6),
         ];
 
         decks = [
-            [ decks[0][0], decks[0][1] ],
-            [ decks[0][2], decks[1][0] ],
-            [ decks[1][1], decks[1][2] ],
+            [ decks[0].pop(), decks[0].pop(), decks[0].pop() ],
+            [ decks[0].pop(), decks[0].pop(), decks[1].pop() ],
+            [ decks[0].pop(), decks[1].pop(), decks[1].pop() ],
+            [ decks[1].pop(), decks[1].pop(), decks[1].pop() ],
         ];
 
         return decks
@@ -269,16 +222,9 @@ class Game {
             .flat();
     }
 
-    _generateCards(type, ...actions) {
-        const COUNT = SUBURBS.length / actions.length;
-        
-        actions = actions
-            .map(action => new Array(COUNT).fill(action))
-            .flat()
-            .shuffle();
-
+    _generateCards(type, action) {
         return SUBURBS
-            .map(suburb => new Card(suburb, actions.shift(), type))
+            .map(suburb => new Card(suburb, action, type))
             .shuffle();
     }
 }
