@@ -61,6 +61,7 @@ const INITIAL_GAME = {
 const LOCAL_STORAGE_KEY = 'pandemic0';
 
 const PURPOSE = {
+    DELETED: 'Deleted',
     DESTROYED: 'Destroyed',
     DISCARD: 'Discard Pile',
     GAME_END: 'Game End',
@@ -130,6 +131,8 @@ class ThreatCard {
             case PURPOSE.THREAT:
             case PURPOSE.GAME_END:
                 return this.affiliation === 'Infection' ? PURPOSE.DISCARD : PURPOSE.THREAT;
+            case PURPOSE.DELETED:
+                return null;
             default:
                 return this.deck.purpose;
         }
@@ -330,7 +333,7 @@ class ThreatDecks {
             this.remove(this._decks[0]);
         }
 
-        [ PURPOSE.DISCARD, PURPOSE.THREAT, PURPOSE.GAME_END, PURPOSE.DESTROYED ]
+        [ PURPOSE.DISCARD, PURPOSE.THREAT, PURPOSE.GAME_END, PURPOSE.DESTROYED, PURPOSE.DELETED ]
             .forEach(purpose => this._addToBottom(new ThreatDeck(purpose)), this);
 
         this.selectedDeck = this._decks[0];
@@ -697,7 +700,7 @@ class Game {
 
     get saveData() {
         return {
-            cards: this._cards.map(card => card.saveData),
+            cards: this._cards.filter(card => card.deckName).map(card => card.saveData),
             playerDeck: this._playerDeck.saveData,
         };
     }
@@ -774,9 +777,9 @@ class Game {
         if (card.deck.purpose === PURPOSE.THREAT && card.deck.count === 1) {
             this._threatDecks.remove(card.deck);
         }
-        let oldDeck = card.saveDeckName;
+        let oldDeckName = card.deckName;
         card.deck = this._threatDecks.selectedDeck;
-        if (oldDeck !== card.saveDeckName) {
+        if (oldDeckName !== card.deckName) {
             saveGame();
         }
         this._recalculateCountdowns();
@@ -823,20 +826,24 @@ function loadGame() {
     if (json) {
         try {
             game.loadFrom(JSON.parse(json));
+            console.log('Game loaded.');
             return;
         }
         catch { }
     }
 
     game.loadFrom(INITIAL_GAME);
+    console.log('New campaign started.');
     saveGame();
 }
 
 function resetGame() {
     window.localStorage.removeItem(LOCAL_STORAGE_KEY);
+    console.log('Game reset.');
     location.reload();
 }
 
 function saveGame() {
     window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(game.saveData));
+    console.log('Game saved.');
 }
