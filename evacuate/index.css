@@ -39,14 +39,20 @@ div.cell {
     margin: 1px;
 }
 
-div.title {
-    font-size: calc(var(--screen-width) * 0.08);
-    margin-bottom: 10px;
-}
-
 div.cell>span {
     margin: 0px;
     text-align: center;
+}
+
+div.title {
+    font-size: calc(var(--screen-width) * 0.07);
+    margin-bottom: 10px;
+}
+
+div.title>span {
+    margin: 0px;
+    text-align: left;
+    width: 100%;
 }
 
 div.button {

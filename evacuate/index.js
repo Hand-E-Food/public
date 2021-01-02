@@ -62,9 +62,14 @@ class Button {
 
     get node() { return this._node; }
 
+    get text() { return this._textNode.nodeValue; }
+    set text(value) { this._textNode.nodeValue = value; }
+
     constructor(text) {
+        this._textNode = document.createTextNode(text);
+
         let span = document.createElement('span');
-        span.appendChild(document.createTextNode(text));
+        span.appendChild(this._textNode);
         this._node = document.createElement('div');
         this._node.classList.add('cell', 'button');
         this._node.appendChild(span);
@@ -92,11 +97,15 @@ class Card {
 
 class Deck {
     _deckCards = [];
+    _drawCardsButton;
+    _drawCount;
     _drawnCards = [];
     _drawnCardsNode;
-    drawCount = 1;
     _cardCountTextNode;
+    _isSeparatorQueued = false;
     _node;
+
+    onCardsDrawn;
 
     get cards() { return this._deckCards; }
     set cards(value) {
@@ -105,18 +114,27 @@ class Deck {
         this._refreshCount();
     }
 
+    get drawCount() { return this._drawCount; }
+    set drawCount(value) {
+        if (this._drawCount === value) {
+            return;
+        }
+        this._drawCount = value;
+        this._drawCardButton.text = `Draw ${value}`;
+    }
+
     get node() { return this._node; }
 
-    constructor(title) {
+    constructor(innerHTML) {
         let titleSpan = document.createElement('span');
-        titleSpan.appendChild(document.createTextNode(title));
+        titleSpan.innerHTML = innerHTML;
 
         let titleDiv = document.createElement('div');
         titleDiv.classList.add('cell', 'title');
         titleDiv.appendChild(titleSpan);
 
-        let drawCardButton = new Button('Draw');
-        drawCardButton.onclick = (e) => this.drawCards(this.drawCount); 
+        this._drawCardButton = new Button('Draw');
+        this._drawCardButton.onclick = (e) => this.drawCards(this.drawCount); 
 
         this._cardCountTextNode = document.createTextNode('0');
 
@@ -129,7 +147,7 @@ class Deck {
 
         let controls = document.createElement('div');
         controls.classList.add('game');
-        controls.appendChild(drawCardButton.node);
+        controls.appendChild(this._drawCardButton.node);
         controls.appendChild(cardCountDiv);
 
         this._drawnCardsNode = document.createElement('div');
@@ -139,6 +157,12 @@ class Deck {
         this._node.appendChild(titleDiv);
         this._node.appendChild(controls);
         this._node.appendChild(this._drawnCardsNode);
+
+        this.drawCount = 1;
+    }
+
+    addSeparator() {
+        this._isSeparatorQueued = !this._isSeparatorLast;
     }
 
     drawCards(count) {
@@ -153,6 +177,14 @@ class Deck {
             count = this._deckCards.length;
         }
 
+        if (this._isSeparatorQueued) {
+            if (this._drawnCardsNode.firstChild) {
+                let line = new HorizontalLine();
+                this._drawnCardsNode.insertBefore(line.node, this._drawnCardsNode.firstChild);
+            }
+            this._isSeparatorQueued = false;
+        }
+
         while (count > 0) {
             count--;
             let card = this._deckCards.shift();
@@ -161,8 +193,9 @@ class Deck {
         }
         this._refreshCount();
 
-        let line = new HorizontalLine();
-        this._drawnCardsNode.insertBefore(line.node, this._drawnCardsNode.firstChild);
+        if (this.onCardsDrawn) {
+            this.onCardsDrawn();
+        }
     }
 
     _clearDrawnCards() {
@@ -184,12 +217,17 @@ class Game {
 
     constructor() {
 
-        let emergencyDeck = new Deck('Emergency');
+        let emergencyDeck = new Deck('1. Respond</p>2. Emergency');
         emergencyDeck.cards = this._generateEmergencyCards();
         emergencyDeck.drawCount = 3;
 
-        let evacueeDeck = new Deck('Evacuee');
+        let evacueeDeck = new Deck('3. Evacuate</p>4. Evacuees');
         evacueeDeck.cards = this._generateEvacueeCards();
+
+        emergencyDeck.onCardsDrawn = () => {
+            emergencyDeck.addSeparator();
+            evacueeDeck.addSeparator();
+        }
 
         this._node = document.createElement('div');
         this._node.classList.add('game');
