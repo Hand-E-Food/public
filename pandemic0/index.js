@@ -68,28 +68,51 @@ const PURPOSE = {
     THREAT: 'Threat',
 };
 
+class Cell {
+    _node;
+    _span;
+
+    onClick;
+
+    get classList() { return this._node.classList; }
+
+    get innerHTML() { return this._span.innerHTML; }
+    set innerHTML(value) { this._span.innerHTML = value; }
+
+    get node() { return this._node; }
+
+    constructor(innerHTML, ...classList) {
+        this._span = document.createElement('span');
+        this._span.innerHTML = innerHTML;
+
+        this._node = document.createElement('div');
+        this._node.classList.add('cell', ...classList);
+        this._node.appendChild(this._span);
+        this._node.onclick = e => this.onClick ? this.onClick(e) : true;
+    }
+
+    appendChild(newChild) {
+        this._span.appendChild(newChild);
+    }
+}
+
 class ThreatCard {
     _affiliation;
+    _cell;
     _deck;
     _deckName;
-    _div;
     _incident;
     _name;
     _region;
-    _span;
 
-    onclick;
+    onClick;
 
     constructor(data) {
-        this._span = document.createElement('span');
-        this._div = document.createElement('div');
-        this._div.classList.add('button');
-        this._div.classList.add('cell');
-        this._div.appendChild(this._span);
-        this._div.onclick = (e) => this.onclick ? this.onclick(e) : true;
+        this._cell = new Cell();
+        this._cell.onClick = e => this.onClick ? this.onClick(e) : true;
 
         this.affiliation = data.affiliation;
-        this._deckName = data.deck;
+        this.deckName = data.deck;
         this.incident = data.incident;
         this.name = data.name;
         this.region = data.region;
@@ -101,11 +124,11 @@ class ThreatCard {
             return;
         }
         if (this._affiliation) {
-            this._div.classList.remove(this._affiliation.toLowerCase());
+            this._cell.classList.remove(this._affiliation.toLowerCase());
         }
         this._affiliation = value;
         if (this._affiliation) {
-            this._div.classList.add(this._affiliation.toLowerCase());
+            this._cell.classList.add(this._affiliation.toLowerCase());
         }
     }
 
@@ -153,10 +176,10 @@ class ThreatCard {
             return;
         }
         this._name = value;
-        this._refreshText();
+        this._cell.innerHTML = this._name;
     }
 
-    get node() { return this._div; }
+    get node() { return this._cell.node; }
 
     get region() { return this._region; }
     set region(value) {
@@ -164,11 +187,11 @@ class ThreatCard {
             return;
         }
         if (this._region) {
-            this._div.classList.remove(this._region.replace(' ', '-').toLowerCase());
+            this._cell.classList.remove(this._region.replace(' ', '-').toLowerCase());
         }
         this._region = value;
         if (this._region) {
-            this._div.classList.add(this._region.replace(' ', '-').toLowerCase());
+            this._cell.classList.add(this._region.replace(' ', '-').toLowerCase());
         }
     }
 
@@ -180,13 +203,6 @@ class ThreatCard {
             name: this.name,
             region: this.region,
         };
-    }
-
-    _refreshText() {
-        while (this._span.firstChild) {
-            this._span.firstChild.remove();
-        }
-        this._span.appendChild(document.createTextNode(this._name));
     }
 }
 
@@ -218,7 +234,7 @@ class ThreatDeck {
         let titleDiv = document.createElement('div');
         titleDiv.classList.add('cell');
         titleDiv.appendChild(titleSpan);
-        titleDiv.onclick = (e) => this.onSelected ? this.onSelected() : true;
+        titleDiv.onclick = e => this.onSelected ? this.onSelected() : true;
     
         this._div = document.createElement('div');
         this._div.classList.add('phase', 'section');
@@ -584,17 +600,87 @@ class PlayerDeck {
     _escalationTurnsOutput;
     _node;
     _pawn;
+    _playerCardCountCell;
     players;
-    _playerCardsSpan;
+    _threatLevel;
+    _threatLevelOutput;
     totalCards;
+
+    onNextPhase;
 
     get node() { return this._node; }
 
+    get threatLevel() { return this._threatLevel; }
+    set threatLevel(value) {
+        if (this._threatLevel === value) {
+            return;
+        }
+        this._threatLevel = value;
+        this._threatLevelOutput.innerHTML = value;
+    }
+
     constructor() {
-        this._escalationTurnsOutput = document.getElementById('escalationTurnsOutput');
-        this._node = document.getElementById('playerDeck');
-        this._pawn = document.getElementById('pawn');
-        this._playerCardsSpan = document.getElementById('playerCardsSpan');
+        let createLabel = function(text) {
+            let label = document.createElement('span');
+            label.classList.add('label');
+            label.appendChild(document.createTextNode(text));
+            return label;
+        };
+        let createValue = function() {
+            let value = document.createElement('span');
+            value.classList.add('value');
+            return value;
+        };
+
+        let escalationButton = new Cell('Escalation!', 'red', 'escalation');
+        escalationButton.onClick = e => this.onNextPhase ? this.onNextPhase(true, true) : true;
+
+        let newPhaseButton = new Cell('New Phase', 'yellow');
+        newPhaseButton.onClick = e => this.onNextPhase ? this.onNextPhase(false, false) : true;
+
+        this._pawn = document.createElement('svg');
+        this._pawn.setAttribute('viewbox', '0 0 4 4');
+        this._pawn.setAttribute('fill', 'white');
+        this._pawn.setAttribute('stroke', 'transparent');
+        this._pawn.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        this._pawn.innerHTML =
+            '<path d="M1 4 L2 0 L3 4 Z"/>'+
+            '<circle cx="2" cy="1" r="1"/>';
+
+        let nextTurnButton = new Cell('Next Turn', 'green');
+        nextTurnButton.appendChild(document.createElement('br'));
+        nextTurnButton.appendChild(this._pawn);
+        nextTurnButton.onClick = e => this.nextTurn();
+
+        let drawPlayerCardButton = new Cell('Draw extra player card', 'blue');
+        drawPlayerCardButton.onClick = e => this.drawPlayerCards(1);
+
+        this._playerCardCountCell = new Cell('0');
+
+        let skipEscalationButton = new Cell('Skip Escalation', 'blue');
+        skipEscalationButton.onClick = e => this.nextEscalation();
+
+        this._escalationTurnsOutput = createValue();
+        this._threatLevelOutput = createValue();
+        this.threatLevel = 2;
+
+        let escalationInfoNode = document.createElement('p');
+        escalationInfoNode.classList.add('info');
+        escalationInfoNode.appendChild(createLabel('Escalation '));
+        escalationInfoNode.appendChild(this._escalationTurnsOutput);
+        escalationInfoNode.appendChild(document.createElement('br'));
+        escalationInfoNode.appendChild(createLabel('Threat Level: '));
+        escalationInfoNode.appendChild(this._threatLevelOutput);
+
+        this._node = document.createElement('div');
+        this._node.classList.add('section');
+        this._node.appendChild(escalationButton.node);
+        this._node.appendChild(newPhaseButton.node);
+        this._node.appendChild(nextTurnButton.node);
+        this._node.appendChild(drawPlayerCardButton.node);
+        this._node.appendChild(this._playerCardCountCell.node);
+        this._node.appendChild(skipEscalationButton.node);
+        this._node.appendChild(escalationInfoNode);
     }
 
     startNewGame() {
@@ -643,7 +729,7 @@ class PlayerDeck {
     _recalculatePlayerCards() {
         let count = 0;
         this._cardStacks.forEach(stack => count = count + stack.cards);
-        this._playerCardsSpan.innerHTML = `${count} cards`;
+        this._playerCardCountCell.innerHTML = `${count} cards`;
     }
     
     nextEscalation() {
@@ -693,7 +779,6 @@ class Game {
     _threatDecks = new ThreatDecks();
     _threatLevel;
     _threatLevels;
-    _threatLevelOutput;
 
     constructor() {
         this._drawPlayerCardButton = document.getElementById('drawPlayerCardButton')
@@ -705,14 +790,8 @@ class Game {
         this._threatLevelOutput = document.getElementById('threatLevelOutput');
 
         this._addCardPanel.onAddCard = card => this._addCard(card);
-        this._drawPlayerCardButton.onclick = e => this._playerDeck.drawPlayerCards(1);
-        this._escalationButton.onclick = e => this._nextPhase(true, true);
         this._newGameButton.onclick = e => this._newGameButtonClicked();
-        this._newPhaseButton.onclick = e => this._nextPhase(false, false);
-        this._nextTurnButton.onclick = e => this._playerDeck.nextTurn();
-        this._skipEscalationButton.onclick = e => this._playerDeck.nextEscalation();
-
-        this._playerDeck.node.remove();
+        this._playerDeck.onNextPhase = (escalation, accelerate) => this._nextPhase(escalation, accelerate);
     }
 
     get saveData() {
@@ -728,20 +807,20 @@ class Game {
             return;
         }
         this._threatLevel = value;
-        this._threatLevelOutput.innerHTML = this.threatLevel;
+        this._playerDeck.threatLevel = this.threatLevel;
     }
 
     loadFrom(data) {
         this._setupPanel.loadFrom(data.playerDeck);
         this._cards = data.cards.map(cardData => {
             const card = new ThreatCard(cardData);
-            card.onclick = e => this._cardClicked(card)
+            card.onClick = e => this._cardClicked(card)
             return card;
         }, this);
     }
 
     _addCard(card) {
-        card.onclick = e => this._cardClicked(card)
+        card.onClick = e => this._cardClicked(card)
         this._cards.push(card);
         card.deck = this._threatDecks.selectedDeck;
         saveGame();
@@ -823,10 +902,6 @@ class Game {
                 : firstTurn === lastTurn ? firstTurn + ' turns'
                 : firstTurn + ' - ' + lastTurn + ' turns';
         });
-
-        let zeroCardsInDiscardPile = this._threatDecks.discardPile.count === 0;
-        this._escalationButton.disabled = zeroCardsInDiscardPile;
-        this._newPhaseButton.disabled = zeroCardsInDiscardPile;
     }
 }
 
