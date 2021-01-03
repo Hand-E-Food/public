@@ -429,47 +429,22 @@ class AddCardPanel {
     }
 }
 
-class PlayerDeck {
-    _cardStacks;
+class SetupPanel {
     _cityCards;
     _cityCardsInput;
-    _currentPlayer;
     _escalationCards;
     _escalationCardsInput;
-    _escalationTurnsOutput;
     _fundingCards;
     _fundingCardsInput;
     _newGameButton;
+    _node;
     _objectiveCards;
     _objectiveCardsInput;
-    _pawn;
-    _playerCardsSpan;
     _playerInputs;
-    _playersInput;
     _players = new Array();
+    _playersInput;
     _resourceCards;
     _resourceCardsInput;
-
-    constructor() {
-        this._cityCardsInput = document.getElementById('cityCardsInput');
-        this._escalationCardsInput = document.getElementById('escalationCardsInput');
-        this._escalationTurnsOutput = document.getElementById('escalationTurnsOutput');
-        this._fundingCardsInput = document.getElementById('fundingCardsInput');
-        this._newGameButton = document.getElementById('newGameButton');
-        this._objectiveCardsInput = document.getElementById('objectiveCardsInput');
-        this._pawn = document.getElementById('pawn');
-        this._playersInput = document.getElementById('playersInput');
-        this._playerCardsSpan = document.getElementById('playerCardsSpan');
-        this._resourceCardsInput = document.getElementById('resourceCardsInput');
-        this._playerInputs = [...document.getElementsByName('playerInput')];
-
-        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput.value      );
-        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput.value);
-        this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput.value   );
-        this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput.value );
-        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput.value  );
-        this._playerInputs.forEach(playerInput => playerInput.onchange = e => this._playerInputChanged(playerInput), this);
-    }
 
     get cityCards() { return this._cityCards; }
     set cityCards(value) {
@@ -499,6 +474,8 @@ class PlayerDeck {
     }
 
     get isValid() { return this.startingCards && this.totalCards > 0; }
+
+    get node() { return this._node; }
 
     get objectiveCards() { return this._objectiveCards }
     set objectiveCards(value) {
@@ -543,6 +520,25 @@ class PlayerDeck {
         return this.cityCards - this.objectiveCards + this.resourceCards + this.fundingCards - this.startingCards + this.escalationCards;
     }
 
+    constructor() {
+        this._cityCardsInput = document.getElementById('cityCardsInput');
+        this._escalationCardsInput = document.getElementById('escalationCardsInput');
+        this._fundingCardsInput = document.getElementById('fundingCardsInput');
+        this._node = document.getElementById('setupPanel');
+        this._objectiveCardsInput = document.getElementById('objectiveCardsInput');
+        this._playersInput = document.getElementById('playersInput');
+        this._resourceCardsInput = document.getElementById('resourceCardsInput');
+        this._playerInputs = [...document.getElementsByName('playerInput')];
+
+        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput.value      );
+        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput.value);
+        this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput.value   );
+        this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput.value );
+        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput.value  );
+        this._playerInputs.forEach(playerInput => playerInput.onchange = e => this._playerInputChanged(playerInput), this);
+        this._newGameButton = document.getElementById('newGameButton');
+    }
+
     loadFrom(data) {
         this.cityCards = data.cityCards;
         this.escalationCards = data.escalationCards;
@@ -579,6 +575,27 @@ class PlayerDeck {
     _updatePlayersInput() {
         this._playersInput.value = this._players.join(',');
     }
+}
+
+class PlayerDeck {
+    _cardStacks;
+    _currentPlayer;
+    escalationCards;
+    _escalationTurnsOutput;
+    _node;
+    _pawn;
+    players;
+    _playerCardsSpan;
+    totalCards;
+
+    get node() { return this._node; }
+
+    constructor() {
+        this._escalationTurnsOutput = document.getElementById('escalationTurnsOutput');
+        this._node = document.getElementById('playerDeck');
+        this._pawn = document.getElementById('pawn');
+        this._playerCardsSpan = document.getElementById('playerCardsSpan');
+    }
 
     startNewGame() {
         this._currentPlayer = 0;
@@ -598,13 +615,13 @@ class PlayerDeck {
     }
 
     nextTurn() {
-        this._currentPlayer = (this._currentPlayer + 1) % this._players.length;
+        this._currentPlayer = (this._currentPlayer + 1) % this.players.length;
         this._recalculatePawnColor();
         this.drawPlayerCards(2);
     }
     
     _recalculatePawnColor() {
-        this._pawn.style.fill = this._players[this._currentPlayer];
+        this._pawn.style.fill = this.players[this._currentPlayer];
     }
 
     drawPlayerCards(drawCards) {
@@ -648,14 +665,17 @@ class PlayerDeck {
             return false;
         });
     
-        let firstTurn = Math.ceil((safeCards + 1) / 2);
-        let lastTurn = Math.ceil((safeCards + escalationStack.cards) / 2);
-        this._escalationTurnsOutput.innerHTML
-            = !escalationStack ? 'never again!'
-            : lastTurn < 1     ? 'is late'
-            : lastTurn === 1   ? 'on this turn'
-            : firstTurn === 1  ? 'within ' + lastTurn + ' turns'
-                               : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
+        if (escalationStack) {
+            let firstTurn = Math.ceil((safeCards + 1) / 2);
+            let lastTurn = Math.ceil((safeCards + escalationStack.cards) / 2);
+            this._escalationTurnsOutput.innerHTML
+                = lastTurn < 1     ? 'is late'
+                : lastTurn === 1   ? 'on this turn'
+                : firstTurn === 1  ? 'within ' + lastTurn + ' turns'
+                                : 'in ' + firstTurn + ' to ' + lastTurn + ' turns';
+        } else {
+            this._escalationTurnsOutput.innerHTML = 'never again!'
+        }
     }
 }
 
@@ -664,12 +684,11 @@ class Game {
     _cards;
     _drawPlayerCardButton;
     _escalationButton;
-    _escalationDiv;
     _newGameButton;
     _newPhaseButton;
     _nextTurnButton;
     _playerDeck = new PlayerDeck();
-    _playerDeckDiv;
+    _setupPanel = new SetupPanel();
     _skipEscalationButton;
     _threatDecks = new ThreatDecks();
     _threatLevel;
@@ -679,11 +698,9 @@ class Game {
     constructor() {
         this._drawPlayerCardButton = document.getElementById('drawPlayerCardButton')
         this._escalationButton = document.getElementById('escalationButton');
-        this._escalationDiv = document.getElementById('escalationDiv');
         this._newGameButton = document.getElementById('newGameButton');
         this._newPhaseButton = document.getElementById('newPhaseButton');
         this._nextTurnButton = document.getElementById('nextTurnButton');
-        this._playerDeckDiv = document.getElementById('playerDeckDiv');
         this._skipEscalationButton = document.getElementById('skipEscalationButton');
         this._threatLevelOutput = document.getElementById('threatLevelOutput');
 
@@ -695,13 +712,13 @@ class Game {
         this._nextTurnButton.onclick = e => this._playerDeck.nextTurn();
         this._skipEscalationButton.onclick = e => this._playerDeck.nextEscalation();
 
-        this._escalationDiv.remove();
+        this._playerDeck.node.remove();
     }
 
     get saveData() {
         return {
             cards: this._cards.filter(card => card.deckName).map(card => card.saveData),
-            playerDeck: this._playerDeck.saveData,
+            playerDeck: this._setupPanel.saveData,
         };
     }
 
@@ -715,7 +732,7 @@ class Game {
     }
 
     loadFrom(data) {
-        this._playerDeck.loadFrom(data.playerDeck);
+        this._setupPanel.loadFrom(data.playerDeck);
         this._cards = data.cards.map(cardData => {
             const card = new ThreatCard(cardData);
             card.onclick = e => this._cardClicked(card)
@@ -735,21 +752,26 @@ class Game {
     }
 
     startNewGame() {
-        if (!this._playerDeck.isValid) {
+        if (!this._setupPanel.isValid) {
             alert('Game settings are invalid.');
             return;
         }
 
+        this._playerDeck.escalationCards = this._setupPanel.escalationCards;
+        this._playerDeck.players = this._setupPanel.players;
+        this._playerDeck.totalCards = this._setupPanel.totalCards;
         this._playerDeck.startNewGame();
         this._threatDecks.startNewGame(this._cards);
         this._threatLevels = [2, 2, 2, 3, 3, 4];
         this.threatLevel = this._threatLevels.shift();
         this._recalculateCountdowns();
 
-        document.body.appendChild(this._escalationDiv);
+        document.body.appendChild(this._playerDeck.node);
         document.body.appendChild(this._threatDecks.node);
         document.body.appendChild(this._addCardPanel.node);
-        this._playerDeckDiv.remove();
+        this._setupPanel.node.remove();
+
+        saveGame();
     }
 
     _nextPhase(escalation, accelerate) {
