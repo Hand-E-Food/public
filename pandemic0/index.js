@@ -620,16 +620,37 @@ class PlayerDeck {
     }
 
     constructor() {
+
         let createLabel = function(text) {
             let label = document.createElement('span');
             label.classList.add('label');
             label.appendChild(document.createTextNode(text));
             return label;
         };
+
         let createValue = function() {
             let value = document.createElement('span');
             value.classList.add('value');
             return value;
+        };
+
+        let createPawnSvg = function() {
+            let head = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            head.setAttribute('cx', 2);
+            head.setAttribute('cy', 1);
+            head.setAttribute('r' , 1);
+
+            let body = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            body.setAttribute('d', 'M1 4 L2 0 L3 4 Z');
+
+            let pawn = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            pawn.classList.add('pawn');
+            pawn.setAttribute('viewBox', '0 0 4 4');
+            pawn.setAttribute('fill', 'white');
+            pawn.setAttribute('stroke', 'transparent');
+            pawn.appendChild(body);
+            pawn.appendChild(head);
+            return pawn;
         };
 
         let escalationButton = new Cell('Escalation!', 'red', 'escalation');
@@ -638,27 +659,20 @@ class PlayerDeck {
         let newPhaseButton = new Cell('New Phase', 'yellow');
         newPhaseButton.onClick = e => this.onNextPhase ? this.onNextPhase(false, false) : true;
 
-        this._pawn = document.createElement('svg');
-        this._pawn.setAttribute('viewbox', '0 0 4 4');
-        this._pawn.setAttribute('fill', 'white');
-        this._pawn.setAttribute('stroke', 'transparent');
-        this._pawn.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        this._pawn.innerHTML =
-            '<path d="M1 4 L2 0 L3 4 Z"/>'+
-            '<circle cx="2" cy="1" r="1"/>';
+        this._pawn = createPawnSvg();
 
         let nextTurnButton = new Cell('Next Turn', 'green');
         nextTurnButton.appendChild(document.createElement('br'));
         nextTurnButton.appendChild(this._pawn);
         nextTurnButton.onClick = e => this.nextTurn();
 
-        let drawPlayerCardButton = new Cell('Draw extra player card', 'blue');
-        drawPlayerCardButton.onClick = e => this.drawPlayerCards(1);
+        let skipEscalationButton = new Cell('Skip Escalation', 'blue');
+        skipEscalationButton.onClick = e => this.nextEscalation();
 
         this._playerCardCountCell = new Cell('0');
 
-        let skipEscalationButton = new Cell('Skip Escalation', 'blue');
-        skipEscalationButton.onClick = e => this.nextEscalation();
+        let drawPlayerCardButton = new Cell('Draw extra player card', 'blue');
+        drawPlayerCardButton.onClick = e => this.drawPlayerCards(1);
 
         this._escalationTurnsOutput = createValue();
         this._threatLevelOutput = createValue();
@@ -677,9 +691,9 @@ class PlayerDeck {
         this._node.appendChild(escalationButton.node);
         this._node.appendChild(newPhaseButton.node);
         this._node.appendChild(nextTurnButton.node);
-        this._node.appendChild(drawPlayerCardButton.node);
-        this._node.appendChild(this._playerCardCountCell.node);
         this._node.appendChild(skipEscalationButton.node);
+        this._node.appendChild(this._playerCardCountCell.node);
+        this._node.appendChild(drawPlayerCardButton.node);
         this._node.appendChild(escalationInfoNode);
     }
 

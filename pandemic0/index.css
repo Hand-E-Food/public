@@ -199,7 +199,7 @@ div.pacific-rim {
     border-color: #996633;
 }
 
-svg#pawn {
+svg.pawn {
     display: inline-block;
     height: 20pt;
     vertical-align: middle;
