@@ -50,11 +50,9 @@ const INITIAL_GAME = {
         { deck:'Threat', name:'Washington'   , affiliation:'Allied' , region:'North America', incident:'Teams Compromised' },
     ],
     playerDeck: {
-        cityCards: 48,
-        escalationCards: 5,
         fundingCards: 5,
         objectiveCards: 1,
-        resourceCards: 0,
+        satelliteCards: 0,
     },
 };
 
@@ -446,10 +444,6 @@ class AddCardPanel {
 }
 
 class SetupPanel {
-    _cityCards;
-    _cityCardsInput;
-    _escalationCards;
-    _escalationCardsInput;
     _fundingCards;
     _fundingCardsInput;
     _newGameButton;
@@ -459,26 +453,10 @@ class SetupPanel {
     _playerInputs;
     _players = new Array();
     _playersInput;
-    _resourceCards;
-    _resourceCardsInput;
+    _satelliteCards;
+    _satelliteCardsInput;
 
-    get cityCards() { return this._cityCards; }
-    set cityCards(value) {
-        if (this._cityCards === value) {
-            return;
-        }
-        this._cityCardsInput.value = value;
-        this._cityCards = value;
-    }
-
-    get escalationCards() { return this._escalationCards; }
-    set escalationCards(value) {
-        if (this._escalationCards === value) {
-            return;
-        }
-        this._escalationCardsInput.value = value;
-        this._escalationCards = value;
-    }
+    get cityCards() { return 48; }
 
     get fundingCards() { return this._fundingCards }
     set fundingCards(value) {
@@ -489,7 +467,7 @@ class SetupPanel {
         this._fundingCards = value;
     }
 
-    get isValid() { return this.startingCards && this.totalCards > 0; }
+    get isValid() { return this.startingCards && this.playerCards > 0; }
 
     get node() { return this._node; }
 
@@ -502,24 +480,24 @@ class SetupPanel {
         this._objectiveCards = value;
     }
 
+    get playerCards() { return this.cityCards - this.objectiveCards + this.fundingCards - this.startingCards; }
+
     get players() { return this._players; }
 
-    get resourceCards() { return this._resourceCards }
-    set resourceCards(value) {
-        if (this._resourceCards === value) {
+    get satelliteCards() { return this._satelliteCards }
+    set satelliteCards(value) {
+        if (this._satelliteCards === value) {
             return;
         }
-        this._resourceCardsInput.value = value;
-        this._resourceCards = value;
+        this._satelliteCardsInput.value = value;
+        this._satelliteCards = value;
     }
 
     get saveData() {
         return {
-            cityCards: this.cityCards,
-            objectiveCards: this.objectiveCards,
-            resourceCards: this.resourceCards,
             fundingCards: this.fundingCards,
-            escalationCards: this.escalationCards,
+            objectiveCards: this.objectiveCards,
+            satelliteCards: this.satelliteCards,
         };
     }
 
@@ -532,10 +510,6 @@ class SetupPanel {
         }
     }
 
-    get totalCards() {
-        return this.cityCards - this.objectiveCards + this.resourceCards + this.fundingCards - this.startingCards + this.escalationCards;
-    }
-
     constructor() {
         this._cityCardsInput = document.getElementById('cityCardsInput');
         this._escalationCardsInput = document.getElementById('escalationCardsInput');
@@ -543,24 +517,20 @@ class SetupPanel {
         this._node = document.getElementById('setupPanel');
         this._objectiveCardsInput = document.getElementById('objectiveCardsInput');
         this._playersInput = document.getElementById('playersInput');
-        this._resourceCardsInput = document.getElementById('resourceCardsInput');
+        this._satelliteCardsInput = document.getElementById('satelliteCardsInput');
         this._playerInputs = [...document.getElementsByName('playerInput')];
 
-        this._cityCardsInput.onchange       = e => this._cityCards       = parseInt(this._cityCardsInput.value      );
-        this._escalationCardsInput.onchange = e => this._escalationCards = parseInt(this._escalationCardsInput.value);
         this._fundingCardsInput.onchange    = e => this._fundingCards    = parseInt(this._fundingCardsInput.value   );
         this._objectiveCardsInput.onchange  = e => this._objectiveCards  = parseInt(this._objectiveCardsInput.value );
-        this._resourceCardsInput.onchange   = e => this._resourceCards   = parseInt(this._resourceCardsInput.value  );
+        this._satelliteCardsInput.onchange   = e => this._satelliteCards   = parseInt(this._satelliteCardsInput.value  );
         this._playerInputs.forEach(playerInput => playerInput.onchange = e => this._playerInputChanged(playerInput), this);
         this._newGameButton = document.getElementById('newGameButton');
     }
 
     loadFrom(data) {
-        this.cityCards = data.cityCards;
-        this.escalationCards = data.escalationCards;
         this.fundingCards = data.fundingCards;
         this.objectiveCards = data.objectiveCards;
-        this.resourceCards = data.resourceCards;
+        this.satelliteCards = data.satelliteCards;
         this._players = new Array();
         this._playerInputs.forEach(playerInput => playerInput.checked = false);
         this._updatePlayersInput();
@@ -596,17 +566,19 @@ class SetupPanel {
 class PlayerDeck {
     _cardStacks;
     _currentPlayer;
-    escalationCards;
     _escalationTurnsOutput;
     _node;
     _pawn;
     _playerCardCountCell;
+    playerCards;
     players;
+    satelliteCards;
     _threatLevel;
     _threatLevelOutput;
-    totalCards;
 
     onNextPhase;
+
+    get escalationCards() { return 5; }
 
     get node() { return this._node; }
 
@@ -702,12 +674,19 @@ class PlayerDeck {
         this._recalculatePawnColor();
 
         this._cardStacks = new Array(this.escalationCards);
-        for(let i = 0; i < this.escalationCards; i++) {
-            this._cardStacks[i] = 0;
+        
+        for(let i = this.escalationCards - 1; i >= 0; i--) {
+            this._cardStacks[i] = 1;
         }
-        for (let playerCards = this.totalCards - 1; playerCards >= 0; playerCards--) {
-            this._cardStacks[playerCards % this.escalationCards]++;
+
+        for (let cards = this.satelliteCards; cards > 0; cards--) {
+            this._cardStacks[this.escalationCards - cards]++;
         }
+
+        for (let cards = this.playerCards - 1; cards >= 0; cards--) {
+            this._cardStacks[cards % this.escalationCards]++;
+        }
+
         this._cardStacks = this._cardStacks.map(cards => ({ cards: cards, escalation: true }));
 
         this._recalculatePlayerCards();
@@ -850,9 +829,10 @@ class Game {
             return;
         }
 
-        this._playerDeck.escalationCards = this._setupPanel.escalationCards;
+        this._playerDeck._escalationCards = this._setupPanel.escalationCards;
         this._playerDeck.players = this._setupPanel.players;
-        this._playerDeck.totalCards = this._setupPanel.totalCards;
+        this._playerDeck.playerCards = this._setupPanel.playerCards;
+        this._playerDeck.satelliteCards = this._setupPanel.satelliteCards;
         this._playerDeck.startNewGame();
         this._threatDecks.startNewGame(this._cards);
         this._threatLevels = [2, 2, 2, 3, 3, 4];
