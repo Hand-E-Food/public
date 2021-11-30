@@ -1,0 +1,35 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+div.atlas {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+select.locations {
+    background-color: black;
+    color: white;
+    height: 100%;
+}
+
+option.location {
+    padding: 3px 13px 3px 3px;
+}
+
+div.map {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+}
+
+svg.map {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
