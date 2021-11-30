@@ -1,6 +1,7 @@
 {
+    "title": "Ticket to Ride: Europe",
     "image": "TicketToRideEurope.jpg",
-    "width": 670,
+    "width":  670,
     "height": 446,
     "locations": [
         { "x": 213, "y": 137, "name": "Amsterdam" },
@@ -22,7 +23,7 @@
         { "x": 265, "y": 142, "name": "Essen" },
         { "x": 255, "y": 188, "name": "Frankfurt" },
         { "x": 614, "y": 214, "name": "Kharkov" },
-        { "x": 311, "y":  76, "name": "Kobenhaven" },
+        { "x": 311, "y":  76, "name": "Københaven" },
         { "x": 528, "y": 181, "name": "Kyïv" },
         { "x":  29, "y": 384, "name": "Lisboa" },
         { "x": 151, "y": 135, "name": "London" },

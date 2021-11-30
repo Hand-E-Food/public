@@ -1,6 +1,19 @@
 body {
     background-color: black;
     color: white;
+    font-size: large;
+}
+
+a {
+    color: white;
+}
+
+li {
+    margin: 5px;
+}
+
+.error {
+    color: #F44;
 }
 
 div.atlas {
@@ -15,7 +28,7 @@ select.locations {
     height: 100%;
 }
 
-option.location {
+select.locations>option {
     padding: 3px 13px 3px 3px;
 }
 
@@ -26,7 +39,7 @@ div.map {
     flex-grow: 1;
 }
 
-svg.map {
+div.map>* {
     position: absolute;
     left: 0;
     top: 0;
