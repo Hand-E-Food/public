@@ -2,91 +2,115 @@ const NS = {
     SVG: 'http://www.w3.org/2000/svg',
 }; 
 
-class LocationList {
-    _location = null;
-    _locations = [];
-    _selectNode;
+class Location {
+    _divNode;
+    _location;
+    _spanNode;
 
     get location() { return this._location; }
-    onLocationChanged;
+    set location(value) {
+        if (this._location === value) { return; }
+        this._location = value;
+        this._spanNode.textContent = value.name;
+    }
 
-    get locations() { return this._locations; }
-    set locations(locations) {
-        if (!locations) {
-            locations = [];
+    get node() { return this._divNode; }
+
+    get selected() { return this._divNode.classList.contains('selected'); }
+    set selected(value) {
+        if (this.selected != value) {
+            if (value) {
+                this._divNode.classList.add('selected');
+            } else {
+                this._divNode.classList.remove('selected');
+            }
         }
-        if (this._locations == locations) {
-            return;
+        if (this.onSelectedChanged) {
+            this.onSelectedChanged({
+                location: this._location,
+                selected: value,
+                target: this,
+            });
         }
+    }
+    onSelectedChanged;
 
-        const selectNode = this._selectNode;
-        selectNode.value = null;
-        while (selectNode.firstChild) {
-            selectNode.lastChild.remove();
-        }
+    constructor() {
+        const divNode = document.createElement('div');
+        divNode.classList.add('location');
+        divNode.onclick = e => this._divNode_onclick(e);
+        this._divNode = divNode;
 
-        this._locations = locations;
+        const spanNode = document.createElement('span');
+        divNode.appendChild(spanNode);
+        this._spanNode = spanNode;
+    }
 
-        const optionNode = document.createElement('option');
-        optionNode.selected = true;
-        optionNode.value = -1;
-        selectNode.appendChild(optionNode);
+    _divNode_onclick(e) {
+        this.selected = !this.selected;
+        return true;
+    }
+}
 
-        const textNode = document.createTextNode('- - -');
-        optionNode.appendChild(textNode);
+class LocationList {
+    _divNode;
+    _locations = [];
 
-        locations.forEach((location, i) => {
-            let optionNode = document.createElement('option');
-            optionNode.classList.add('location');
-            optionNode.value = i;
-            selectNode.appendChild(optionNode);
+    onSelectedLocationsChanged;
 
-            let textNode = document.createTextNode(location.name);
-            optionNode.appendChild(textNode);
+    get locations() { return this._locations.map(node => node.location); }
+    set locations(value) {
+        this._locations.forEach(location => {
+            delete location.onSelectedChanged;
+            location.node.remove();
+        });
+        this._locations = [];
+
+        if (!value) { return; }
+
+        value.forEach(item => {
+            const location = new Location();
+            location.location = item;
+            location.onSelectedChanged = e => this._location_onSelectedChanged(e);
+            const locationNode = location.node;
+            this._divNode.appendChild(locationNode);
+            this._locations.push(locationNode);
         });
     }
 
-    get node() { return this._selectNode; }
+    get node() { return this._divNode; }
 
-    constructor(locations) {
-        const selectNode = document.createElement('select');
-        selectNode.classList.add('locations');
-        selectNode.size = 2;
-        selectNode.onchange = e => this._selectNode_onchange(e);
-        this._selectNode = selectNode;
-
-        this.locations = locations;
+    constructor() {
+        const divNode = document.createElement('div');
+        divNode.classList.add('locations');
+        this._divNode = divNode;
     }
 
-    _selectNode_onchange(e) {
-        const index = this._selectNode.value ? parseInt(this._selectNode.value) : -1;
-        
-        this._location = index >= 0 ? this._locations[index] : null;
-
-        return this.onLocationChanged
-            ? this.onLocationChanged({
-                location: this._location,
-                target: this,
-            })
-            : true;
+    _location_onSelectedChanged(e) {
+        if (!this.onSelectedLocationsChanged) { return; }
+        this.onSelectedLocationsChanged(e);
     }
 }
 
 class Map {
     _divNode;
-    _lineHNode;
-    _lineVNode;
+    _scale;
     _svgNode;
+    _targets = {};
 
     get node() { return this._divNode; }
 
     constructor(image, width, height) {
+        this._scale = Math.min(width, height) / 100;
+
         const divNode = document.createElement('div');
         divNode.classList.add('map');
         this._divNode = divNode;
 
         const svgNode = document.createElementNS(NS.SVG, 'svg');
-        svgNode.setAttribute('stroke-width', Math.min(width, height) / 100)
+        svgNode.setAttribute('fill', 'transparent');
+        svgNode.setAttribute('stroke', 'red');
+        svgNode.setAttribute('stroke-width', this._scale)
         svgNode.setAttribute('viewBox', `0 0 ${width} ${height}`);
         divNode.appendChild(svgNode);
         this._svgNode = svgNode;
@@ -97,35 +121,53 @@ class Map {
         imageNode.setAttribute('width', width);
         svgNode.appendChild(imageNode);
 
-        const lineHNode = document.createElementNS(NS.SVG, 'line');
-        lineHNode.setAttribute('x1', 0);
-        lineHNode.setAttribute('x2', width);
-        svgNode.appendChild(lineHNode);
-        this._lineHNode = lineHNode;
-
-        const lineVNode = document.createElementNS(NS.SVG, 'line');
-        lineVNode.setAttribute('y1', 0);
-        lineVNode.setAttribute('y2', height);
-        svgNode.appendChild(lineVNode);
-        this._lineVNode = lineVNode;
-
-        this.clearTarget();
+        this.clearTargets();
     }
 
-    clearTarget() {
-        this._svgNode.setAttribute('stroke', 'transparent');
-        this._lineVNode.setAttribute('x1', 0);
-        this._lineVNode.setAttribute('x2', 0);
-        this._lineHNode.setAttribute('y1', 0);
-        this._lineHNode.setAttribute('y2', 0);
+    addTarget(x, y) {
+        const key = `${x},${y}`;
+        if (this._targets[key]) {
+            return;
+        }
+
+        const circleNode = document.createElementNS(NS.SVG, 'circle');
+        circleNode.setAttribute('cx', x);
+        circleNode.setAttribute('cy', y);
+        this._svgNode.appendChild(circleNode);
+
+        const animateNode = document.createElementNS(NS.SVG, 'animate');
+        animateNode.setAttribute('attributeName', 'r');
+        animateNode.setAttribute('calcMode', 'spline');
+        animateNode.setAttribute('dur', '2s');
+        animateNode.setAttribute('keyTimes', '0;0.5;1');
+        animateNode.setAttribute('keySplines', '0.5 0 0.5 1;0.5 0 0.5 1');
+        animateNode.setAttribute('repeatCount', 'indefinite');
+        animateNode.setAttribute('values', `0;${this._scale * 5};0`);
+        circleNode.appendChild(animateNode);
+
+        this._targets[key] = [ circleNode ];
     }
 
-    setTarget(x, y) {
-        this._lineVNode.setAttribute('x1', x);
-        this._lineVNode.setAttribute('x2', x);
-        this._lineHNode.setAttribute('y1', y);
-        this._lineHNode.setAttribute('y2', y);
-        this._svgNode.setAttribute('stroke', 'red');
+    clearTargets() {
+        Object.values(this._targets).forEach(nodes =>
+            nodes.forEach(node =>
+                node.remove()
+            )
+        );
+        this._targets = {};
+    }
+
+    removeTarget(x, y) {
+        const key = `${x},${y}`;
+        const nodes = this._targets[key];
+        if (!nodes) {
+            return;
+        }
+
+        nodes.forEach(node =>
+            node.remove()
+        );
+        delete this._targets[key];
     }
 }
 
@@ -146,8 +188,9 @@ class Atlas {
         divNode.classList.add('atlas');
         this._divNode = divNode;
         
-        const locationList = new LocationList(data.locations);
-        locationList.onLocationChanged = e => this._locationList_onLocationChanged(e);
+        const locationList = new LocationList();
+        locationList.locations = data.locations;
+        locationList.onSelectedLocationsChanged = e => this._locationList_onSelectedLocationsChanged(e);
         divNode.appendChild(locationList.node);
         this._locationList = locationList;
 
@@ -156,11 +199,13 @@ class Atlas {
         this._map = map;
     }
 
-    _locationList_onLocationChanged(e) {
+    _locationList_onSelectedLocationsChanged(e) {
         if (e.location) {
-            this._map.setTarget(e.location.x, e.location.y);
-        } else {
-            this._map.clearTarget();
+            if (e.selected) {
+                this._map.addTarget(e.location.x, e.location.y);
+            } else {
+                this._map.removeTarget(e.location.x, e.location.y);
+            }
         }
     }
 }

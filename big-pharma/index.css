@@ -1,0 +1,3 @@
+html {
+    --screen-width: calc(100vw - 20px);
+}
