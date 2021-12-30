@@ -1,0 +1,73 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: sans-serif;
+    font-size: 1cm;
+}
+
+a {
+    color: white;
+}
+
+li {
+    margin: 5px;
+}
+
+.error {
+    color: #F44;
+}
+
+.total {
+    border-bottom: 1px solid white;
+    color: white;
+    font-weight: bold;
+}
+
+.include {
+    color: lightgreen;
+}
+
+.exclude {
+    color: #F44;
+    text-decoration-line: line-through;
+}
+
+.highlight {
+    color: yellow;
+}
+
+div.atlas {
+    height: 100%;
+    width: 100%;
+}
+
+div.summary {
+    width: 20%;
+}
+
+div.summary>table {
+    color: gray;
+    margin: 5%;
+    padding: 0;
+    width: 90%;
+}
+
+div.map {
+    height: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 80%;
+}
+
+div.map>* {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+svg {
+    background-color: chocolate;
+}
