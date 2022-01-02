@@ -2,7 +2,7 @@ const Color = {
     darkGray: '#666',
     default: null,
     excluded: 'red',
-    highlight: 'yellow',
+    highlight: 'gold',
     included: 'lightgreen',
     player: 'purple',
     station: 'plum',
@@ -192,13 +192,24 @@ class Map {
 
 class MapCity {
     _gNode;
+    _highlight;
     _name;
+    _onChange = new EventSource();
     _x;
     _y;
     
+    get highlight() { return this._highlight; }
+    set highlight(value) {
+        if (this._highlight === value) return;
+        this._highlight = value;
+        this._gNode.setAttribute('fill', value ? Color.highlight : Color.darkGray);
+    }
+
     get name() { return this._name; }
 
     get node() { return this._gNode; }
+
+    get onChange() { return this._onChange; }
 
     get x() { return this._x; }
 
@@ -218,14 +229,16 @@ class MapCity {
         const textWidth = fontSize * name.length * 0.6;
 
         const gNode = document.createElementNS(NS.SVG, 'g');
+        gNode.setAttribute('fill', Color.darkGray);
+        gNode.setAttribute('stroke', Color.transparent)
         this._gNode = gNode;
 
         const circleNode = document.createElementNS(NS.SVG, 'circle');
         circleNode.setAttribute('cx', x);
         circleNode.setAttribute('cy', y);
-        circleNode.setAttribute('fill', Color.darkGray);
         circleNode.setAttribute('r', scale * 2);
-        circleNode.setAttribute('stroke', Color.transparent)
+        circleNode.onmouseenter = e => this._handleHover(true);
+        circleNode.onmouseleave = e => this._handleHover(false);
         gNode.appendChild(circleNode);
 
         const rectNode = document.createElementNS(NS.SVG, 'rect');
@@ -235,8 +248,8 @@ class MapCity {
         rectNode.setAttribute('height', textHeight);
         rectNode.setAttribute('rx', fontSize / 4);
         rectNode.setAttribute('ry', fontSize / 4);
-        rectNode.setAttribute('fill', Color.darkGray);
-        rectNode.setAttribute('stroke', Color.transparent);
+        rectNode.onmouseenter = e => this._handleHover(true);
+        rectNode.onmouseleave = e => this._handleHover(false);
         gNode.appendChild(rectNode);
 
         const textNode = document.createElementNS(NS.SVG, 'text');
@@ -248,7 +261,15 @@ class MapCity {
         textNode.setAttribute('font-family', 'sans-serif');
         textNode.setAttribute('font-size', fontSize);
         textNode.appendChild(document.createTextNode(name));
+        textNode.onmouseenter = e => this._handleHover(true);
+        textNode.onmouseleave = e => this._handleHover(false);
         gNode.appendChild(textNode);
+    }
+
+    _handleHover(value) {
+        this.highlight = value;
+        this._onChange.invoke({ mapCity: this });
+        return true;
     }
 }
 
@@ -295,6 +316,7 @@ class MapTrack {
     _cities;
     _distance;
     _gNode;
+    _highlight = false;
     _isBuilt = TrackBuilt.no;
     _onChange = new EventSource();
     
@@ -302,26 +324,19 @@ class MapTrack {
 
     get distance() { return this._distance; }
 
+    get highlight() { return this._highlight; }
+    set highlight(value) {
+        if (this._highlight === value) return;
+        this._highlight = value;
+        this._refreshColor();
+    }
+
     get isBuilt() { return this._isBuilt; }
     set isBuilt(value) {
         if (this._isBuilt === value) return;
-        let stroke;
-        switch (value) {
-            case TrackBuilt.no:
-                stroke = Color.transparent;
-                break;
-            case TrackBuilt.player:
-                stroke = Color.player;
-                break;
-            case TrackBuilt.station:
-                stroke = Color.station;
-                break;
-            default:
-                throw new Error(`Invalid isBuilt: ${value}`);
-        }
-        this._builtLineNode.setAttribute('stroke', stroke);
         this._isBuilt = value
         this._onChange.invoke({ mapTrack: this });
+        this._refreshColor();
     }
 
     get node() { return this._gNode; }
@@ -455,6 +470,28 @@ class MapTrack {
         e.stopPropagation();
         return true;
     }
+
+    _refreshColor() {
+        let stroke;
+        if (this.highlight) {
+            stroke = Color.highlight;
+        } else {
+            switch (this.isBuilt) {
+                case TrackBuilt.no:
+                    stroke = Color.transparent;
+                    break;
+                case TrackBuilt.player:
+                    stroke = Color.player;
+                    break;
+                case TrackBuilt.station:
+                    stroke = Color.station;
+                    break;
+                default:
+                    throw new Error(`Invalid isBuilt: ${value}`);
+            }
+        }
+        this._builtLineNode.setAttribute('stroke', stroke);
+    }
 }
 
 class ScoreCard {
@@ -484,7 +521,6 @@ class ScoreCard {
         const scoreLongRoutes = sortedRoutes
             .filter(route => route.isLong)
             .map(route => new ScoreLongRoute(route));
-        console.log(scoreLongRoutes);
         scoreLongRoutes.forEach(thisRoute => {
             thisRoute.longRoutes = scoreLongRoutes;
         });
@@ -557,7 +593,8 @@ class ScoreItem {
 
     constructor() {
         this._trNode = document.createElement('tr');
-        this._textTdNode
+        this._trNode.onmouseenter = e => this._handleHover(true);
+        this._trNode.onmouseleave = e => this._handleHover(false);
         
         this._textTdNode = document.createElement('td');
         this._trNode.appendChild(this._textTdNode);
@@ -566,6 +603,8 @@ class ScoreItem {
         this._pointsTdNode.style.textAlign = 'right';
         this._trNode.appendChild(this._pointsTdNode);
     }
+
+    _handleHover(value) { }
 
     _raiseOnChange() {
         this._onChange.invoke({ scoreItem: this });
@@ -577,6 +616,7 @@ class ScoreItem {
 }
 
 class ScoreLongestTrack extends ScoreItem {
+    _longestTracks = [];
     _tracks;
 
     constructor(map) {
@@ -588,16 +628,26 @@ class ScoreLongestTrack extends ScoreItem {
         this.refresh();
     }
 
-    getLongestTrackLength() {
+    getLongestTrack() {
         //TODO: Measure longest contiguous track.
         return this._tracks
             .filter(track => track.isBuilt === TrackBuilt.player)
-            .map(track => track.distance)
-            .reduce((a, b) => Math.max(a, b), 0);
+            .sort((a, b) => b.distance - a.distance)
+            .slice(0, 1);
+    }
+
+    _handleHover(value) {
+        this._longestTracks.forEach(track => {
+            track.highlight = value;
+        });
     }
 
     refresh() {
-        const trackLength = this.getLongestTrackLength();
+        this._longestTracks = this.getLongestTrack();
+        const trackLength = this._longestTracks
+            .map(track => track.distance)
+            .reduce((a, b) => a + b, 0);
+
         this.mode = trackLength > 0 ? ScoreMode.included : ScoreMode.none;
         this.text = 'Longest track'; //TODO: `Longest track (${trackLength})`;
     }
@@ -630,7 +680,15 @@ class ScoreRemainingStations extends ScoreItem {
 }
 
 class ScoreRoute extends ScoreItem {
+    _highlight = false;
     _route;
+
+    get highlight() { return this._highlight; }
+    set highlight(value) {
+        if (this._highlight === value) return;
+        this._highlight = value;
+        this.textColor = value ? Color.highlight : Color.default;
+    }
 
     get route() { return this._route; }
 
@@ -640,11 +698,24 @@ class ScoreRoute extends ScoreItem {
         this.text = route.cities.map(city => city.name).join(' - ');
         this._route = route;
         route.onChange.addHandler(e => this.refresh());
+
+        route.cities.forEach(city => city.onChange.addHandler(e => this._refreshHighlight()))
+
         this.refresh();
+    }
+
+    _handleHover(value) {
+        this.highlight = value;
+        this._route.cities.forEach(city => city.highlight = value);
+        return true;
     }
 
     refresh() {
         this.mode = this._route.isCompleted ? ScoreMode.included : ScoreMode.none;
+    }
+
+    _refreshHighlight() {
+        this.highlight = this._route.cities.some(city => city.highlight);
     }
 }
 
