@@ -23,30 +23,18 @@ li {
     font-weight: bold;
 }
 
-.include {
-    color: lightgreen;
-}
-
-.exclude {
-    color: #F44;
-    text-decoration-line: line-through;
-}
-
-.highlight {
-    color: yellow;
-}
-
 div.atlas {
     height: 100%;
     width: 100%;
 }
 
-div.summary {
-    width: 20%;
+div.score {
+    width: 15%;
 }
 
-div.summary>table {
+div.score>table {
     color: gray;
+    font-size: 9.5pt;
     margin: 5%;
     padding: 0;
     width: 90%;
@@ -57,7 +45,7 @@ div.map {
     position: fixed;
     right: 0;
     top: 0;
-    width: 80%;
+    width: 85%;
 }
 
 div.map>* {
