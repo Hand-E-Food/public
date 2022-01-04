@@ -36,12 +36,21 @@ const TrackPoints = {
 };
 
 Array.prototype.remove = function(item) {
-    var index = array.indexOf(item);
+    var index = this.indexOf(item);
     if (index !== -1) {
-        array.splice(index, 1);
+        this.splice(index, 1);
         return true;
     } else {
         return false;
+    }
+}
+
+Array.prototype.removeFirst = function(predicate, thisArg) {
+    var index = this.findIndex(predicate, thisArg);
+    if (index !== -1) {
+        return this.splice(index, 1)[0];
+    } else {
+        return undefined;
     }
 }
 
@@ -72,6 +81,286 @@ class EventSource {
     invoke(...params) {
         this._handlers.forEach(callback => callback(...params))
     }
+}
+
+/**
+ * A city junction from which any number of routes extend.
+ */
+class JunctionCity {
+    /**
+     * The city in which this junction exists.
+     * @type {MapCity}
+     * @private
+     */
+    _city;
+
+    /**
+     * The routes extending from this junction.
+     * @type {JunctionRoute[]}
+     * @private
+     */
+    _routes;
+
+    /**
+     * The city in which this junction exists.
+     * @type {MapCity}
+     */
+    get city() { return this._city; }
+
+    /**
+     * The routes extending from this junction.
+     * @type {JunctionRoute[]}
+     */
+    get routes() { return this._routes; }
+
+    /**
+     * Creates a junction in a city.
+     * @param {MapCity} city The city in which this junction exists.
+     * @param {JunctionRoute[]} routes The routes extending from this junction.
+     */
+    constructor(city, routes) {
+        this._city = city;
+        this._routes = routes;
+    }
+
+    /**
+     * Adds the specified route to this junction.
+     * @param {JunctionRoute} route The route to add.
+     */
+    addRoute(route) {
+        this._routes.push(route);
+    }
+
+    /**
+     * Removes the specified route from this junction.
+     * @param {JunctionRoute} route The route to remove.
+     */
+    removeRoute(route) {
+        this._routes.remove(route);
+    }
+}
+
+/**
+ * A route between two cities that can be traversed without making a significant decision.
+ */
+class JunctionRoute {
+    /**
+     * The cities at either end of this route.
+     * @type {MapCity[]}
+     * @private
+     */
+    _cities;
+
+    /**
+     * This route's distance.
+     * @type {number}
+     * @private
+     */
+    _distance;
+
+    /**
+     * The tracks traversed by this route.
+     * @type {MMapTrack[]}
+     * @private
+     */
+    _tracks;
+
+    /**
+     * The cities at either end of this route.
+     * @type {MapCity[]}
+     */
+    get cities() { return this._cities; }
+
+    /**
+     * This route's distance.
+     * @type {number}
+     */
+    get distance() { return this._distance; }
+
+    /**
+     * true if this route is a loop.
+     * @type {boolean}
+     */
+    get isLoop() { return this._cities[0] === this._cities[1]; }
+
+    /**
+     * The tracks traversed by this route.
+     * @type {MMapTrack[]}
+     */
+    get tracks() { return this._tracks; }
+
+    /**
+     * @private
+     * Do not use. Use a static method instead.
+     */
+    constructor() { }
+
+    /**
+     * Creates a route along a single piece of track.
+     * @param {MapTrack} track The track forming this route.
+     * @returns {JunctionRoute} The route.
+     */
+    static fromTrack(track) {
+        const route = new JunctionRoute();
+        route._cities = track.cities;
+        route._distance = track.distance;
+        route._tracks = [ track ];
+        return route;
+    }
+
+    /**
+     * Gets the city at the other end of this route from the specified city.
+     * @param {MapCity} city The origin city.
+     * @returns {MapCity} The city at the other end of this route.
+     */
+    getOtherCity(city) {
+        // If this route is a loop, both cities are the same, so return that one city.
+        return this._cities[0] !== city
+            ? this._cities[0]
+            : this._cities[1];
+    }
+
+    /**
+     * Creates a new route by joining two routes.
+     * @param {MapCity} commonCity The city in which to perform the join.
+     * @param {JunctionRoute} routes The routes to join.
+     * @returns {JunctionRoute} The joined route.
+     */
+    static joinRoutes(commonCity, routes) {
+        if (routes.length !== 2) throw new Error("Can only join two routes.");
+        const joinedRoute = new JunctionRoute();
+        joinedRoute._cities = routes.map(route => route.getOtherCity(commonCity));
+        joinedRoute._distance = routes[0].distance + routes[1].distance;
+        joinedRoute._tracks = [ ...routes[0].tracks, ...routes[1].tracks ];
+        return joinedRoute;
+    }
+}
+
+/**
+ * A collection of junctions.
+ */
+class JunctionMap {
+    /**
+     * All junction cities in this collection.
+     * @type {JunctionCity[]}
+     * @private
+     */
+    _cities;
+
+    /**
+     * The routes joining the junctions in this collection.
+     * @type {JunctionRoute[]}
+     * @private
+     */
+    _routes;
+
+    /**
+     * All junction cities in this collection.
+     * @type {JunctionCity[]}
+     */
+    get cities() { return this._cities; }
+
+    /**
+     * The routes joining the junctions in this collection.
+     * @type {JunctionRoute[]}
+     */
+    get routes() { return this._routes; }
+
+    /**
+     * Creates a collection of junctions.
+     * @param {MapTrack[]} mapTracks The built tracks that will form routes.
+     */
+    constructor(mapTracks) {
+        this._routes = mapTracks.map(mapTrack => JunctionRoute.fromTrack(mapTrack));
+
+        const mapCities = new Set();
+        mapTracks.forEach(mapTrack => mapTrack.cities.forEach(mapCity => mapCities.add(mapCity)));
+        this._cities = [...mapCities]
+            .map(mapCity => new JunctionCity(
+                mapCity,
+                this._routes.filter(junctionRoute => junctionRoute.cities.some(routeCity => routeCity === mapCity)),
+            ));
+    }
+
+    /**
+     * Finds the junction for the specified city.
+     * @param {MapCity} mapCity The city to find.
+     * @returns {JunctionCity} The junction for the specified city.
+     */
+    getByCity(mapCity) {
+        return this._cities.find(junctionCity => junctionCity.city === mapCity);
+    }
+
+    /**
+     * Gets the junction at the other end of the route.
+     * @param {JunctionCity} junctionCity The junction to start from.
+     * @param {JunctionRoute} junctionRoute The route to follow.
+     * @returns {JunctionCity} The junction at the other end of the route.
+     */
+    getOtherCity(junctionCity, junctionRoute) {
+        return this.getByCity(junctionRoute.getOtherCity(junctionCity.city));
+    }
+
+    /**
+     * Joins two routes into a single route. Fixes junctions.
+     * @param {JunctionCity} junctionCity The junction at which the join occurs.
+     * @param {JunctionRoute[]} junctionRoutes Two routes to join.
+     * @returns {JunctionRoute} The joined route.
+     */
+    joinRoutes(junctionCity, junctionRoutes) {
+        junctionRoutes = [...junctionRoutes];
+        const joinedRoute = JunctionRoute.joinRoutes(junctionCity.city, junctionRoutes);
+        junctionRoutes.forEach(junctionRoute => this.removeRoute(junctionRoute), this);
+        this._routes.push(joinedRoute);
+        this.getByCity(joinedRoute.cities[0]).addRoute(joinedRoute);
+        if (!joinedRoute.isLoop)
+            this.getByCity(joinedRoute.cities[1]).addRoute(joinedRoute);
+
+        return joinedRoute;
+    }
+
+    /**
+     * Removes the junction for the specified city from this collecdtion.
+     * @param {MapCity} mapCity The city to remove.
+     */
+    removeCity(mapCity) {
+        this._cities.removeFirst(junctionCity => junctionCity.city === mapCity);
+    }
+
+    /**
+     * Removes the specified junction from this collection.
+     * @param {JunctionCity} junctionCity The junction to remove.
+     */
+    removeJunction(junctionCity) {
+        this._cities.remove(junctionCity);
+    }
+
+    /**
+     * Removes the specified route from its junctions.
+     * @param {JunctionRoute} junctionRoute The route to remove.
+     */
+    removeRoute(junctionRoute) {
+        junctionRoute.cities
+            .map(city => this.getByCity(city), this)
+            .forEach(junctionCity => junctionCity.removeRoute(junctionRoute));
+        this._routes.remove(junctionRoute);
+    }
+}
+
+/**
+ * A result of finding the longest track.
+ */
+class LongestTrackResult {
+    /**
+     * The total distance of this result.
+     */
+    distance = 0;
+
+    /**
+     * The tracks in this reuslt.
+     * @type {MapTrack[]}
+     */
+    tracks = [];
 }
 
 class Map {
@@ -212,7 +501,7 @@ class Map {
 
 class MapCity {
     _gNode;
-    _highlight;
+    _highlight = false;
     _name;
     _onChange = new EventSource();
     _routes = [];
@@ -638,6 +927,10 @@ class ScoreCard {
     }
 
     refresh() {
+        this.isValid = this._scoreItems.every(item => item.isValid);
+
+        this._scoreTotal.mode = this.isValid ? ScoreMode.none : ScoreMode.excluded;
+
         this._scoreTotal.points = this._scoreItems
             .map(item => item.score)
             .reduce((a, b) => a + b, 0);
@@ -646,6 +939,7 @@ class ScoreCard {
 
 class ScoreItem {
     _highlight = false;
+    isValid = true;
     _mode = ScoreMode.none;
     _onChange = new EventSource();
     _pointsTdNode;
@@ -725,10 +1019,33 @@ class ScoreItem {
     }
 }
 
+/** A score item for the longest track. */
 class ScoreLongestTrack extends ScoreItem {
-    _longestTracks = [];
+    /**
+     * All junctions in the latest refresh.
+     * @type {JunctionMap}
+     * @private
+     */
+    _junctions;
+
+    /**
+     * The longest track calculated in the latest refresh.
+     * @type {LongestTrackResult}
+     * @private
+     */
+    _longestTrack = new LongestTrackResult();
+
+    /** 
+     * Every track on the map.
+     * @type {MapTrack[]}
+     * @private
+     */
     _tracks;
 
+    /**
+     * Creates a score item for the longest track.
+     * @param {Map} map The map to score.
+     */
     constructor(map) {
         super();
         this.points = 10;
@@ -738,28 +1055,204 @@ class ScoreLongestTrack extends ScoreItem {
         this.refresh();
     }
 
-    getLongestTrack() {
-        //TODO: Measure longest contiguous track.
-        return this._tracks
-            .filter(track => track.isBuilt === TrackBuilt.player)
-            .sort((a, b) => b.distance - a.distance)
-            .slice(0, 1);
+    /**
+     * Finds the longest track.
+     * @returns {LongestTrackResult} The tracks and distance of the longest track.
+     * @private
+     */
+    _findLongestTrack() {
+        const tracks = this._tracks
+            .filter(track => track.isBuilt === TrackBuilt.player);
+        if (tracks.length === 0) return [];
+
+        const junctions = new JunctionMap(tracks);
+        this._junctions = junctions;
+        this._simplifyJunctionMap();
+        return this._junctions.cities
+            .sort((a, b) => a.routes.length - b.routes.length)
+            .reduce((bestResult, junctionCity) => {
+                const result = this._findLongestTrackFrom(junctionCity, [...junctions.routes]);
+                return result.distance > bestResult.distance ? result : bestResult;
+            }, new LongestTrackResult());
+    }
+    
+    /**
+     * Finds the longest track starting from the specified city using the specified routes.
+     * @param {JunctionCity} junctionCity The junction from which to find the longest track.
+     * @param {JunctionRoute[]} unusedRoutes The routes to consider using.
+     * @returns {LongestTrackResult} The tracks and distance of the longest track.
+     * @private
+     */
+    _findLongestTrackFrom(junctionCity, unusedRoutes) {
+        const junctions = this._junctions;
+        return junctionCity.routes
+            .filter(junctionRoute => unusedRoutes.indexOf(junctionRoute) !== -1)
+            .reduce((bestResult, junctionRoute) => {
+                let result = this._findLongestTrackFrom(
+                    junctions.getOtherCity(junctionCity, junctionRoute),
+                    unusedRoutes.filter(route => route !== junctionRoute),
+                );
+                result.tracks.splice(0, 0, ...junctionRoute.tracks);
+                result.distance += junctionRoute.distance;
+                return result.distance > bestResult.distance ? result : bestResult;
+            }, new LongestTrackResult());
     }
 
+    /**
+     * Highlights the longest track on the UI.
+     * @param {boolean} value true to highlight the track.
+     * @override
+     * @private
+     */
     _handleHover(value) {
-        this._longestTracks.forEach(track => {
+        this._longestTrack.tracks.forEach(track => {
             track.highlight = value;
         });
     }
 
+    /**
+     * Recalculates the player's longest track and updates the UI.
+     * @override
+     */
     refresh() {
-        this._longestTracks = this.getLongestTrack();
-        const trackLength = this._longestTracks
-            .map(track => track.distance)
-            .reduce((a, b) => a + b, 0);
+        this._longestTrack = this._findLongestTrack();
+        this.mode = this._longestTrack.distance > 0 ? ScoreMode.included : ScoreMode.none;
+        this.text = `Longest track (${this._longestTrack.distance})`;
+    }
 
-        this.mode = trackLength > 0 ? ScoreMode.included : ScoreMode.none;
-        this.text = 'Longest track'; //TODO: `Longest track (${trackLength})`;
+    /**
+     * Simplifies junctions and routes.
+     * @returns {boolean} true if one or more junctions or routes were simplified.
+     * @private
+     */
+    _simplifyJunctionMap() {
+        console.log('----------');
+        let dirty = [ true ];
+        while(dirty.length > 0) {
+            const junctions = [...this._junctions.cities];
+            console.log(junctions.map(junction => junction.city.name + ': ' + junction.routes.map(route => `${route.getOtherCity(junction.city).name} (${route.tracks.length}${route.isLoop ? ' loop' : ''})`).join(', ')).join('\n'));
+            dirty = [];
+            if (dirty.length === 0) dirty = junctions.map(junction => this._simplifyPassthrough(junction), this).filter(x => x);
+            if (dirty.length === 0) dirty = junctions.map(junction => this._simplifyEmpty(junction), this).filter(x => x);
+            if (dirty.length === 0) dirty = junctions.map(junction => this._simplifyLoop(junction), this).filter(x => x);
+            if (dirty.length === 0) dirty = junctions.map(junction => this._simplifyDeadEnd(junction), this).filter(x => x);
+            if (dirty.length === 0) dirty = junctions.map(junction => this._simplifyTriplets(junction), this).filter(x => x);
+            console.log(dirty.join('\n'));
+        }
+    }
+
+    /**
+     * Simplifies a junction by removing shorter dead end routes.
+     * @param {JunctionCity} junction The junction to simplify.
+     * @returns {boolean} true if the junction was simplified.
+     * @private
+     */
+    _simplifyDeadEnd(junction) {
+        const junctions = this._junctions;
+
+        const endpoints = junction.routes
+            .map(route => ({ route, branches: junctions.getOtherCity(junction, route).routes.length }))
+            .sort((a, b) => {
+                let result = b.route.distance - a.route.distance;
+                if (result !== 0) return result;
+                result = b.branches - a.branches;
+                return result;
+            });
+        
+        let dirty = false;
+        while(endpoints.length > 2) {
+            const endpoint = endpoints.pop();
+            if (endpoint.branches === 1) {
+                junctions.removeRoute(endpoint.route);
+                dirty = true;
+            }
+        }
+
+        return dirty ? `Removed dead ends from ${junction.city.name}.` : null;
+    }
+
+    /**
+     * Simplifies a junction that has exactly 0 routes by removing it.
+     * @param {JunctionCity} junction The junction to simplify.
+     * @returns {boolean} true if the junction was simplified.
+     * @private
+     */
+    _simplifyEmpty(junction) {
+        if (junction.routes.length !== 0) return null;
+
+        this._junctions.removeJunction(junction);
+        return `Removed empty junction in ${junction.city.name}.`;
+    }
+
+    /**
+     * Simplifies a junction by joining looped routes with other routes.
+     * @param {JunctionCity} junction The junction to simplify.
+     * @returns {boolean} true if the junction was simplified.
+     * @private
+     */
+     _simplifyLoop(junction) {
+        const loopRoutes = junction.routes.filter(route => !route.isLoop).length <= 2
+            ? [...junction.routes]
+            : junction.routes.filter(route => route.isLoop);
+
+        if (loopRoutes.length <= 1) return null;
+
+        console.log(loopRoutes);
+
+        const junctions = this._junctions;
+        let route = loopRoutes.pop();
+        while (loopRoutes.length > 0) {
+            route = junctions.joinRoutes(junction, [route, loopRoutes.pop()]);
+        }
+        return `Express loops ${junction.city.name} from ${route.cities[0].name} to ${route.cities[1].name}.`;
+    }
+
+    /**
+     * Simplifies a junction that has exactly 2 routes by combining the routes and removing this junction.
+     * @param {JunctionCity} junction The junction to simplify.
+     * @returns {boolean} true if the junction was simplified.
+     * @private
+     */
+    _simplifyPassthrough(junction) {
+        if (junction.routes.length !== 2) return null;
+
+        const junctions = this._junctions;
+        const route = junctions.joinRoutes(junction, junction.routes);
+        return `Express through ${junction.city.name} from ${route.cities[0].name} to ${route.cities[1].name}.`;
+    }
+
+    /**
+     * Simplifies a junction that has 3 or more routes to the same city by combining the longest pair of routes.
+     * @param {JunctionCity} junction The junction to simplify.
+     * @returns {boolean} true if the junction was simplified.
+     * @private
+     */
+    _simplifyTriplets(junction) {
+        const junctions = this._junctions;
+        let dirty = [];
+        junction.routes
+            .reduce((result, route) => {
+                const city = route.getOtherCity(junction.city);
+                let entry = result.find(x => x.city === city);
+                if (!entry) {
+                    entry = { city: city, routes: [] };
+                    result.push(entry);
+                }
+                entry.routes.push(route);
+                return result;
+            }, [])
+            .filter(group => group.routes.length >= 3)
+            .forEach(group => {
+                const city = group.city;
+                const routes = group.routes;
+                routes.sort((a, b) => b.distance - a.distance);
+                while(routes.length >= 3) {
+                    junctions.joinRoutes(city, routes.splice(0, 2));
+                    dirty.push(`Express braids ${junction.city.name} with ${city.name}.`);
+                };
+            });
+
+        return dirty.length === 0 ? null : dirty.join('\n');
     }
 }
 
@@ -783,9 +1276,10 @@ class ScoreRemainingStations extends ScoreItem {
 
     refresh() {
         const remainingStations = this.getRemainingStations();
+        this.isValid = remainingStations >= 0;
+        this.mode = this.isValid ? ScoreMode.included : ScoreMode.excluded;
         this.points = remainingStations * 4;
         this.text = pluralise(remainingStations, 'remaining station');
-        this.textColor = remainingStations >= 0 ? Color.default : Color.excluded;
     }
 }
 
@@ -861,8 +1355,6 @@ class ScoreTracks extends ScoreItem {
 
     constructor(map) {
         super();
-        this.mode = ScoreMode.included;
-
         this._map = map;
         this._tracks = [...map._tracks].sort((a, b) => a.distance - b.distance);
         map.onChange.addHandler(e => this.refresh());
@@ -890,10 +1382,8 @@ class ScoreTracks extends ScoreItem {
         let track = tracks.shift();
         track.cities.forEach(city => cities.add(city));
 
-        let i;
         while (tracks.length > 0) {
-            i = tracks.findIndex(track => track.cities.some(city => cities.has(city)));
-            track = tracks.splice(i, 1)[0];
+            track = tracks.removeFirst(track => track.cities.some(city => cities.has(city)));
             if (track.cities.every(city => cities.has(city))) {
                 surplus += track.distance;
             } else {
@@ -914,9 +1404,10 @@ class ScoreTracks extends ScoreItem {
     refresh() {
         const remainingTracks = this.getRemainingTracks();
         const surplusTracks = this.getSurplusTracks();
+        this.isValid = remainingTracks >= 0;
+        this.mode = this.isValid ? ScoreMode.included : ScoreMode.excluded;
         this.points = this.getTrackScore();
         this.text = `Built tracks (${remainingTracks} remaining, ${surplusTracks} surplus)`;
-        this.textColor = remainingTracks >= 0 ? Color.default : Color.excluded;
     }
 }
 
