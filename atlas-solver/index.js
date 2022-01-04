@@ -45,6 +45,12 @@ Array.prototype.remove = function(item) {
     }
 }
 
+function blockEvent(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+}
+
 function pluralise(count, singular, plural) {
     if (!plural) plural = singular + 's';
     return `${count} ${count === 1 ? singular : plural}`;
@@ -73,10 +79,12 @@ class Map {
     _divNode;
     _onChange = new EventSource();
     _routes;
-    _networks;
+    _networks = [];
     _tracks;
 
     get cities() { return this._cities; }
+
+    get networks() { return this._networks; }
     
     get node() { return this._divNode; }
 
@@ -126,6 +134,8 @@ class Map {
 
         const svgNode = document.createElementNS(NS.SVG, 'svg');
         svgNode.setAttribute('viewBox', `0 0 ${model.width} ${model.height}`);
+        svgNode.onclick = blockEvent;
+        svgNode.oncontextmenu = blockEvent;
         divNode.appendChild(svgNode);
 
         if (model.image) {
@@ -156,31 +166,41 @@ class Map {
         let networks = this._tracks
             .filter(track => track.isBuilt !== TrackBuilt.no)
             .map(track => {
-                const network = new Set();
-                track.cities.forEach(city => network.add(city));
-                return network;
+                const cities = new Set();
+                const tracks = [ track ];
+                track.cities.forEach(city => cities.add(city));
+                return { cities: cities, tracks: tracks };
             });
         
         for (let a = networks.length - 2; a >= 0; a--) {
             const networkA = networks[a];
+            const citiesA = networkA.cities;
             for (let b = networks.length - 1; b > a; b--) {
-                const networkB = [...networks[b].values()];
-                if (networkB.some(city => networkA.has(city))) {
-                    networkB.forEach(city => networkA.add(city));
+                const networkB = networks[b];
+                const citiesB = [...networkB.cities];
+                if (citiesB.some(city => citiesA.has(city))) {
+                    citiesB.forEach(city => citiesA.add(city));
+                    networkA.tracks.push(...networkB.tracks);
                     networks.splice(b, 1);
                 }
             }
         }
 
+        networks.forEach(network => {
+            network.tracks.sort((a, b) => a.distance - b.distance);
+        });
+
         return networks;
     }
 
     isRouteCompleted(mapRoute) {
-        return this._networks.some(network =>
-            mapRoute.cities.every(city =>
-                network.has(city)
-            )
-        );
+        return this._networks
+            .map(network => network.cities)
+            .some(networkCities =>
+                mapRoute.cities.every(routeCity =>
+                    networkCities.has(routeCity)
+                )
+            );
     }
 
     _mapTrack_onChange(e) {
@@ -195,6 +215,10 @@ class MapCity {
     _highlight;
     _name;
     _onChange = new EventSource();
+    _routes = [];
+    _score = 0;
+    _scoreNode;
+    _tracks = [];
     _x;
     _y;
     
@@ -210,6 +234,17 @@ class MapCity {
     get node() { return this._gNode; }
 
     get onChange() { return this._onChange; }
+
+    get routes() { return this._routes; }
+
+    get score() { return this._score; }
+    set score(value) {
+        if (this._score === value) return;
+        this._score = value;
+        this._scoreNode.nodeValue = value;
+    }
+
+    get tracks() { return this._tracks; }
 
     get x() { return this._x; }
 
@@ -237,39 +272,84 @@ class MapCity {
         circleNode.setAttribute('cx', x);
         circleNode.setAttribute('cy', y);
         circleNode.setAttribute('r', scale * 2);
+        circleNode.onclick = blockEvent;
+        circleNode.oncontextmenu = blockEvent;
         circleNode.onmouseenter = e => this._handleHover(true);
         circleNode.onmouseleave = e => this._handleHover(false);
         gNode.appendChild(circleNode);
 
         const rectNode = document.createElementNS(NS.SVG, 'rect');
         rectNode.setAttribute('x', x - textWidth / 2);
-        rectNode.setAttribute('y', y - fontSize / 2);
+        rectNode.setAttribute('y', y - textHeight);
         rectNode.setAttribute('width', textWidth);
         rectNode.setAttribute('height', textHeight);
         rectNode.setAttribute('rx', fontSize / 4);
         rectNode.setAttribute('ry', fontSize / 4);
+        rectNode.onclick = blockEvent;
+        rectNode.oncontextmenu = blockEvent;
         rectNode.onmouseenter = e => this._handleHover(true);
         rectNode.onmouseleave = e => this._handleHover(false);
         gNode.appendChild(rectNode);
 
-        const textNode = document.createElementNS(NS.SVG, 'text');
-        textNode.setAttribute('x', x);
-        textNode.setAttribute('y', y);
-        textNode.setAttribute('text-anchor', 'middle');
-        textNode.setAttribute('dominant-baseline', 'central');
-        textNode.setAttribute('fill', Color.white);
-        textNode.setAttribute('font-family', 'sans-serif');
-        textNode.setAttribute('font-size', fontSize);
-        textNode.appendChild(document.createTextNode(name));
-        textNode.onmouseenter = e => this._handleHover(true);
-        textNode.onmouseleave = e => this._handleHover(false);
-        gNode.appendChild(textNode);
+        const nameTextNode = document.createElementNS(NS.SVG, 'text');
+        nameTextNode.setAttribute('x', x);
+        nameTextNode.setAttribute('y', y - textHeight / 2);
+        nameTextNode.setAttribute('text-anchor', 'middle');
+        nameTextNode.setAttribute('dominant-baseline', 'central');
+        nameTextNode.setAttribute('fill', Color.white);
+        nameTextNode.setAttribute('font-family', 'sans-serif');
+        nameTextNode.setAttribute('font-size', fontSize);
+        nameTextNode.appendChild(document.createTextNode(name));
+        nameTextNode.onclick = blockEvent;
+        nameTextNode.oncontextmenu = blockEvent;
+        nameTextNode.onmouseenter = e => this._handleHover(true);
+        nameTextNode.onmouseleave = e => this._handleHover(false);
+        gNode.appendChild(nameTextNode);
+
+        const scoreTextNode = document.createElementNS(NS.SVG, 'text');
+        scoreTextNode.setAttribute('x', x);
+        scoreTextNode.setAttribute('y', y + textHeight / 2);
+        scoreTextNode.setAttribute('text-anchor', 'middle');
+        scoreTextNode.setAttribute('dominant-baseline', 'central');
+        scoreTextNode.setAttribute('fill', Color.white);
+        scoreTextNode.setAttribute('font-family', 'sans-serif');
+        scoreTextNode.setAttribute('font-size', fontSize);
+        scoreTextNode.setAttribute('font-weight', 'bold');
+        scoreTextNode.onclick = blockEvent;
+        scoreTextNode.oncontextmenu = blockEvent;
+        scoreTextNode.onmouseenter = e => this._handleHover(true);
+        scoreTextNode.onmouseleave = e => this._handleHover(false);
+        gNode.appendChild(scoreTextNode);
+
+        this._scoreNode = document.createTextNode('0');
+        scoreTextNode.appendChild(this._scoreNode);
+    }
+
+    addRoute(route) {
+        this._routes.push(route);
+        route.onChange.addHandler(e => this._refreshScore());
+        this._refreshScore();
+    }
+
+    addTrack(track) {
+        this._tracks.push(track);
     }
 
     _handleHover(value) {
         this.highlight = value;
         this._onChange.invoke({ mapCity: this });
         return true;
+    }
+
+    toDebug() {
+        return `MapCity {name: "${this._name}", score: ${this._score}}`;
+    }
+
+    _refreshScore() {
+        this.score = this._routes
+            .filter(route => route.isCompleted && !route.isLong)
+            .map(route => route.points)
+            .reduce((a, b) => a + b, 0);
     }
 }
 
@@ -308,6 +388,12 @@ class MapRoute {
         this._cities = cities;
         this._isLong = isLong === true;
         this._points = points;
+
+        cities.forEach(city => city.addRoute(this));
+    }
+
+    toDebug() {
+        return `MapRoute {cities: ["${this._cities.map(city => city.name).join('", "')}"], points: ${this._points}, isLong: ${this._isLong}, isCompleted: ${this._isCompleted}}`;
     }
 }
 
@@ -359,6 +445,8 @@ class MapTrack {
 
         this._cities = cities;
         this._distance = distance;
+
+        cities.forEach(city => city.addTrack(this));
 
         const TRACK_SPACING = 1.25;
         const x1 = cities[0].x;
@@ -456,19 +544,20 @@ class MapTrack {
         mouseLineNode.setAttribute('stroke', Color.transparent);
         mouseLineNode.setAttribute('stroke-width', fullWidth)
         mouseLineNode.onclick = e => this._mouseLineNode_onclick(e);
+        mouseLineNode.oncontextmenu = e => this._mouseLineNode_onclick(e);
         gNode.appendChild(mouseLineNode);
     }
 
+    toDebug() {
+        return `MapTrack {cities: ["${this._cities.map(city => city.name).join('", "')}"], distance: ${this._distance}, isBuilt: ${['no', 'player', 'station'][this._isBuilt]}}`;
+    }
+
     _mouseLineNode_onclick(e) {
-        if (this.isBuilt !== TrackBuilt.no) {
-            this.isBuilt = TrackBuilt.no;
-        } else if (e.ctrlKey) {
-            this.isBuilt = TrackBuilt.station;
-        } else {
-            this.isBuilt = TrackBuilt.player;
-        }
+        const mode = e.which === 3 || e.button === 2 ? TrackBuilt.station : TrackBuilt.player;
+        this.isBuilt = this.isBuilt === mode ? TrackBuilt.no : mode;
+        e.preventDefault();
         e.stopPropagation();
-        return true;
+        return false;
     }
 
     _refreshColor() {
@@ -556,6 +645,7 @@ class ScoreCard {
 }
 
 class ScoreItem {
+    _highlight = false;
     _mode = ScoreMode.none;
     _onChange = new EventSource();
     _pointsTdNode;
@@ -563,11 +653,18 @@ class ScoreItem {
     _textTdNode;
     _trNode;
 
+    get highlight() { return this._highlight; }
+    set highlight(value) {
+        if (this._highlight === value) return;
+        this._highlight = value;
+        this._refreshColor();
+    }
+
     get mode() { return this._mode; }
     set mode(value) {
         if (this._mode === value) return;
         this._mode = value;
-        this._pointsTdNode.style.color = [Color.default, Color.included, Color.excluded][value];
+        this._refreshColor();
         this._raiseOnChange();
     }
 
@@ -606,12 +703,25 @@ class ScoreItem {
 
     _handleHover(value) { }
 
+    toDebug() {
+        return `ScoreItem {text: "${this._text}", points: ${this._points}, mode: ${['none', 'included', 'excluded'][this._mode]}}`;
+    }
+
     _raiseOnChange() {
         this._onChange.invoke({ scoreItem: this });
     }
 
     refresh() {
         throw new ReferenceError('Function "refresh" is not overridden.');
+    }
+
+    _refreshColor() {
+        const color = this._highlight
+            ? Color.highlight
+            : [Color.default, Color.included, Color.excluded][this._mode];
+
+        this._pointsTdNode.style.color = color;
+        this._textTdNode.style.color = color;
     }
 }
 
@@ -680,15 +790,7 @@ class ScoreRemainingStations extends ScoreItem {
 }
 
 class ScoreRoute extends ScoreItem {
-    _highlight = false;
     _route;
-
-    get highlight() { return this._highlight; }
-    set highlight(value) {
-        if (this._highlight === value) return;
-        this._highlight = value;
-        this.textColor = value ? Color.highlight : Color.default;
-    }
 
     get route() { return this._route; }
 
@@ -754,13 +856,15 @@ class ScoreTotal extends ScoreItem {
 }
 
 class ScoreTracks extends ScoreItem {
+    _map;
     _tracks;
 
     constructor(map) {
         super();
         this.mode = ScoreMode.included;
 
-        this._tracks = map._tracks;
+        this._map = map;
+        this._tracks = [...map._tracks].sort((a, b) => a.distance - b.distance);
         map.onChange.addHandler(e => this.refresh());
         this.refresh();
     }
@@ -772,6 +876,34 @@ class ScoreTracks extends ScoreItem {
             .reduce((a, b) => a - b, 45);
     }
 
+    getSurplusTracks() {
+        return this._map.networks
+            .map(network => this._getSurplusTracksInNetwork(network))
+            .reduce((a, b) => a + b, 0);
+    }
+
+    _getSurplusTracksInNetwork(network) {
+        const cities = new Set();
+        const tracks = [...network.tracks];
+        let surplus = 0;
+
+        let track = tracks.shift();
+        track.cities.forEach(city => cities.add(city));
+
+        let i;
+        while (tracks.length > 0) {
+            i = tracks.findIndex(track => track.cities.some(city => cities.has(city)));
+            track = tracks.splice(i, 1)[0];
+            if (track.cities.every(city => cities.has(city))) {
+                surplus += track.distance;
+            } else {
+                track.cities.forEach(city => cities.add(city));
+            }
+        }
+
+        return surplus;
+    }
+
     getTrackScore() {
         return this._tracks
             .filter(track => track.isBuilt === TrackBuilt.player)
@@ -781,8 +913,9 @@ class ScoreTracks extends ScoreItem {
 
     refresh() {
         const remainingTracks = this.getRemainingTracks();
+        const surplusTracks = this.getSurplusTracks();
         this.points = this.getTrackScore();
-        this.text = `Built tracks (${remainingTracks} remaining)`;
+        this.text = `Built tracks (${remainingTracks} remaining, ${surplusTracks} surplus)`;
         this.textColor = remainingTracks >= 0 ? Color.default : Color.excluded;
     }
 }

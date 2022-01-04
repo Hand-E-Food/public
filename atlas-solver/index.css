@@ -2,7 +2,7 @@ body {
     background-color: black;
     color: white;
     font-family: sans-serif;
-    font-size: 1cm;
+    font-size: 12pt;
 }
 
 a {
@@ -29,7 +29,7 @@ div.atlas {
 }
 
 div.score {
-    width: 15%;
+    width: 18%;
 }
 
 div.score>table {
@@ -45,7 +45,7 @@ div.map {
     position: fixed;
     right: 0;
     top: 0;
-    width: 85%;
+    width: 82%;
 }
 
 div.map>* {
@@ -57,5 +57,5 @@ div.map>* {
 }
 
 svg {
-    background-color: chocolate;
+    background-color: #420;
 }
