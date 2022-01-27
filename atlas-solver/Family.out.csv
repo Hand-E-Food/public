@@ -1,0 +1,55 @@
+Points,CityA,RegionA,CityB,RegionB,IsLong
+5,"Olivia's Animal Kingdom","Paige","Home Design Store","Paige",0
+5,"Animalania","Olivia","Sunbeam","Olivia",0
+5,"Granite","Lucelia","Argan","Lucelia",0
+5,"Box Town","Olivia","Watertank Maze","Olivia",0
+5,"Waterfall Spa","Paige","Catzilla Island","Paige",0
+6,"Beton","Lucelia","Opera","Lucelia",0
+6,"Dionysus","Mark","Hera","Mark",0
+6,"Taro's Tower","Olivia","Fly Trap Sofa","Olivia",0
+6,"Pancake Town","Paige","Moovie Town","Paige",0
+6,"Zeus","Mark","Hephaestus","Mark",0
+7,"Demeter","Mark","Hermes","Mark",0
+7,"Pancake Town","Paige","Paige's Hut","Paige",0
+7,"Dune","Lucelia","Melamine","Lucelia",0
+7,"Dionysus","Mark","Demeter","Mark",0
+7,"Butterhead Mesa","Olivia","Animalania","Olivia",0
+7,"Ship Shop","Paige","Unicorn Farm","Paige",0
+8,"Sleepy Softland","Olivia","Beach Resort","Paige",0
+8,"Poseidon","Mark","Shopping Mall","Paige",0
+8,"Zeus","Mark","Daddy's Gameboards","Paige",0
+8,"Artemis","Mark","Athena","Mark",0
+8,"Butterhead Mesa","Olivia","Palm Tree","Olivia",0
+8,"Granite","Lucelia","Groove","Lucelia",0
+8,"Watertank Maze","Olivia","Fly Trap Sofa","Olivia",0
+9,"Mousie Mountain","Olivia","Apollo","Mark",0
+9,"Olivia's Animal Kingdom","Paige","Grey Elm","Lucelia",0
+9,"Fish Pond","Olivia","Beton","Lucelia",0
+9,"Moovie Town","Paige","Demeter","Mark",0
+9,"Savoye","Lucelia","Aphrodite","Mark",0
+9,"Notaio","Lucelia","Butterhead Mesa","Olivia",0
+9,"Mousie Mountain","Olivia","Beach Resort","Paige",0
+9,"Apollo","Mark","Cube","Lucelia",0
+9,"Fish Pond","Olivia","Angora","Lucelia",0
+9,"Dune","Lucelia","Argan","Lucelia",0
+9,"Unicorn Farm","Paige","Waterfall Spa","Paige",0
+10,"Shopping Mall","Paige","Notaio","Lucelia",0
+10,"Animalania","Olivia","Aphrodite","Mark",0
+10,"Ship Shop","Paige","Zeus","Mark",0
+10,"Opera","Lucelia","Taro's Tower","Olivia",0
+10,"Groove","Lucelia","Waterfall Spa","Paige",0
+10,"Savannah's Seat","Olivia","Poseidon","Mark",0
+11,"Artemis","Mark","Sunbeam","Olivia",0
+11,"Catzilla Island","Paige","Grey Elm","Lucelia",0
+12,"Paige's Hut","Paige","Hera","Mark",0
+12,"Savoye","Lucelia","Palm Tree","Olivia",0
+13,"Sleepy Softland","Olivia","Daddy's Gameboards","Paige",0
+13,"Angora","Lucelia","Ares","Mark",0
+20,"Watertank Maze","Olivia","Athena","Mark",1
+20,"Pancake Town","Paige","Granite","Lucelia",1
+20,"Savannah's Seat","Olivia","Dionysus","Mark",1
+20,"Home Design Store","Paige","Melamine","Lucelia",1
+21,"Argan","Lucelia","Hermes","Mark",1
+21,"Moovie Town","Paige","Box Town","Olivia",1
+21,"Fly Trap Sofa","Olivia","Hephaestus","Mark",1
+21,"Cube","Lucelia","Unicorn Farm","Paige",1

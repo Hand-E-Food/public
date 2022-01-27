@@ -31,7 +31,9 @@ const TrackPoints = {
     2: 2,
     3: 4,
     4: 7,
+    5: 11,
     6: 15,
+    7: 18,
     8: 21,
 };
 
@@ -738,6 +740,7 @@ class MapTrack {
         cities.forEach(city => city.addTrack(this));
 
         const TRACK_SPACING = 1.25;
+        const lineScale = scale * 0.5;
         const x1 = cities[0].x;
         const x2 = cities[1].x;
         const y1 = cities[0].y;
@@ -757,15 +760,15 @@ class MapTrack {
             tunnelLineNode.setAttribute('x2', x2);
             tunnelLineNode.setAttribute('y2', y2);
             tunnelLineNode.setAttribute('stroke', Color.darkGray);
-            tunnelLineNode.setAttribute('stroke-width', scale * (TRACK_SPACING * (colors.length - 1) + 2))
+            tunnelLineNode.setAttribute('stroke-width', lineScale * (TRACK_SPACING * (colors.length - 1) + 2))
             gNode.appendChild(tunnelLineNode);
         }
 
         const dxCity = x1 - x2;
         const dyCity = y1 - y2;
         const degTrack = Math.atan(dyCity / dxCity) + Math.PI / 2;
-        const dxTrack = Math.cos(degTrack) * scale * TRACK_SPACING;
-        const dyTrack = Math.sin(degTrack) * scale * TRACK_SPACING;
+        const dxTrack = Math.cos(degTrack) * lineScale * TRACK_SPACING;
+        const dyTrack = Math.sin(degTrack) * lineScale * TRACK_SPACING;
         const colorNames = {
             'a': 'gray',
             'r': 'red',
@@ -776,6 +779,7 @@ class MapTrack {
             'p': 'pink',
             'w': 'white',
             'k': 'black',
+            '?': 'brown',
         };
         for (let i = 0; i < colors.length; i++) {
             const drTrack = (1 - colors.length) / 2 + i;
@@ -785,11 +789,11 @@ class MapTrack {
             trackLineNode.setAttribute('x2', x2 + dxTrack * drTrack);
             trackLineNode.setAttribute('y2', y2 + dyTrack * drTrack);
             trackLineNode.setAttribute('stroke', colorNames[colors[i]]);
-            trackLineNode.setAttribute('stroke-width', scale)
+            trackLineNode.setAttribute('stroke-width', lineScale)
             gNode.appendChild(trackLineNode);
         }
 
-        const fullWidth = scale * (TRACK_SPACING * (colors.length - 1) + 2);
+        const fullWidth = lineScale * (TRACK_SPACING * (colors.length - 1) + 2);
         const builtLineNode = document.createElementNS(NS.SVG, 'line');
         builtLineNode.setAttribute('x1', x1);
         builtLineNode.setAttribute('y1', y1);

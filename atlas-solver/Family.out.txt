@@ -1,0 +1,41 @@
+Cities:       48
+Tracks/City:  3.7083333333333335
+
+Tracks:       89
+Cars:         294
+Cars/Track:   2.8823529411764706
+1-tracks:     3.3707865168539324%
+2-tracks:     37.07865168539326%
+3-tracks:     32.58426966292135%
+4-tracks:     21.34831460674157%
+5-tracks:     3.3707865168539324%
+6-tracks:     1.1235955056179776%
+7-tracks:     1.1235955056179776%
+any    cars:  118
+white  cars:  22
+pink   cars:  22
+red    cars:  22
+orange cars:  22
+yellow cars:  22
+green  cars:  22
+blue   cars:  22
+black  cars:  22
+???    cars:  0
+engine cars:  5.782312925170068%
+Twin-tracks:  14.606741573033707%
+Twin-cars:    34
+Tunnels:      16.853932584269664%
+
+Routes:       54
+Points/Route: 10.148148148148149
+ 5 points:    5
+ 6 points:    5
+ 7 points:    6
+ 8 points:    7
+ 9 points:    11
+10 points:    6
+11 points:    2
+12 points:    2
+13 points:    2
+20 points:    4
+21 points:    4
