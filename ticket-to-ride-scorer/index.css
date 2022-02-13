@@ -1,0 +1,80 @@
+body {
+    background-color: black;
+    height: 100vh;
+
+    color: white;
+    font-family: sans-serif;
+    font-size: 3cm;
+}
+
+div.players {
+    width: 100%;
+}
+
+div.player {
+    margin: 0.5cm;
+
+    border-color: transparent;
+    border-radius: 0.5cm;
+    border-style: solid;
+    border-width: 2px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+div.selected {
+    border-color: #DDD;
+}
+
+span.playerName {
+    flex-basis: 0;
+    flex-grow: 1;
+    padding: 0.5cm;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+span.playerScore {
+    flex-basis: content;
+    padding: 0.5cm;
+
+    color: #DDD;
+}
+
+div.palette {
+    position: fixed;
+    left: 0cm;
+    right: 0cm;
+    bottom: 0cm;
+    height: auto;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+div.button {
+    width: 20vw;
+    height: 20vw;
+    margin: 2.25vw;
+    padding: 0vw;
+
+    border-color: white;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 20vw;
+
+    text-align: center;
+    vertical-align: middle;
+    line-height: 20vw;
+
+    font-size: 2.5cm;
+}
+
+div.undo {
+    margin-left: auto;
+}
