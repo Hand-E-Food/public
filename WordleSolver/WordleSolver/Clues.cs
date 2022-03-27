@@ -6,8 +6,14 @@ namespace WordleSolver
 {
     public sealed class Clues : IEquatable<Clues>
     {
-        public static readonly Clues Correct = new string('2', WordLength);
+        /// <summary>
+        /// The index represented by clues that are all <see cref="Clue.Correct">.
+        /// </summary>
+        public static readonly int Correct = Clues.FromString(new string('2', WordLength)).GetHashCode();
 
+        /// <summary>
+        /// The size to give to arrays where each index represents clues.
+        /// </summary>
         public static readonly int ArrayLength = Correct + 1;
 
         private readonly int[] clues = new int[WordLength];

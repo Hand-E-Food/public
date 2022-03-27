@@ -10,16 +10,33 @@ namespace WordleSolver
     [JsonConverter(typeof(SolutionJsonConverter))]
     public class Solution
     {
-        public string Guess { get; set; }
-
+        /// <summary>
+        /// The solution to follow for every potential set of clues received.
+        /// </summary>
         public IList<Solution> Branches { get; } = new Solution[Clues.ArrayLength];
+
+        /// <summary>
+        /// The depth of this guess, starting from 1.
+        /// </summary>
+        public int Depth { get; private set; }
+
+        /// <summary>
+        /// The next word to guess.
+        /// </summary>
+        public string Guess { get; private set; }
 
         private Solution()
         { }
 
-        public Solution(string guess)
+        /// <summary>
+        /// Initialises a new instance of the <see cref="Solution"/> class.
+        /// </summary>
+        /// <param name="guess">The word to guess.</param>
+        /// <param name="depth">The depth of this guess, starting from 1.</param>
+        public Solution(string guess, int depth)
         {
             Guess = guess;
+            Depth = depth;
         }
 
         private class SolutionJsonConverter : JsonConverter<Solution>
@@ -49,6 +66,8 @@ namespace WordleSolver
 
                     if (propertyName.Equals(nameof(value.Guess)))
                         value.Guess = reader.GetString();
+                    else if (propertyName.Equals(nameof(value.Depth)))
+                        value.Depth = reader.GetInt32();
                     else if (propertyName.Length == WordLength && propertyName.All("012".Contains))
                         value.Branches[Clues.FromString(propertyName).GetHashCode()] = Read(ref reader, typeof(Solution), options);
                     else
@@ -68,6 +87,7 @@ namespace WordleSolver
 
                 writer.WriteStartObject();
                 writer.WriteString(nameof(value.Guess), value.Guess);
+                writer.WriteNumber(nameof(value.Depth), value.Depth);
                 for (int i = 0; i < Clues.Correct; i++)
                 {
                     var propertyValue = value.Branches[i];

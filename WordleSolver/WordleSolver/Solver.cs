@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static WordleSolver.Constants;
@@ -9,7 +8,10 @@ namespace WordleSolver
     public class Solver
     {
         private readonly string[] allWords;
+        private readonly int[] allWordIndices;
         private readonly int[,] cache;
+        private readonly object syncLock = new();
+
         private int solvedWords = -1;
         private int totalWords;
 
@@ -19,26 +21,56 @@ namespace WordleSolver
         /// </summary>
         public bool HardMode { get; }
 
+        /// <summary>
+        /// Raised when the solution is updated.
+        /// </summary>
         public event ProgressEventHandler Progress;
-        public delegate void ProgressEventHandler(int done, int total);
-        public void OnProgress()
+        /// <summary>
+        /// The signature of the <see cref="Progress"/> event.
+        /// </summary>
+        /// <param name="doneCount">The number of words solved.</param>
+        /// <param name="totalCount">The total number of words to solve.</param>
+        public delegate void ProgressEventHandler(int doneCount, int totalCount);
+        /// <summary>
+        /// Calculates the number of words solved and raises the <see cref="Progreess"/> event.
+        /// </summary>
+        protected void OnProgress()
         {
-            solvedWords++;
-            Progress?.Invoke(solvedWords, totalWords);
+            lock (syncLock)
+            {
+                solvedWords++;
+                Progress?.Invoke(solvedWords, totalWords);
+            }
         }
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="Solver"/> class.
+        /// </summary>
+        /// <param name="words">Every possible word.</param>
+        /// <param name="hardMode">
+        /// True to solve for hard mode, where each guess must respect previous clues.
+        /// False to solve for normal mode, where each guess can be any valid word.
+        /// </param>
         public Solver(IEnumerable<string> words, bool hardMode)
         {
             allWords = words.OrderBy(word => word).ToArray();
             totalWords = allWords.Length;
+            allWordIndices = new int[totalWords];
+            for (int i = 0; i < totalWords; i++)
+                allWordIndices[i] = i;
+            HardMode = hardMode;
             cache = new int[totalWords, totalWords];
         }
 
+        /// <summary>
+        /// Creates a graph of guesses that leads to every possible word.
+        /// </summary>
+        /// <returns>The solution graph.</returns>
         public Solution Solve()
         {
             Initialise();
             OnProgress();
-            return GetSolution(allWords);
+            return GetSolution(allWordIndices, 1);
         }
 
         private void Initialise()
@@ -54,6 +86,12 @@ namespace WordleSolver
             });
         }
 
+        /// <summary>
+        /// Calculates the clues returned for a specified guess and target word.
+        /// </summary>
+        /// <param name="guessWord">The word being guessed.</param>
+        /// <param name="targetWord">The secret target word.</param>
+        /// <returns>The clues for the guess.</returns>
         public static Clues CalculateClues(string guessWord, string targetWord)
         {
             const char used = '\0';
@@ -91,49 +129,60 @@ namespace WordleSolver
             return clues;
         }
 
-        private Solution GetSolution(ICollection<string> targetWords)
+        private Solution GetSolution(ICollection<int> targetWordIndices, int depth)
         {
-            if (targetWords.Count == 1)
-                return new Solution(targetWords.Single());
+            if (targetWordIndices.Count == 1)
+            {
+                OnProgress();
+                return new Solution(allWords[targetWordIndices.Single()], depth);
+            }
 
-            var guessWords = HardMode ? targetWords : allWords;
+            var guessWordIndices = HardMode ? targetWordIndices : allWordIndices;
 
-            var result = GetResults(guessWords, targetWords)
-                .Aggregate((a, b) => a.CompareTo(b) <= 0 ? a : b);
+            var result = GetBestResult(guessWordIndices, targetWordIndices);
 
-            var solution = new Solution(result.Guess);
+            var solution = new Solution(allWords[result.GuessWordIndex], depth);
 
-            if (targetWords.Contains(solution.Guess))
+            if (targetWordIndices.Contains(result.GuessWordIndex))
                 OnProgress();
 
-            foreach (var branch in result)
-            {
-                if (branch.Words.Count == 0) continue;
-                if (branch.Clues == Clues.Correct) continue;
-                solution.Branches[branch.Clues] = GetSolution(branch.Words);
-            }
+            depth++;
+            result
+                .Where(branch => branch.WordIndices.Count > 0 && branch.Clues != Clues.Correct)
+                .AsParallel()
+                .ForAll(branch => solution.Branches[branch.Clues] = GetSolution(branch.WordIndices, depth));
+
             return solution;
         }
 
-        private IEnumerable<GuessResult> GetResults(IEnumerable<string> guessWords, ICollection<string> targetWords) =>
-            guessWords.AsParallel().Select(word => GetResult(word, targetWords));
-
-        private GuessResult GetResult(string guessWord, IEnumerable<string> targetWords)
+        private GuessResult GetBestResult(IEnumerable<int> guessWordIndices, ICollection<int> targetWordIndices)
         {
-            var result = new GuessResult(guessWord);
-
-            foreach (var targetWord in targetWords)
+            var largestCountThreshold = int.MaxValue;
+            GuessResult bestResult = null;
+            foreach (var guessWordIndex in guessWordIndices)
             {
-                var clues = GetClues(guessWord, targetWord);
-                result[clues].Words.Add(targetWord);
+                var result = GetResult(guessWordIndex, targetWordIndices, largestCountThreshold);
+                if (result == null) continue;
+                largestCountThreshold = result.LargestCount;
+                bestResult = result;
+                if (largestCountThreshold == 1) break;
+            }
+            return bestResult;
+        }
+
+        private GuessResult GetResult(int guessWordIndex, ICollection<int> targetWordIndices, int largestCountThreshold)
+        {
+            var result = new GuessResult(guessWordIndex, targetWordIndices.Count);
+
+            foreach (var targetWordIndex in targetWordIndices)
+            {
+                var clues = cache[guessWordIndex, targetWordIndex];
+                var wordIndices = result[clues].WordIndices;
+                wordIndices.Add(targetWordIndex);
+                if (wordIndices.Count >= largestCountThreshold) return null;
             }
 
             return result;
         }
-
-        public int GetClues(string guessWord, string targetWord) =>
-            cache[GetCacheIndex(guessWord), GetCacheIndex(targetWord)];
-
-        private int GetCacheIndex(string word) => Array.BinarySearch(allWords, word);
     }
 }
