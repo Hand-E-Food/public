@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static WordleSolver.Constants;
 
 namespace WordleSolver
@@ -42,16 +43,15 @@ namespace WordleSolver
 
         private void Initialise()
         {
-            string guessWord, targetWord;
-            for (int i = 0; i < allWords.Length; i++)
+            Parallel.For(0, allWords.Length, i =>
             {
-                guessWord = allWords[i];
+                var guessWord = allWords[i];
                 for (int j = 0; j < allWords.Length; j++)
                 {
-                    targetWord = allWords[j];
+                    var targetWord = allWords[j];
                     cache[i,j] = CalculateClues(guessWord, targetWord);
                 }
-            }
+            });
         }
 
         public static Clues CalculateClues(string guessWord, string targetWord)
@@ -116,7 +116,7 @@ namespace WordleSolver
         }
 
         private IEnumerable<GuessResult> GetResults(IEnumerable<string> guessWords, ICollection<string> targetWords) =>
-            guessWords.Select(word => GetResult(word, targetWords));
+            guessWords.AsParallel().Select(word => GetResult(word, targetWords));
 
         private GuessResult GetResult(string guessWord, IEnumerable<string> targetWords)
         {
