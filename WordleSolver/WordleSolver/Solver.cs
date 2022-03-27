@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using static WordleSolver.Constants;
 
@@ -6,8 +7,9 @@ namespace WordleSolver
 {
     public class Solver
     {
-        private readonly ICollection<string> allWords;
-        private int solvedWords = 0;
+        private readonly string[] allWords;
+        private readonly int[,] cache;
+        private int solvedWords = -1;
         private int totalWords;
 
         /// <summary>
@@ -24,55 +26,35 @@ namespace WordleSolver
             Progress?.Invoke(solvedWords, totalWords);
         }
 
-        public Solver(ICollection<string> words, bool hardMode)
+        public Solver(IEnumerable<string> words, bool hardMode)
         {
-            allWords = words;
-            totalWords = words.Count;
+            allWords = words.OrderBy(word => word).ToArray();
+            totalWords = allWords.Length;
+            cache = new int[totalWords, totalWords];
         }
 
-        public Solution Solve() => GetSolution(allWords);
-
-        private Solution GetSolution(ICollection<string> targetWords)
+        public Solution Solve()
         {
-            if (targetWords.Count == 1)
-                return new Solution(targetWords.Single());
+            Initialise();
+            OnProgress();
+            return GetSolution(allWords);
+        }
 
-            var guessWords = HardMode ? targetWords : allWords;
-
-            var result = GetResults(guessWords, targetWords)
-                .Aggregate((a, b) => a.CompareTo(b) <= 0 ? a : b);
-
-            var solution = new Solution(result.Guess);
-
-            if (targetWords.Contains(solution.Guess))
-                OnProgress();
-
-            foreach (var branch in result)
+        private void Initialise()
+        {
+            string guessWord, targetWord;
+            for (int i = 0; i < allWords.Length; i++)
             {
-                if (branch.Words.Count == 0) continue;
-                if (branch.Clues == Clues.Correct) continue;
-                solution.Branches[branch.Clues] = GetSolution(branch.Words);
+                guessWord = allWords[i];
+                for (int j = 0; j < allWords.Length; j++)
+                {
+                    targetWord = allWords[j];
+                    cache[i,j] = CalculateClues(guessWord, targetWord);
+                }
             }
-            return solution;
         }
 
-        private IEnumerable<GuessResult> GetResults(IEnumerable<string> guessWords, ICollection<string> targetWords) =>
-            guessWords.Select(word => GetResult(word, targetWords));
-
-        private GuessResult GetResult(string guessWord, ICollection<string> targetWords)
-        {
-            var result = new GuessResult(guessWord);
-
-            foreach (var targetWord in targetWords)
-            {
-                var clues = GetClues(guessWord, targetWord);
-                result[clues].Words.Add(targetWord);
-            }
-
-            return result;
-        }
-
-        public static Clues GetClues(string guessWord, string targetWord)
+        public static Clues CalculateClues(string guessWord, string targetWord)
         {
             const char used = '\0';
 
@@ -108,5 +90,50 @@ namespace WordleSolver
 
             return clues;
         }
+
+        private Solution GetSolution(ICollection<string> targetWords)
+        {
+            if (targetWords.Count == 1)
+                return new Solution(targetWords.Single());
+
+            var guessWords = HardMode ? targetWords : allWords;
+
+            var result = GetResults(guessWords, targetWords)
+                .Aggregate((a, b) => a.CompareTo(b) <= 0 ? a : b);
+
+            var solution = new Solution(result.Guess);
+
+            if (targetWords.Contains(solution.Guess))
+                OnProgress();
+
+            foreach (var branch in result)
+            {
+                if (branch.Words.Count == 0) continue;
+                if (branch.Clues == Clues.Correct) continue;
+                solution.Branches[branch.Clues] = GetSolution(branch.Words);
+            }
+            return solution;
+        }
+
+        private IEnumerable<GuessResult> GetResults(IEnumerable<string> guessWords, ICollection<string> targetWords) =>
+            guessWords.Select(word => GetResult(word, targetWords));
+
+        private GuessResult GetResult(string guessWord, IEnumerable<string> targetWords)
+        {
+            var result = new GuessResult(guessWord);
+
+            foreach (var targetWord in targetWords)
+            {
+                var clues = GetClues(guessWord, targetWord);
+                result[clues].Words.Add(targetWord);
+            }
+
+            return result;
+        }
+
+        public int GetClues(string guessWord, string targetWord) =>
+            cache[GetCacheIndex(guessWord), GetCacheIndex(targetWord)];
+
+        private int GetCacheIndex(string word) => Array.BinarySearch(allWords, word);
     }
 }

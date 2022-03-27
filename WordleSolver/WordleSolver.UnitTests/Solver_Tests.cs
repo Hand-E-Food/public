@@ -10,9 +10,9 @@ namespace WordleSolver.UnitTests
         [InlineData("fghij", "abcde", "00000")]
         [InlineData("rrrrr", "error", "02202")]
         [InlineData("rrree", "error", "12210")]
-        public void GetClues(string guess, string target, Clues expected)
+        public void CalculateClues(string guess, string target, Clues expected)
         {
-            var actual = Solver.GetClues(guess, target);
+            var actual = Solver.CalculateClues(guess, target);
             Assert.Equal(expected, actual);
         }
     }

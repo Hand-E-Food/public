@@ -9,7 +9,7 @@ namespace WordleSolver
         static void Main(string[] args)
         {
             var words = File.ReadAllLines("wordle.txt");
-            Console.WriteLine($"Solved 0 of {words.Length} words.");
+            Console.WriteLine($"Initialising...");
             var solver = new Solver(words, false);
             solver.Progress += ReportProgress;
             var solution = solver.Solve();
