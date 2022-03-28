@@ -12,7 +12,7 @@ namespace WordleSolver.UnitTests
         [InlineData("rrree", "error", "12210")]
         public void CalculateClues(string guess, string target, Clues expected)
         {
-            var actual = Solver.CalculateClues(guess, target);
+            Clues actual = Solver.CalculateClues(guess, target);
             Assert.Equal(expected, actual);
         }
     }

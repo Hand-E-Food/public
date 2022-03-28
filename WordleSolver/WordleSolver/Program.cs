@@ -2,46 +2,67 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using static WordleSolver.Constants;
 
 namespace WordleSolver
 {
     class Program
     {
-        private const bool HardMode = true;
+        private static readonly object consoleLock = new();
 
-        private static readonly TimeSpan ProgressReportThrottle = TimeSpan.FromSeconds(1);
+        private const Difficulty Difficulty = WordleSolver.Difficulty.Normal;
 
-        private static TimeSpan nextProgressReport = TimeSpan.Zero;
         private static readonly Stopwatch stopwatch = new();
+
+        private static long nextUpdated = 0;
 
         static void Main(string[] args)
         {
+            string difficultyName = Difficulty.ToString().ToLower();
             stopwatch.Start();
-            WriteLine($"Initialising...");
-            var words = File.ReadAllLines("wordle.txt");
-            var solver = new Solver(words, HardMode);
-            solver.Progress += ReportProgress;
-            var solution = solver.Solve();
-            WriteLine($"Solved!");
-            var filename = $"wordle-{(HardMode ? "hard" : "normal")}.json";
-            WriteLine($"Saving {filename}");
-            using (var file = File.OpenWrite(filename))
-            using (var writer = new Utf8JsonWriter(file, new JsonWriterOptions { Indented = true }))
+            WriteLine($"Started solving for {difficultyName} mode at {DateTime.Now:HH:mm:ss zzz}");
+            WriteLine("Initialising...");
+            string[] words = File.ReadAllLines("wordle.txt");
+            Solver solver = new(words, Difficulty);
+            solver.ProgressChanged += ProgressChanged;
+            Solution solution = solver.Solve();
+            if (solution == null)
             {
-                JsonSerializer.Serialize(writer, solution, new JsonSerializerOptions { WriteIndented = true });
+                WriteLine($"No solution found using at most {MaximumGuesses} guesses.");
             }
-            WriteLine($"Done!");
+            else
+            {
+                WriteLine("Solved!");
+                string filename = $"wordle-{difficultyName}.json";
+                WriteLine($"Saving {filename}");
+                using (Stream file = File.OpenWrite(filename))
+                using (Utf8JsonWriter writer = new(file, new() { Indented = true }))
+                {
+                    JsonSerializer.Serialize(writer, solution, new() { WriteIndented = true });
+                }
+                WriteLine("Done!");
+            }
             stopwatch.Stop();
         }
 
-        private static void ReportProgress(int doneCount, int totalCount) 
+        private static void ProgressChanged(int count, int total)
         {
-            if (nextProgressReport > stopwatch.Elapsed) return;
-            nextProgressReport = stopwatch.Elapsed.Add(ProgressReportThrottle);
-            WriteLine($"Solved {doneCount} of {totalCount} words.");
+            lock (consoleLock)
+            {
+                if (nextUpdated < stopwatch.ElapsedMilliseconds)
+                {
+                    nextUpdated = stopwatch.ElapsedMilliseconds + 1000;
+                    WriteLine($"Solved {count} of {total} words.    ");
+                }
+            }
         }
 
-        private static void WriteLine(string value) =>
-            Console.WriteLine($"{stopwatch.Elapsed:hh:mm:ss}: {value}");
+        private static void WriteLine(string value)
+        {
+            lock (consoleLock)
+            {
+                Console.WriteLine($"{stopwatch.Elapsed:hh\\:mm\\:ss} {value}");
+            }
+        }
     }
 }

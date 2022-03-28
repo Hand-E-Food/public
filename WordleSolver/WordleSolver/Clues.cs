@@ -9,7 +9,7 @@ namespace WordleSolver
         /// <summary>
         /// The index represented by clues that are all <see cref="Clue.Correct">.
         /// </summary>
-        public static readonly int Correct = Clues.FromString(new string('2', WordLength)).GetHashCode();
+        public static readonly int Correct = Clues.FromString(new('2', WordLength)).GetHashCode();
 
         /// <summary>
         /// The size to give to arrays where each index represents clues.
@@ -20,7 +20,7 @@ namespace WordleSolver
 
         public static Clues FromHashCode(int hashCode)
         {
-            var result = new Clues();
+            Clues result = new();
             for (int i = WordLength - 1; i >= 0; i--)
             {
                 result.clues[i] = hashCode % 3;
@@ -31,7 +31,7 @@ namespace WordleSolver
 
         public static Clues FromString(string str)
         {
-            var result = new Clues();
+            Clues result = new();
             for (int i = 0; i < WordLength; i++)
                 result.clues[i] = str[i] - '0';
             return result;

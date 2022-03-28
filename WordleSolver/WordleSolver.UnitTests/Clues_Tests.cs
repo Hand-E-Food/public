@@ -15,7 +15,7 @@ namespace WordleSolver.UnitTests
         [InlineData(173, "20102")]
         public void FromHashCode_ReturnsCorrectValue(int hashCode, Clues expected)
         {
-            var actual = Clues.FromHashCode(hashCode);
+            Clues actual = Clues.FromHashCode(hashCode);
             Assert.Equal(expected, actual);
         }
 
@@ -30,7 +30,7 @@ namespace WordleSolver.UnitTests
         [InlineData("20102", 173)]
         public void GetHashCode_ReturnsCorrectValue(Clues clues, int expected)
         {
-            var actual = clues.GetHashCode();
+            int actual = clues.GetHashCode();
             Assert.Equal(expected, actual);
         }
     }
