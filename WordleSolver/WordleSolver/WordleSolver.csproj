@@ -6,11 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="wordle.txt" />
+    <None Remove="wordle-ENABLE.txt" />
+    <None Remove="wordle-NewYorkTimes.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="wordle.txt">
+    <Content Include="wordle-ENABLE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordle-NewYorkTimes.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

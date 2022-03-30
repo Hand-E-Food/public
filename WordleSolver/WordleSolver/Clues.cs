@@ -37,10 +37,47 @@ namespace WordleSolver
             return result;
         }
 
-        public Clue this[int i]
+        private Clues()
+        { }
+
+        /// <summary>
+        /// Calculates the clues returned for a specified guess and target word.
+        /// </summary>
+        /// <param name="guessWord">The word being guessed.</param>
+        /// <param name="targetWord">The secret target word.</param>
+        /// <returns>The clues for the guess.</returns>
+        public Clues(string guessWord, string targetWord)
         {
-            get => (Clue)clues[i];
-            set => clues[i] = (int)value;
+            const char used = '\0';
+
+            char[] guessChars = guessWord.ToCharArray();
+            char[] targetChars = targetWord.ToCharArray();
+
+            for (int i = 0; i < WordLength; i++)
+            {
+                if (guessChars[i] == targetChars[i])
+                {
+                    clues[i] = (int)Clue.Correct;
+                    guessChars[i] = used;
+                    targetChars[i] = used;
+                }
+            }
+
+            for (int i = 0; i < WordLength; i++)
+            {
+                char guessChar = guessChars[i];
+                if (guessChar == used) continue;
+                for (int j = 0; j < WordLength; j++)
+                {
+                    if (guessChar == targetChars[j])
+                    {
+                        clues[i] = (int)Clue.Present;
+                        guessChars[i] = used;
+                        targetChars[j] = used;
+                        break;
+                    }
+                }
+            }
         }
 
         public bool Equals(Clues other)

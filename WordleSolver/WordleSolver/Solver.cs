@@ -35,6 +35,11 @@ namespace WordleSolver
         public Difficulty Difficulty { get; }
 
         /// <summary>
+        /// The maximum number of gueses that can be used.
+        /// </summary>
+        private int maximumDepth = int.MaxValue;
+
+        /// <summary>
         /// Manages the progress events.
         /// </summary>
         private readonly Progress progress;
@@ -49,6 +54,19 @@ namespace WordleSolver
         }
 
         /// <summary>
+        /// Raised when a better solution is found.
+        /// </summary>
+        public event SolutionUpdatedEventHandler SolutionUpdated;
+
+        private void OnSolutionUpdated(Solution solution) => SolutionUpdated?.Invoke(solution);
+
+        /// <summary>
+        /// The signature of the <see cref="SolutionUpdated"/> event.
+        /// </summary>
+        /// <param name="solution">The new solution.</param>
+        public delegate void SolutionUpdatedEventHandler(Solution solution);
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="Solver"/> class.
         /// </summary>
         /// <param name="words">Every possible word.</param>
@@ -60,6 +78,7 @@ namespace WordleSolver
             allWords = words;
             cache = new int[wordCount, Clues.ArrayLength][];
             Difficulty = difficulty;
+ 
             progress = new Progress(wordCount);
             for (int i = 0; i < wordCount; i++)
                 for (int j = 0; j < Clues.ArrayLength; j++)
@@ -75,12 +94,21 @@ namespace WordleSolver
         {
             Initialise();
 
-            progress.Count = 0; // To trigger Changed event.
+            int[] startingIndices = OrderByQuality(allIndices);
+            int bestScore = int.MaxValue;
+            Solution bestSolution = null;
+            for (int i = 0; i < startingIndices.Length; i++)
+            {
+                progress.NextBatch();
+                Solution solution = GetSolution(startingIndices[i], allIndices, allIndices, 1, default);
+                if (solution == null || bestScore <= solution.Score) continue;
 
-            return GetResults(allIndices)
-                .OrderBy(result => result)
-                .Select(result => GetSolution(result, allIndices, allIndices, 1, default))
-                .FirstOrDefault(solution => solution != null);
+                bestScore = solution.Score;
+                maximumDepth = solution.MaximumDepth;
+                OnSolutionUpdated(bestSolution = solution);
+            }
+
+            return bestSolution;
         }
 
         /// <summary>
@@ -90,54 +118,11 @@ namespace WordleSolver
         {
             Parallel.For(0, allWords.Length, guessIndex =>
             {
-                foreach (var group in allIndices.GroupBy(targetIndex => CalculateClues(allWords[guessIndex], allWords[targetIndex])))
+                foreach (var group in allIndices.GroupBy(targetIndex => new Clues(allWords[guessIndex], allWords[targetIndex]).GetHashCode()))
                 {
                     cache[guessIndex, group.Key] = group.ToArray();
                 }
             });
-        }
-
-        /// <summary>
-        /// Calculates the clues returned for a specified guess and target word.
-        /// </summary>
-        /// <param name="guessWord">The word being guessed.</param>
-        /// <param name="targetWord">The secret target word.</param>
-        /// <returns>The clues for the guess.</returns>
-        public static Clues CalculateClues(string guessWord, string targetWord)
-        {
-            const char used = '\0';
-
-            char[] guessChars = guessWord.ToCharArray();
-            char[] targetChars = targetWord.ToCharArray();
-            Clues clues = new();
-
-            for (int i = 0; i < WordLength; i++)
-            {
-                if (guessChars[i] == targetChars[i])
-                {
-                    clues[i] = Clue.Correct;
-                    guessChars[i] = used;
-                    targetChars[i] = used;
-                }
-            }
-
-            for (int i = 0; i < WordLength; i++)
-            {
-                char guessChar = guessChars[i];
-                if (guessChar == used) continue;
-                for (int j = 0; j < WordLength; j++)
-                {
-                    if (guessChar == targetChars[j])
-                    {
-                        clues[i] = Clue.Misplaced;
-                        guessChars[i] = used;
-                        targetChars[j] = used;
-                        break;
-                    }
-                }
-            }
-
-            return clues;
         }
 
         /// <summary>
@@ -148,38 +133,41 @@ namespace WordleSolver
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The solution graph. <see langword="null"/> if no soultion can be found within
         /// <see cref="MaximumGuesses"/> guesses.</returns>
-        private Solution GetSolution(IList<int> guessIndices, IList<int> targetIndices, int depth, CancellationToken cancellationToken)
+        private Solution GetSolution(int[] guessIndices, int[] targetIndices, int depth, CancellationToken cancellationToken)
         {
-            if (targetIndices.Count == 1)
+            if (targetIndices.Length == 1)
             {
                 progress.Increment();
                 return new(allWords[targetIndices[0]], depth, true);
             }
-            else if (depth >= MaximumGuesses)
+            else if (depth >= maximumDepth)
             {
                 return null;
             }
             else
             {
-                return GetResults(guessIndices, targetIndices)
-                    .OrderBy(result => result)
-                    .Select(result => GetSolution(result, guessIndices, targetIndices, depth, cancellationToken))
-                    .FirstOrDefault(solution => solution != null);
+                return OrderByQuality(guessIndices, targetIndices)
+                    .Select(guessIndex => GetSolution(guessIndex, guessIndices, targetIndices, depth, cancellationToken))
+                    //.FirstOrDefault(solution => solution != null);
+                    .FirstOrDefault();
             }
         }
 
-        private IEnumerable<GuessResult> GetResults(IEnumerable<int> guessIndices)
+        private int[] OrderByQuality(int[] guessIndices)
         {
             return guessIndices
                 .Select(guessIndex => new GuessResult
                 {
                     GuessIndex = guessIndex,
                     IsAnswer = true,
-                    LargestCount = allClues.Max(clues => GetTargetIndices(guessIndex, clues).Length),
-                });
+                    LargestCount = allClues.Max(clues => cache[guessIndex, clues].Length),
+                })
+                .OrderBy(result => result)
+                .Select(result => result.GuessIndex)
+                .ToArray();
         }
 
-        private IEnumerable<GuessResult> GetResults(IEnumerable<int> guessIndices, ICollection<int> targetIndices)
+        private int[] OrderByQuality(int[] guessIndices, int[] targetIndices)
         {
             return guessIndices
                 .Select(guessIndex => new GuessResult
@@ -187,17 +175,24 @@ namespace WordleSolver
                     GuessIndex = guessIndex,
                     IsAnswer = targetIndices.Contains(guessIndex),
                     LargestCount = allClues.Max(clues => FilterTargetIndices(guessIndex, clues, targetIndices).Count()),
-                });
+                })
+                .OrderBy(result => result)
+                .Select(result => result.GuessIndex)
+                .ToArray();
         }
 
-        private Solution GetSolution(GuessResult result, IList<int> guessIndices, IList<int> targetIndices, int depth, CancellationToken cancellationToken)
+        private Solution GetSolution(int guessIndex, int[] guessIndices, int[] targetIndices, int depth, CancellationToken cancellationToken)
         {
-            int guessIndex = result.GuessIndex;
-            
+            int[] nextGuessIndices = null;
             if (Difficulty == Difficulty.Normal)
-                guessIndices = guessIndices.Where(wordIndex => wordIndex != guessIndex).ToArray();
+            {
+                nextGuessIndices = new int[guessIndices.Length - 1];
+                int i = Array.IndexOf(guessIndices, guessIndex);
+                Array.Copy(guessIndices, 0, nextGuessIndices, 0, i);
+                Array.Copy(guessIndices, i + 1, nextGuessIndices, i, nextGuessIndices.Length - i);
+            }
 
-            Solution solution = new(allWords[guessIndex], depth, result.IsAnswer);
+            Solution solution = new(allWords[guessIndex], depth, targetIndices.Contains(guessIndex));
             if (solution.IsAnswer) progress.Increment();
             try
             {
@@ -207,14 +202,11 @@ namespace WordleSolver
                 ParallelOptions parallelOptions = new() { CancellationToken = cancellationToken };
                 Parallel.For(0, Clues.ArrayLength - 1, parallelOptions, clues =>
                 {
-                    IList<int> nextTargetIndices = FilterTargetIndices(guessIndex, clues, targetIndices).ToArray();
-                    if (nextTargetIndices.Count == 0) return;
-                    IList<int> nextGuessIndices = Difficulty switch
-                    {
-                        Difficulty.Hard => nextTargetIndices,
-                        Difficulty.Normal => guessIndices,
-                        _ => Array.Empty<int>(),
-                    };
+                    int[] nextTargetIndices = FilterTargetIndices(guessIndex, clues, targetIndices).ToArray();
+                    if (nextTargetIndices.Length == 0) return;
+
+                    if (Difficulty == Difficulty.Hard)
+                        nextGuessIndices = nextTargetIndices;
 
                     Solution branchSolution = GetSolution(nextGuessIndices, nextTargetIndices, depth, cancellationToken);
                     solution.Branches[clues] = branchSolution;
@@ -224,16 +216,34 @@ namespace WordleSolver
             }
             catch (Exception ex) when (AllExceptionsAre<OperationCanceledException>(ex))
             {
-                progress.Add(-solution.Score);
+                progress.Add(-solution.TotalAnswers);
                 return null;
             }
         }
 
-        private int[] GetTargetIndices(int guessIndex, int clues) =>
-            cache[guessIndex, clues];
-
-        private IEnumerable<int> FilterTargetIndices(int guessIndex, int clues, ICollection<int> targetIndices) =>
-            cache[guessIndex, clues].Where(targetIndices.Contains);
+        private IEnumerable<int> FilterTargetIndices(int guessIndex, int clues, int[] targetIndices)
+        {
+            int[] allTargetIndices = cache[guessIndex, clues];
+            for (int i = 0, j = 0; i < allTargetIndices.Length && j < targetIndices.Length;)
+            {
+                int targetIndex = allTargetIndices[i];
+                int comparison = targetIndex.CompareTo(targetIndices[j]);
+                if (comparison < 0)
+                {
+                    i++;
+                }
+                else if (comparison > 0)
+                {
+                    j++;
+                }
+                else
+                {
+                    yield return targetIndex;
+                    i++;
+                    j++;
+                }
+            }
+        }
 
         /// <summary>
         /// Checks a graph of <see cref="AggregateException"/> classes that all of the inner

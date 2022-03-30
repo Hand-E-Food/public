@@ -2,8 +2,8 @@
 {
     public enum Clue
     {
-        Excluded = 0,
-        Misplaced = 1,
+        Absent = 0,
+        Present = 1,
         Correct = 2,
     }
 }

@@ -31,9 +31,23 @@ namespace WordleSolver
         public bool IsAnswer { get; private set; }
 
         /// <summary>
+        /// The the depth of the most deeply nested <see cref="Solution"/> in this graph.
+        /// </summary>
+        public int MaximumDepth => Math.Max(Depth, Branches.Max(branch => branch?.MaximumDepth ?? 0));
+
+        /// <summary>
+        /// A relative score for this solution. A lower score is better.
+        /// </summary>
+        /// <remarks>
+        /// Sums the depth of each solution that is an answer. A lower score indicates that, on
+        /// average, less guesses are required to find the answer.
+        /// </remarks>
+        public int Score => Branches.Sum(branch => branch?.Score ?? 0) + (IsAnswer ? Depth : 0);
+
+        /// <summary>
         /// The number of correct guesses in this solution graph.
         /// </summary>
-        public int Score => Branches.Sum(branch => branch?.Score ?? 0) + (IsAnswer ? 1 : 0);
+        public int TotalAnswers => Branches.Sum(branch => branch?.TotalAnswers ?? 0) + (IsAnswer ? 1 : 0);
 
         private Solution()
         { }

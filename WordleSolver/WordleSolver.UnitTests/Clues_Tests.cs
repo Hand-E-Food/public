@@ -33,5 +33,17 @@ namespace WordleSolver.UnitTests
             int actual = clues.GetHashCode();
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData("abcde", "abcde", "22222")]
+        [InlineData("edcba", "abcde", "11211")]
+        [InlineData("fghij", "abcde", "00000")]
+        [InlineData("rrrrr", "error", "02202")]
+        [InlineData("rrree", "error", "12210")]
+        public void Constructor_CalculatesCorrectClues(string guessWord, string targetWord, Clues expected)
+        {
+            Clues actual = new Clues(guessWord, targetWord);
+            Assert.Equal(expected, actual);
+        }
     }
 }
