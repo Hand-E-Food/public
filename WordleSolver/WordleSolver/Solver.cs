@@ -37,7 +37,7 @@ namespace WordleSolver
         /// <summary>
         /// The maximum number of gueses that can be used.
         /// </summary>
-        private int maximumDepth = int.MaxValue;
+        private int maximumDepth = 6;
 
         /// <summary>
         /// Manages the progress events.
@@ -93,22 +93,13 @@ namespace WordleSolver
         public Solution Solve()
         {
             Initialise();
+            progress.NextBatch();
+            Solution solution = OrderByQuality(allIndices)
+                .Select(guessIndex => GetSolution(guessIndex, allIndices, allIndices, 1, default))
+                .FirstOrDefault(solution => solution != null);
 
-            int[] startingIndices = OrderByQuality(allIndices);
-            int bestScore = int.MaxValue;
-            Solution bestSolution = null;
-            for (int i = 0; i < startingIndices.Length; i++)
-            {
-                progress.NextBatch();
-                Solution solution = GetSolution(startingIndices[i], allIndices, allIndices, 1, default);
-                if (solution == null || bestScore <= solution.Score) continue;
-
-                bestScore = solution.Score;
-                maximumDepth = solution.MaximumDepth;
-                OnSolutionUpdated(bestSolution = solution);
-            }
-
-            return bestSolution;
+            if (solution != null) OnSolutionUpdated(solution);
+            return solution;
         }
 
         /// <summary>
@@ -148,8 +139,7 @@ namespace WordleSolver
             {
                 return OrderByQuality(guessIndices, targetIndices)
                     .Select(guessIndex => GetSolution(guessIndex, guessIndices, targetIndices, depth, cancellationToken))
-                    //.FirstOrDefault(solution => solution != null);
-                    .FirstOrDefault();
+                    .FirstOrDefault(solution => solution != null);
             }
         }
 
