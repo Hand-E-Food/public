@@ -1,3 +1,10 @@
+/* eslint no-multi-spaces: off */
+/* global clearwalls: true,
+          grid_click: true,
+          mapdata: false,
+          solution: false,
+*/
+
 /** Indicates how to treat a tile.
  * @readonly
  * @enum {number}
@@ -29,7 +36,7 @@ function createRules() {
   function x1(rule) {
     return [ rule ];
   }
-  
+
   /** Mirror this rule into two orientations. */
   function x2(rule) {
     return [
@@ -37,7 +44,7 @@ function createRules() {
       rule.map(cell => d(cell.y, cell.x, cell.type)),
     ];
   }
-  
+
   /** Rotate this rule into four orientations. */
   function x4(rule) {
     return [
@@ -47,7 +54,7 @@ function createRules() {
       rule.map(cell => d( cell.y, -cell.x, cell.type)),
     ];
   }
-  
+
   /** Mirror and rotate this rule into eight orientations. */
   function x8(rule) {
     return x2(rule).map(x4).flat();
@@ -60,16 +67,16 @@ function createRules() {
       x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, PathType.Start   ), d(+1, +1, PathType.Start ) ]), // two adjacent pathables blocked on three sides
       x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, PathType.Finish  ), d(+1, +1, PathType.Finish) ]), // two adjacent pathables blocked on three sides
     ].flat(),
-    
+
     [PathType.Ice]: [
       x4([ d(-1,  0), d( 0, -1) ]) // Blocked on adjacent sides
     ].flat(),
-    
+
     [PathType.Start]: [
       x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
       x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, PathType.Start) ]), // Blocked on three sides and open side is also start
     ].flat(),
-    
+
     [PathType.Finish]: [
       x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
       x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, PathType.Finish) ]), // Blocked on three sides and open side is also finish
@@ -77,7 +84,7 @@ function createRules() {
   };
 }
 
-/** The rules that can cause a particular tile to be inaccessible. 
+/** The rules that can cause a particular tile to be inaccessible.
  * @readonly
  * @type {{PathType: Array<Array<{x: number, y: number, type: PathType}>>}}
  */
@@ -187,7 +194,7 @@ class Annotater {
         this.xyToAssess.push({x, y});
       }
     }
-    
+
     while (this.xyToAssess.length > 0) {
       const cell = this.xyToAssess.pop();
       const x = cell.x;
@@ -252,16 +259,16 @@ class Annotater {
    * @param y {number} The cell's Y coordinate.
    * @param value {PathType} The PathType for the specified cell.
    */
-   _setPath(x, y, value) { this.path[y][x] = value; }
+  _setPath(x, y, value) { this.path[y][x] = value; }
 }
 
-if (typeof super_clearwalls === "undefined") super_clearwalls = clearwalls;
+var super_clearwalls = clearwalls;
 clearwalls = function(mapid) {
   super_clearwalls(mapid);
   annotaters[mapid].annotate();
 }
 
-if (typeof super_grid_click === "undefined") super_grid_click = grid_click;
+var super_grid_click = grid_click;
 grid_click = function(obj) {
   super_grid_click(obj);
   const tmp = obj.id.split(',');
