@@ -202,10 +202,14 @@ class Annotater {
 
       if (this._shouldBlockTile(x, y)) {
         this.xyToAssess.push(
-          {x: x-1, y},
-          {x: x+1, y},
-          {x, y: y-1},
-          {x, y: y+1},
+          {x: x-1, y: y-1},
+          {x: x  , y: y-1},
+          {x: x+1, y: y-1},
+          {x: x-1, y: y  },
+          {x: x+1, y: y  },
+          {x: x-1, y: y+1},
+          {x: x  , y: y+1},
+          {x: x+1, y: y+1},
         );
         this._setPath(x, y, PathType.Inaccessible);
         this._annotateCell(x, y, true);
@@ -262,6 +266,16 @@ class Annotater {
   _setPath(x, y, value) { this.path[y][x] = value; }
 }
 
+var annotaters = {};
+mapdata
+  .filter(map => map)
+  .forEach(map => {
+    const annotater = new Annotater(map.ID);
+    annotaters[map.ID] = annotater;
+    annotater.annotate();
+  }
+);
+
 var super_clearwalls = clearwalls;
 clearwalls = function(mapid) {
   super_clearwalls(mapid);
@@ -275,13 +289,3 @@ grid_click = function(obj) {
   const mapid = tmp[0] - 0;
   annotaters[mapid].annotate();
 }
-
-var annotaters = {};
-mapdata
-  .filter(map => map)
-  .forEach(map => {
-    const annotater = new Annotater(map.ID);
-    annotaters[map.ID] = annotater;
-    annotater.annotate();
-  }
-);
