@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         Pathery Annotater
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Annotates Pathery maps.
+// @author       Mark Richardson
+// @match        https://www.pathery.com/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=pathery.com
+// @grant        none
+// ==/UserScript==
+
 /* eslint no-multi-spaces: off */
 /* global clearwalls: true,
           grid_click: true,
@@ -9,108 +20,43 @@
  * @readonly
  * @enum {number}
  */
-const PathType = {
+const CellType = {
+  /** Indicate that the tile is inaccessible. */
   Inaccessible: 0,
-  Terminus: 1,
-  Start: 2,
-  Finish: 3,
-  Pathable: 4,
+  /** Indicate that the tile is pathable. */
+  Pathable: 1,
+  /** Indicate that the tile is a terminus and the path might extend in only one direction.
+   * A terminus can include a checkpoint or teleport out.
+   */
+  Terminus: 2,
+  /** Indicate that the tile is a pathable start tile. */
+  Start: 3,
+  /** Indicate that the tile is a pathable finish tile. */
+  Finish: 4,
+  /** Indicate that the tile is pathable ice. */
   Ice: 5,
 };
 
-/** Used to populate `Rules`.
- * @returns {{PathType: Array<Array<{x: number, y: number, type: PathType}>>}} The rules for each
- * PathType.
+/** Indicates how to annotate a tile.
+ * @readonly
+ * @enum {string}
  */
-function createRules() {
-
-  /** Generate a simple object describing the PathType expected at a tile offset.
-   * @param x {number} The X offset.
-   * @param y {number} The Y offset.
-   * @param type {PathType} The expected PathType. Default: `PathType.Inaccessible`
-   * @returns {{x: number, y: number, type: PathType}}
+const AnnotationType = {
+  /** Remove the annotation.
+   * @type string
    */
-  function d(x, y, type = PathType.Inaccessible) { return {x, y, type}; }
-
-  /** Keep this rule in one orientation. */
-  function x1(rule) {
-    return [ rule ];
-  }
-
-  /** Mirror this rule into two orientations. */
-  function x2(rule) {
-    return [
-      rule.map(cell => d(cell.x, cell.y, cell.type)),
-      rule.map(cell => d(cell.y, cell.x, cell.type)),
-    ];
-  }
-
-  /** Rotate this rule into four orientations. */
-  function x4(rule) {
-    return [
-      rule.map(cell => d( cell.x,  cell.y, cell.type)),
-      rule.map(cell => d(-cell.y,  cell.x, cell.type)),
-      rule.map(cell => d(-cell.x, -cell.y, cell.type)),
-      rule.map(cell => d( cell.y, -cell.x, cell.type)),
-    ];
-  }
-
-  /** Mirror and rotate this rule into eight orientations. */
-  function x8(rule) {
-    return x2(rule).map(x4).flat();
-  }
-
-  return {
-    [PathType.Pathable]: [ // Block if a dead end, one or two tiles wide.
-      x4([ d(-1,  0), d( 0, -1), d(+1,  0) ]), // Blocked on three sides
-      x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, PathType.Pathable) ]), // two adjacent pathables blocked on three sides
-      x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, PathType.Start   ), d(+1, +1, PathType.Start ) ]), // two adjacent pathables blocked on three sides
-      x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, PathType.Finish  ), d(+1, +1, PathType.Finish) ]), // two adjacent pathables blocked on three sides
-    ].flat(),
-
-    [PathType.Ice]: [
-      x4([ d(-1,  0), d( 0, -1) ]) // Blocked on adjacent sides
-    ].flat(),
-
-    [PathType.Start]: [
-      x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
-      x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, PathType.Start) ]), // Blocked on three sides and open side is also start
-    ].flat(),
-
-    [PathType.Finish]: [
-      x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
-      x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, PathType.Finish) ]), // Blocked on three sides and open side is also finish
-    ].flat(),
-  };
+  Clear: null,
+  /** Annotate that the cell is inaccessible. */
+  Inaccessible: "#ff000088",
+  /** Annotate that the cell is a bottleneck. */
+  Bottleneck: "#00ffff88",
 }
 
-/** The rules that can cause a particular tile to be inaccessible.
- * @readonly
- * @type {{PathType: Array<Array<{x: number, y: number, type: PathType}>>}}
- */
-const Rules = createRules();
+/** Manages the state of the map being analysed. */
+class PatheryMap {
 
-/** Annotates a map. */
-class Annotater {
-
-  /** Initialises an Annotater for the specified map ID.
-   * @param id {number} The map ID.
-   */
-  constructor(id) {
-    this.id = id;
-    const mapdata = this.mapdata;
-    this.tiles = mapdata.tiles;
-    this.width = mapdata.width;
-    this.height = mapdata.height;
-
-    this.path = new Array(this.height);
-    for(let y = 0; y < this.height; y++) {
-      this.path[y] = new Array(this.width);
-    }
-  }
-
-  /** Gets this annotater's map data.
-   * @returns {{
+  /** This map source data.
+   * @type {{
    *   ID: number,
    *   checkpoints: number,
    *   code: string,
@@ -135,21 +81,230 @@ class Annotater {
    *   width: number,
    * }}
    */
-  get mapdata() { return mapdata[this.id]; }
+  _mapdata;
+
+  /** This map's width.
+   * @type {number}
+   */
+  width;
+
+  /** This map's height.
+   * @type {number}
+   */
+  height;
+
+  /** The information derived for this map.
+   * @type {Array<Array<CellType>>}
+  */
+  _cells;
+
+  /** The locations each path can start at. Always contains two elements: a list of the normal
+   * start locations; and a list of the reverse start locations.
+   * @type {Array<Array<{x: number, y: number}>>}
+   */
+  starts = [[],[]];
+
+  /** The finish locations.
+   * @type {Array<{x: number, y: number}>}
+   */
+  finishes = [];
+
+  /** The locations of each checkpoint. The final list represents the finish.
+   * @type {Array<Array<{x: number, y: number}>>}
+   */
+  checkpoints;
+
+  /** The in and out location of each teleport.
+   * @type {Array<{in: {x: number, y: number}, out: {x: number, y: number}}>}
+   */
+  teleports;
+
+  /** Initialises a Map for the specified map ID.
+   * @param {number} id The map ID.
+   */
+  constructor(id) {
+    this._mapdata = mapdata[id];
+    this.width = this._mapdata.width;
+    this.height = this._mapdata.height;
+
+    this._cells = new Array(this.height);
+    for(let y = 0; y < this.height; y++) {
+      this._cells[y] = new Array(this.width);
+    }
+
+    this.checkpoints = new Array(this._mapdata.checkpoints);
+    for(let i = 0; i < this.checkpoints.length; i++) {
+      this.checkpoints[i] = [];
+    }
+
+    this.teleports = new Array(this._mapdata.teleports);
+    for(let i = 0; i < this.teleports.length; i++) {
+      this.teleports[i] = { in: null, out: null };
+    }
+
+    for(let y = 0; y < this.height; y++) {
+      const tilesRow = this._mapdata.tiles[y];
+      for(let x = 0; x < this.width; x++) {
+        const tilesCell = tilesRow[x];
+        const n = tilesCell[1] - 1;
+        switch (tilesCell[0]) {
+          case "c": this.checkpoints[n].push({ x, y }); break; // checkpoint
+          case "f": this.finishes.push({ x, y });       break; // finish
+          case "s": this.starts[n].push({ x, y });      break; // start
+          case "t": this.teleports[n].in = { x, y };    break; // teleport in
+          case "u": this.teleports[n].out = { x, y };   break; // teleport out
+        }
+      }
+    }
+  }
+
+  /** Resets the path type of every cell. */
+  reset() {
+    const tiles = this._mapdata.tiles;
+    for(let y = 0; y < this.height; y++) {
+      const pathRow = this._cells[y];
+      const tilesRow = tiles[y];
+      for(let x = 0; x < this.width; x++) {
+        pathRow[x] = this._getCellType(tilesRow[x][0]);
+      }
+    }
+  }
+
+  /** Determines how a given map cell should be treated.
+   * @param {string} value The map cell's type as a single letter.
+   * @returns {CellType} A CellType indicating how to treat this cell.
+  */
+  _getCellType(value) {
+    switch (value) {
+      case "c": return CellType.Terminus;     // checkpoint
+      case "f": return CellType.Finish;       // finish
+      case "o": return CellType.Pathable;     // open
+      case "p": return CellType.Pathable;     // pathable only
+      case "r": return CellType.Inaccessible; // rock
+      case "s": return CellType.Start;        // green/red start
+      case "t": return CellType.Pathable;     // teleport in
+      case "u": return CellType.Terminus;     // teleport out
+      case "x": return CellType.Pathable;     // green/red pathable/rock
+      case "z": return CellType.Ice;          // ice
+      default:  return CellType.Pathable;
+    }
+  }
+
+  /** Gets the path type applied to the specified cell.
+   * @param {number} x The cell's X coordinate.
+   * @param {number} y The cell's Y coordinate.
+   * @returns {CellType} The CellType for the specified cell.
+   */
+  get(x, y) { return (x >= 0 && x < this.width && y >= 0 && y < this.height) ? this._cells[y][x] : CellType.Inaccessible; }
+
+  /** Sets the path type applied to the specified cell.
+   * @param {number} x The cell's X coordinate.
+   * @param {number} y The cell's Y coordinate.
+   * @param {CellType} value The CellType for the specified cell.
+   */
+  set(x, y, value) { this._cells[y][x] = value; }
+}
+
+/** Annotates a map. */
+class PatheryAnnotater {
+
+  /** The rules that can cause a particular tile to be inaccessible.
+   * @static @readonly
+   * @type {{CellType: Array<Array<{x: number, y: number, type: CellType}>>}}
+   */
+  static InaccessibleRules = function() {
+
+    /** Generate a simple object describing the CellType expected at a tile offset.
+     * @param {number} x The X offset.
+     * @param {number} y The Y offset.
+     * @param {CellType} type The expected CellType. Default: `CellType.Inaccessible`
+     * @returns {{x: number, y: number, type: CellType}}
+     */
+    function d(x, y, type = CellType.Inaccessible) { return {x, y, type}; }
+
+    /** Keep this rule in one orientation. */
+    function x1(rule) {
+      return [ rule ];
+    }
+
+    /** Mirror this rule into two orientations. */
+    function x2(rule) {
+      return [
+        rule.map(cell => d(cell.x, cell.y, cell.type)),
+        rule.map(cell => d(cell.y, cell.x, cell.type)),
+      ];
+    }
+
+    /** Rotate this rule into four orientations. */
+    function x4(rule) {
+      return [
+        rule.map(cell => d( cell.x,  cell.y, cell.type)),
+        rule.map(cell => d(-cell.y,  cell.x, cell.type)),
+        rule.map(cell => d(-cell.x, -cell.y, cell.type)),
+        rule.map(cell => d( cell.y, -cell.x, cell.type)),
+      ];
+    }
+
+    /** Mirror and rotate this rule into eight orientations. */
+    function x8(rule) {
+      return x2(rule).map(x4).flat();
+    }
+
+    return {
+      [CellType.Pathable]: [ // Block if a dead end, one or two tiles wide.
+        x4([ d(-1,  0), d( 0, -1), d(+1,  0) ]), // Blocked on three sides
+        x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, CellType.Pathable) ]), // two adjacent pathables blocked on three sides
+        x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, CellType.Start   ), d(+1, +1, CellType.Start ) ]), // two adjacent pathables blocked on three sides
+        x8([ d(-1,  0), d( 0, -1), d(+1, -1), d(+2,  0), d(+1,  0, CellType.Finish  ), d(+1, +1, CellType.Finish) ]), // two adjacent pathables blocked on three sides
+      ].flat(),
+
+      [CellType.Ice]: [
+        x4([ d(-1,  0), d( 0, -1) ]) // Blocked on adjacent sides
+      ].flat(),
+
+      [CellType.Start]: [
+        x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
+        x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, CellType.Start) ]), // Blocked on three sides and open side is also start
+      ].flat(),
+
+      [CellType.Finish]: [
+        x1([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1) ]), // Blocked on four sides
+        x4([ d(-1,  0), d( 0, -1), d(+1,  0), d( 0, +1, CellType.Finish) ]), // Blocked on three sides and open side is also finish
+      ].flat(),
+    };
+  }();
+
+  /** The map ID service by this annotater.
+   * @type {number}
+   */
+  id;
+
+  /** The map holding the information used by this annotater.
+   * @type {PatheryMap}
+   */
+  map;
+
+  /** Initialises an Annotater for the specified map ID.
+   * @param {number} id The map ID.
+   */
+  constructor(id) {
+    this.id = id;
+    this.map = new PatheryMap(id);
+  }
 
   /** Replaces the map annotation. */
   annotate() {
-    this._initialisePath();
-    this._annotatePath();
+    this._reset();
+    this._annotateInaccessibleCells();
   }
 
   /** Resets the analysis of the map before finding details to annotate. */
-  _initialisePath() {
+  _reset() {
+    this.map.reset();
+    
     for(let y = 0; y < this.height; y++) {
-      const pathRow = this.path[y];
       for(let x = 0; x < this.width; x++) {
-        pathRow[x] = this._getPathType(this.tiles[y][x][0]);
-        this._annotateCell(x, y, false);
+        this._annotateCell(x, y, AnnotationType.Clear);
       }
     }
 
@@ -157,27 +312,7 @@ class Annotater {
       .split(".")
       .filter(cell => cell.length > 0)
       .map(cell => cell.split(","))
-      .forEach(cell => this._setPath(cell[1], cell[0], PathType.Inaccessible), this);
-  }
-
-  /** Determines how a given map cell should be treated.
-   * @param value {string} The map cell's type as a single letter.
-   * @returns {PathType} A PathType indicating how to treat this cell.
-  */
-  _getPathType(value) {
-    switch (value) {
-      case "c": return PathType.Terminus;     // checkpoint
-      case "f": return PathType.Finish;       // finish
-      case "o": return PathType.Pathable;     // open
-      case "p": return PathType.Pathable;     // pathable only
-      case "r": return PathType.Inaccessible; // rock
-      case "s": return PathType.Start;        // green/red start
-      case "t": return PathType.Pathable;     // teleport in
-      case "u": return PathType.Terminus;     // teleport out
-      case "x": return PathType.Pathable;     // green/red pathable/rock
-      case "z": return PathType.Ice;          // ice
-      default:  return PathType.Pathable;
-    }
+      .forEach(cell => this.map.set(cell[1], cell[0], CellType.Inaccessible), this);
   }
 
   /** Gets the current solution drawn on this annotater's map.
@@ -187,10 +322,10 @@ class Annotater {
   get solution() { return solution[this.id]; }
 
   /** Finds and annotates map cells that cannot be accessed. */
-  _annotatePath() {
+  _annotateInaccessibleCells() {
     this.xyToAssess = [];
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
+    for (let y = 0; y < this.map.height; y++) {
+      for (let x = 0; x < this.map.width; x++) {
         this.xyToAssess.push({x, y});
       }
     }
@@ -200,7 +335,7 @@ class Annotater {
       const x = cell.x;
       const y = cell.y;
 
-      if (this._shouldBlockTile(x, y)) {
+      if (this._isInaccessible(x, y)) {
         this.xyToAssess.push(
           {x: x-1, y: y-1},
           {x: x  , y: y-1},
@@ -211,81 +346,72 @@ class Annotater {
           {x: x  , y: y+1},
           {x: x+1, y: y+1},
         );
-        this._setPath(x, y, PathType.Inaccessible);
-        this._annotateCell(x, y, true);
+        this.map.set(x, y, CellType.Inaccessible);
+        this._annotateCell(x, y, AnnotationType.Inaccessible);
       }
     }
   }
 
   /** Checks if a map cell should be inaccessible.
-   * @param x {number} The cell's X coordinate.
-   * @param y {number} The cell's Y coordinate.
+   * @param {number} x The cell's X coordinate.
+   * @param {number} y The cell's Y coordinate.
    */
-  _shouldBlockTile(x, y) {
-    const rules = Rules[this._getPath(x, y)];
+  _isInaccessible(x, y) {
+    const rules = PatheryAnnotater.InaccessibleRules[this.map.get(x, y)];
     if (!rules) return false;
 
     return rules
       .some(rule =>
         rule.every(cell =>
-          this._getPath(x + cell.x, y + cell.y) === cell.type
-        ,this)
-      ,this);
+          this.map.get(x + cell.x, y + cell.y) === cell.type
+        , this)
+      , this);
   }
 
+  _annotateBottleneckCells() {}
+
   /** Annotates the specified cell.
-   * @param x {number} The cell's X coordinate.
-   * @param y {number} The cell's Y coordinate.
-   * @param value {boolean} `true` to annotate the cell as inaccessible. `false` to clear the annotation.
+   * @param {number} x The cell's X coordinate.
+   * @param {number} y The cell's Y coordinate.
+   * @param {AnnotationType} value How to annotate this cell.
    */
   _annotateCell(x, y, value) {
-    this.getHTMLElement(x, y).firstElementChild.style.backgroundColor = value ? "#ff000088" : null;
+    this.getHTMLElement(x, y).firstElementChild.style.backgroundColor = value;
   }
 
   /** Gets the HTML element for the specified cell.
-   * @param x {number} The cell's X coordinate.
-   * @param y {number} The cell's Y coordinate.
+   * @param {number} x The cell's X coordinate.
+   * @param {number} y The cell's Y coordinate.
    * @returns {HTMLElement} The HTML element for the specified cell.
    */
-  getHTMLElement(x, y) {
-    return document.getElementById(`${this.id},${y},${x}`);
-  }
-
-  /** Gets the path type applied to the specified cell.
-   * @param x {number} The cell's X coordinate.
-   * @param y {number} The cell's Y coordinate.
-   * @returns {PathType} The PathType for the specified cell.
-   */
-  _getPath(x, y) { return (x >= 0 && x < this.width && y >= 0 && y < this.height) ? this.path[y][x] : PathType.Inaccessible; }
-
-  /** Sets the path type applied to the specified cell.
-   * @param x {number} The cell's X coordinate.
-   * @param y {number} The cell's Y coordinate.
-   * @param value {PathType} The PathType for the specified cell.
-   */
-  _setPath(x, y, value) { this.path[y][x] = value; }
+  getHTMLElement(x, y) { return document.getElementById(`${this.id},${y},${x}`); }
 }
 
-var annotaters = {};
-mapdata
-  .filter(map => map)
-  .forEach(map => {
-    const annotater = new Annotater(map.ID);
-    annotaters[map.ID] = annotater;
-    annotater.annotate();
-  }
-);
-
-var super_clearwalls = clearwalls;
+var super_clearwalls = super_clearwalls ?? clearwalls;
 clearwalls = function(mapid) {
   super_clearwalls(mapid);
-  annotaters[mapid].annotate();
+  annotate(mapid);
 }
 
-var super_grid_click = grid_click;
+var super_grid_click = super_grid_click ?? grid_click;
 grid_click = function(obj) {
   super_grid_click(obj);
   const tmp = obj.id.split(',');
   const mapid = tmp[0] - 0;
-  annotaters[mapid].annotate();
+  annotate(mapid);
+}
+
+/** The annotater for each map ID.
+ * @type {Object.<number, PatheryAnnotater>}
+ */
+var annotaters = {};
+
+/** Annotates the specified map id.
+ * @param {number} mapid The map's ID.
+ */
+function annotate(mapid) {
+  let annotater = annotaters[mapid];
+  if (!annotater)
+    annotaters[mapid] = annotater = new PatheryAnnotater(mapid);
+  annotater.annotate();
 }
