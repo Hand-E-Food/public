@@ -1,0 +1,16 @@
+.option {
+    color: #0078D7;
+}
+
+.available:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.accepted {
+    font-weight: bold;
+}
+
+.rejected {
+    opacity: 0.5;
+}

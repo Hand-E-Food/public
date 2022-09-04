@@ -1,0 +1,24 @@
+Start
+    Beach
+        Docks
+            Yacht Passenger
+                Shed Password
+            Yacht Cargo
+
+        Guard Hut
+            
+
+    Cliffs
+        Exterior
+            Radio Tower
+                Report
+                []Learn German
+        Geothermal Power Plant
+
+
+        [Shed Password]Shed
+            Shed Cellar
+            [Exterior]Ladder
+    Submarine Pen
+
+        []Inner Sanctum
