@@ -1,4 +1,6 @@
-﻿namespace PsiFi
+﻿using System.ComponentModel;
+
+namespace PsiFi
 {
     /// <summary>
     /// An ability.

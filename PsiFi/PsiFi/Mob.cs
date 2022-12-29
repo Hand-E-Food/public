@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace PsiFi
 {
@@ -6,7 +8,7 @@ namespace PsiFi
     /// A mob.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay}")]
-    public abstract class Mob
+    public abstract class Mob : INotifyPropertyChanged
     {
         internal string DebuggerDisplay => $"{Name}, health: {Health.DebuggerDisplay}";
 
@@ -17,17 +19,38 @@ namespace PsiFi
         public Mob(int health)
         {
             Health = new Range(health);
+            Health.PropertyChanged += (sender, e) => OnPropertyChanged(nameof(Health));
         }
 
         /// <summary>
         /// This mob's natural abilities.
         /// </summary>
-        public ICollection<Ability> Abilities { get; protected set; } = Array.Empty<Ability>();
+        public ICollection<Ability> Abilities
+        {
+            get => abilities;
+            protected set
+            {
+                if (abilities == value) return;
+                abilities = value ?? Array.Empty<Ability>();
+                OnPropertyChanged();
+            }
+        }
+        private ICollection<Ability> abilities = Array.Empty<Ability>();
 
         /// <summary>
         /// The target of this mob's attacks.
         /// </summary>
-        public Mob? AttackTarget { get; set; }
+        public Mob? AttackTarget
+        {
+            get => attackTarget;
+            set
+            {
+                if (attackTarget == value) return;
+                attackTarget = value;
+                OnPropertyChanged();
+            }
+        }
+        private Mob? attackTarget;
 
         /// <summary>
         /// This mob's health.
@@ -46,12 +69,18 @@ namespace PsiFi
             get => room;
             set
             {
+                if (room == value) return;
                 if (room != null) room.Mobs.Remove(this);
                 room = value;
                 if (room != null) room.Mobs.Add(this);
+                OnPropertyChanged();
             }
         }
         private Room? room = null;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+            PropertyChanged?.Invoke(this, new(propertyName));
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Causes this mob to die.

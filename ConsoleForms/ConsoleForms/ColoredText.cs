@@ -1,10 +1,14 @@
-﻿namespace ConsoleForms
+﻿using System.Diagnostics;
+
+namespace ConsoleForms
 {
     /// <summary>
     /// Text with colour.
     /// </summary>
     public class ColoredText
     {
+        public override string ToString() => $"\"{Text}\" {ForegroundColor}/{BackgroundColor}";
+
         /// <summary>
         /// Creates a new <see cref="ColoredText"/>.
         /// </summary>
@@ -18,6 +22,20 @@
             BackgroundColor = backgroundColor;
         }
 
+        /// <inheritdoc cref="String.Remove(int)"/>
+        public ColoredText Remove(int startIndex) => Clone(Text.Remove(startIndex));
+
+        /// <inheritdoc cref="String.Remove(int, int)"/>
+        public ColoredText Remove(int startIndex, int count) => Clone(Text.Remove(startIndex, count));
+
+        /// <inheritdoc cref="String.Substring(int)"/>
+        public ColoredText Substring(int startIndex) => Clone(Text.Substring(startIndex));
+
+        /// <inheritdoc cref="String.Substring(int, int)"/>
+        public ColoredText Substring(int startIndex, int length) => Clone(Text.Substring(startIndex, length));
+
+        private ColoredText Clone(string text) => new(text, ForegroundColor, BackgroundColor);
+
         /// <summary>
         /// This text's background color.
         /// </summary>
@@ -27,6 +45,11 @@
         /// This text's foreground color.
         /// </summary>
         public readonly ConsoleColor ForegroundColor;
+
+        /// <summary>
+        /// The text's length.
+        /// </summary>
+        public int Length => Text.Length;
 
         /// <summary>
         /// The text to write.

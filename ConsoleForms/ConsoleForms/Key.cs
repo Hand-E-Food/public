@@ -5,37 +5,40 @@
     /// </summary>
     public static class Key
     {
-        public const char Backspace = '\x08'; // backspace
-        public const char Delete = '\x7F'; // delete
+        //public const char AltModifier = '⎇';
+        public const char Backspace = '␈';
+        //public const char ControlModifier = '^';
+        public const char Delete = '␡';
         public const char DownArrow = '↓';
-        public const char End = '\x04'; // end of transmission
-        public const char Enter = '\x0A'; // line feed
-        public const char Escape = '\x1B'; // escape
-        public const char Home = '\x01'; // start of heading
-        public const char Insert = '\x1A'; // substitute
+        public const char End = '␃';
+        public const char Enter = '⏎';
+        public const char Escape = '␛';
+        public const char Home = '␂';
+        public const char Insert = '⎀';
         public const char LeftArrow = '←';
-        public const char None = '\x00'; // null
-        public const char PageDown = '\x02'; // start of text
-        public const char PageUp = '\x03'; // end of text
+        public const char None = '\x00';
+        public const char PageDown = '⎘';
+        public const char PageUp = '⎗';
         public const char RightArrow = '→';
-        public const char Tab = '\x09'; // horizontal tab
+        //public const char ShiftModifier = '⇧';
+        public const char Tab = '⭾';
         public const char UpArrow = '↑';
         public static class Shift
         {
             public const char Backspace = '\x06'; // acknowledge
             public const char Delete = '\x15'; // negative acknowledge
-            public const char DownArrow = '▾';
+            public const char DownArrow = '⇓';
             public const char End = '\x1F'; // unit separator
             public const char Enter = '\x17'; // end of transmission block
             public const char Escape = '\x18'; // cancel
             public const char Home = '\x1C'; // file separator
             public const char Insert = '\x07'; // bell
-            public const char LeftArrow = '◂';
+            public const char LeftArrow = '⇐';
             public const char PageDown = '\x1E'; // record separator
             public const char PageUp = '\x1D'; // group separator
-            public const char RightArrow = '▸';
+            public const char RightArrow = '⇒';
             public const char Tab = '\x11'; // vertical tab
-            public const char UpArrow = '▴';
+            public const char UpArrow = '⇑';
         }
 
         /// <summary>

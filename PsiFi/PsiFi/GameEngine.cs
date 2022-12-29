@@ -1,4 +1,6 @@
-﻿namespace PsiFi
+﻿using PsiFi.Interactions;
+
+namespace PsiFi
 {
     /// <summary>
     /// Manages playing a game.
@@ -9,15 +11,15 @@
         /// Creates a new <see cref="GameEngine"/>.
         /// </summary>
         /// <param name="protagonist">This game's protagonist.</param>
-        public GameEngine(Protagonist protagonist)
+        public GameEngine(Game game)
         {
-            Protagonist = protagonist;
+            Game = game;
         }
 
         /// <summary>
-        /// This game's protagonist.
+        /// The game being run by this engine.
         /// </summary>
-        public Protagonist Protagonist { get; }
+        public Game Game { get; }
 
         /// <summary>
         /// Runs a game.
@@ -25,8 +27,11 @@
         /// <returns>A sequence of interactions.</returns>
         public IEnumerable<Interaction> RunGame()
         {
-            var missionEngine = new MissionEngine(Protagonist);
-            foreach (var interaction in missionEngine.RunMission()) yield return interaction;
+            var mapGenerator = new MapGenerator();
+            Game.Mission = new Mission(mapGenerator.CreateMap());
+            var missionEngine = new MissionEngine(Game);
+            yield return new StartMissionInteraction(missionEngine.RunMission());
+            yield return new EndMissionInteraction();
         }
     }
 }

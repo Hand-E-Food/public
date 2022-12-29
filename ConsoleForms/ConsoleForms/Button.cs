@@ -1,31 +1,39 @@
 ﻿namespace ConsoleForms
 {
     /// <summary>
-    /// A button that can be pressed with a key.
+    /// A button control that handles a key press.
     /// </summary>
     public class Button : Control
     {
         /// <summary>
-        /// Creates a new <see cref="Button"/>.
-        /// </summary>
-        /// <param name="key">The key to press to activate this button.</param>
-        /// <param name="action">The action performed when this button is presseed.</param>
-        public Button(char key, Action action)
-        {
-            BackgroundColor = ConsoleColor.DarkGreen;
-            Key = key;
-            Action = action;
-        }
-
-        /// <summary>
         /// This button's text color when enabled.
         /// </summary>
-        public ConsoleColor EnabledColor { get; set; } = ConsoleColor.Green;
+        public ConsoleColor EnabledColor
+        {
+            get => enabledColor;
+            set
+            {
+                if (enabledColor == value) return;
+                enabledColor = value;
+                InvalidateDrawing();
+            }
+        }
+        private ConsoleColor enabledColor = ConsoleColor.Green;
 
         /// <summary>
         /// This button's text color when disabled.
         /// </summary>
-        public ConsoleColor DisabledColor { get; set; } = ConsoleColor.Black;
+        public ConsoleColor DisabledColor
+        {
+            get => disabledColor;
+            set
+            {
+                if (disabledColor == value) return;
+                disabledColor = value;
+                InvalidateDrawing();
+            }
+        }
+        private ConsoleColor disabledColor = ConsoleColor.Black;
 
         /// <summary>
         /// True if this button is enabled. False if this button is disabled.
@@ -35,8 +43,9 @@
             get => isEnabled;
             set
             {
+                if (isEnabled == value) return;
                 isEnabled = value;
-                Invalidate();
+                InvalidateDrawing();
             }
         }
         private bool isEnabled = true;
@@ -44,19 +53,41 @@
         /// <summary>
         /// The key to press to activate this button.
         /// </summary>
-        public char Key { get; set; }
+        public char? Key
+        {
+            get => key;
+            set
+            {
+                if (key == value) return;
+                key = value;
+                InvalidateDrawing();
+            }
+        }
+        private char? key = null;
 
         /// <summary>
         /// The action performed when this button is pressed.
         /// </summary>
-        public Action Action { get; set; }
+        public Action Action { get; set; } = NoAction;
 
-        public override void Draw(Graphics graphics)
+        /// <summary>
+        /// Does nothing. The default value of <see cref="Action"/>.
+        /// </summary>
+        public static void NoAction() { }
+
+        protected override void Draw(Graphics graphics)
         {
-            base.Draw(graphics);
+            var text = Key?.ToString() ?? string.Empty;
             var foregroundColor = IsEnabled ? EnabledColor : DisabledColor;
-            graphics.SetCursorPosition(Left, Top);
-            graphics.Write(Key.ToString(), foregroundColor, BackgroundColor);
+            graphics.SetCursorPosition(Bounds.TopLeft);
+            graphics.Write(text, foregroundColor, BackgroundColor);
+        }
+
+        public override bool HandleKey(char key)
+        {
+            var handled = IsEnabled && key == Key;
+            if (handled) Action();
+            return handled;
         }
     }
 }

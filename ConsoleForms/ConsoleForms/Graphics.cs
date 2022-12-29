@@ -1,20 +1,24 @@
+using System.Diagnostics;
+using ConsoleForms;
+
 namespace ConsoleForms
 {
     /// <summary>
     /// A graphics manager.
     /// </summary>
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public class Graphics
     {
-        private readonly Canvas canvas;
+        private string DebuggerDisplay => $"ClipRegion = {ClipRegion}, Cursor = {CursorX},{CursorY}";
 
         /// <summary>
         /// Creates a new <see cref="Graphics"/>.
         /// </summary>
-        /// <param name="canvas">The canvas to draw on.</param>
+        /// <param name="bitmap">The bitmap to draw on.</param>
         /// <param name="clipRegion">The region to allow drawing on.</param>
-        public Graphics(Canvas canvas, Rectangle clipRegion)
+        public Graphics(Bitmap bitmap, Rectangle clipRegion)
         {
-            this.canvas = canvas;
+            this.bitmap = bitmap;
             ClipRegion = clipRegion;
         }
 
@@ -29,7 +33,7 @@ namespace ConsoleForms
         /// <param name="region">The new clip region.</param>
         /// <returns>A <see cref="Graphics"/> object.</returns>
         public Graphics CreateClipRegion(Rectangle region) =>
-            new(canvas, Rectangle.Intersection(ClipRegion, region) ?? Rectangle.Empty);
+            new(bitmap, Rectangle.Intersection(ClipRegion, region) ?? Rectangle.Empty);
 
         /// <summary>
         /// Clears the clip region.
@@ -40,8 +44,14 @@ namespace ConsoleForms
             if (!ClipRegion.HasArea) return;
             for (int y = ClipRegion.Top; y < ClipRegion.Bottom; y++)
                 for (int x = ClipRegion.Left; x < ClipRegion.Right; x++)
-                    canvas.Pixels[x, y] = new Pixel(' ', backgroundColor: backgroundColor);
+                    bitmap.Pixels[x, y] = new Pixel(' ', backgroundColor: backgroundColor);
         }
+
+        /// <summary>
+        /// Sets the current cursor position.
+        /// </summary>
+        /// <param name="point">The cursor position.</param>
+        public void SetCursorPosition(Point point) => SetCursorPosition(point.X, point.Y);
 
         /// <summary>
         /// Sets the current cursor position.
@@ -53,6 +63,11 @@ namespace ConsoleForms
             CursorX = x;
             CursorY = y;
         }
+
+        /// <summary>
+        /// The current position of the cursor.
+        /// </summary>
+        public Point Cursor => new(CursorX, CursorY);
 
         /// <summary>
         /// The current X position of the cursor.
@@ -87,10 +102,18 @@ namespace ConsoleForms
             while (i < text.Length && CursorX < ClipRegion.Right)
             {
                 if (CursorX >= ClipRegion.Left)
-                    canvas.Pixels[CursorX, CursorY] = new Pixel(text[i], coloredText.ForegroundColor, coloredText.BackgroundColor);
+                    bitmap.Pixels[CursorX, CursorY] = new Pixel(text[i], coloredText.ForegroundColor, coloredText.BackgroundColor);
                 CursorX++;
                 i++;
             }
         }
+
+        /// <summary>
+        /// Writes the specified bitmap to the current cursor position.
+        /// </summary>
+        /// <param name="bitmap">The bitmap to write.</param>
+        public void Write(Bitmap bitmap) => throw new NotImplementedException();
+
+        private readonly Bitmap bitmap;
     }
 }

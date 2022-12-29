@@ -1,33 +1,44 @@
-﻿using PsiFi.Abilities;
-using PsiFi.Interactions;
+﻿using PsiFi.Interactions;
+using System.Linq;
 
 namespace PsiFi
 {
     internal class MissionEngine
     {
         private readonly ICollection<Ability> abilities;
-        private readonly QuitAbility quitAbility = new();
 
         /// <summary>
         /// Creates a new <see cref="MissionEngine"/>.
         /// </summary>
-        /// <param name="protagonist">This mission's protagonist.</param>
-        public MissionEngine(Protagonist protagonist)
+        /// <param name="game">The game to run.</param>
+        public MissionEngine(Game game)
         {
-            Protagonist = protagonist;
-            abilities = Protagonist.Abilities
-                .Concat(Protagonist.Skills
+            Game = game;
+            if (game.Protagonist == null) throw new InvalidOperationException("The game must have a protagonist.");
+            if (game.Mission == null) throw new InvalidOperationException("The game must have a current mission.");
+            abilities = Game.Protagonist.Abilities
+                .Concat(Game.Protagonist.Skills
                     .Select(skill => skill.Ability)
                     .WhereNotNull()
                 )
-                .Append(quitAbility)
+                .Append(game.Mission.QuitAbility)
                 .ToArray();
         }
 
         /// <summary>
-        /// This mission's protagonist.
+        /// The game.
         /// </summary>
-        public Protagonist Protagonist { get; }
+        public Game Game { get; }
+
+        /// <summary>
+        /// The game's current mission.
+        /// </summary>
+        private Mission Mission => Game.Mission!;
+
+        /// <summary>
+        /// The game's protagonist.
+        /// </summary>
+        private Protagonist Protagonist => Game.Protagonist!;
 
         /// <summary>
         /// Runs a mission.
@@ -35,14 +46,22 @@ namespace PsiFi
         /// <returns>A sequence of interactions.</returns>
         public IEnumerable<Interaction> RunMission()
         {
-            yield return new StartMissionInteraction();
-            var room = new MapGenerator().CreateMap();
-            Protagonist.Room = room;
-            yield return new ShowRoomInteraction(room);
-            while (!quitAbility.Activated && Protagonist.Room != null)
+            yield return MoveProtagonistToRoom(Mission.EntryRoom);
+            while (!Mission.QuitAbility.Activated && Game.Protagonist.Room != null)
             {
                 foreach (var interaction in RunProtagonist()) yield return interaction;
             }
+        }
+
+        /// <summary>
+        /// Moves the protagonist to the specified room.
+        /// </summary>
+        /// <param name="room">The room to move to.</param>
+        /// <returns>The interaction that displays the new room.</returns>
+        private ShowRoomInteraction MoveProtagonistToRoom(Room room)
+        {
+            Protagonist.Room = room;
+            return new ShowRoomInteraction(room);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace PsiFi
 {
@@ -6,26 +8,61 @@ namespace PsiFi
     /// A number constrained by an upper and lower bounds.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay}")]
-    public class Range
+    public class Range : INotifyPropertyChanged
     {
+
         internal string DebuggerDisplay => Minimum == 0
-            ? $"{Value}/{Maximum}"
-            : $"{Value} ({Minimum} to {Maximum})";
+                    ? $"{Value}/{Maximum}"
+                    : $"{Value} ({Minimum} to {Maximum})";
 
         /// <summary>
         /// This range's minimum value.
         /// </summary>
-        public int Minimum { get; set; }
+        public int Minimum
+        {
+            get => minimum;
+            set
+            {
+                if (minimum == value) return;
+                minimum = value;
+                OnPropertyChanged();
+            }
+        }
+        private int minimum;
 
         /// <summary>
         /// This range's maximum value.
         /// </summary>
-        public int Maximum { get; set; }
+        public int Maximum
+        {
+            get => maximum;
+            set
+            {
+                if (maximum == value) return;
+                maximum = value;
+                OnPropertyChanged();
+            }
+        }
+        private int maximum;
 
         /// <summary>
         /// This range's current value.
         /// </summary>
-        public int Value { get; set; }
+        public int Value
+        {
+            get => value;
+            set
+            {
+                if (this.value == value) return;
+                this.value = value;
+                OnPropertyChanged();
+            }
+        }
+        private int value;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+            PropertyChanged?.Invoke(this, new(propertyName));
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Initialises a new <see cref="Range"/> with a minimum of 0 and the specified maximum.
@@ -43,9 +80,9 @@ namespace PsiFi
         public Range(int minimum, int maximum)
         {
             if (minimum > maximum) throw new ArgumentOutOfRangeException(nameof(maximum), $"{nameof(maximum)} cannot be less than {nameof(minimum)}.");
-            Minimum = minimum;
-            Maximum = maximum;
-            Value = maximum;
+            this.minimum = minimum;
+            this.maximum = maximum;
+            this.value = maximum;
         }
 
         /// <summary>

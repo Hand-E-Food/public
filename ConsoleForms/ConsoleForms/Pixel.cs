@@ -5,6 +5,11 @@ namespace ConsoleForms
     /// </summary>
     public struct Pixel
     {
+        public override string ToString()
+        {
+            var escaped = Character > 32 ? Character.ToString() : "\\x" + ((int)Character).ToString("x2");
+            return $"'${escaped}' {ForegroundColor}/{BackgroundColor}";
+        }
 
         /// <summary>
         /// Creates a new <see cref="Pixel"/>.
