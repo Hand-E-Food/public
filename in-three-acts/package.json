@@ -1,0 +1,22 @@
+{
+  "name": "in-three-acts",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Mark Richardson",
+  "license": "ISC",
+  "main": "out/index.js",
+  "scripts": {
+    "preapp": "npm run build",
+    "app": "node out/index.js",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.4",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@types/cli-color": "^2.0.2",
+    "cli-color": "^2.0.3",
+    "readline": "^1.3.0"
+  }
+}
