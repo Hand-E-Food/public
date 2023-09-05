@@ -1,0 +1,46 @@
+body {
+    background-color: black;
+
+    height: 100vh;
+    width:  100vw;
+    --size: calc(min(100vw, 100vh) / 12);
+
+    font-family: sans-serif;
+}
+
+.field {
+    position: fixed;
+    height: calc(var(--size) * 5);
+    width: calc(var(--size) * 11);
+    top: 0;
+    left: 0;
+
+    background-color: #00A000;
+}
+
+.field > .cell {
+    background-color: #008000;
+
+    display: block;
+    position: absolute;
+    height: calc(var(--size) * 0.90);
+    width: calc(var(--size) * 0.90);
+    border-width: calc(var(--size) * 0.05);
+    margin: calc(var(--size) * 0.05);
+}
+
+.field > .shadow {
+    background-color: #006000;
+}
+
+.field > .start {
+    background-image: radial-gradient(#FFFFFFFF 10%, #FFFFFF00 12%);
+}
+
+.field > .blue-goal {
+    background-color: #0000FF;
+}
+
+.field > .red-goal {
+    background-color: #FF0000;
+}
