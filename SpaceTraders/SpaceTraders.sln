@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceTraders", "SpaceTraders\SpaceTraders.csproj", "{47EC0C02-7092-4EAB-B0E2-073DF542B6E5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceTraders.Cli", "SpaceTraders.Cli\SpaceTraders.Cli.csproj", "{D485093F-BF93-40AF-B142-4CCB8C9B2C4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47EC0C02-7092-4EAB-B0E2-073DF542B6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47EC0C02-7092-4EAB-B0E2-073DF542B6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47EC0C02-7092-4EAB-B0E2-073DF542B6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47EC0C02-7092-4EAB-B0E2-073DF542B6E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D485093F-BF93-40AF-B142-4CCB8C9B2C4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D485093F-BF93-40AF-B142-4CCB8C9B2C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D485093F-BF93-40AF-B142-4CCB8C9B2C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D485093F-BF93-40AF-B142-4CCB8C9B2C4F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FCB4AB5A-E762-4854-8D6D-C118B9D8EDE4}
+	EndGlobalSection
+EndGlobal
