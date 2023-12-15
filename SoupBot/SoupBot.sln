@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoupBot", "SoupBot\SoupBot.csproj", "{3C08B048-A273-4427-A423-18900EE704BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{5D04DC48-B782-44A7-85F3-BD532E73B92F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C08B048-A273-4427-A423-18900EE704BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C08B048-A273-4427-A423-18900EE704BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C08B048-A273-4427-A423-18900EE704BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C08B048-A273-4427-A423-18900EE704BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D803C6B9-7896-4742-A0FA-D7A19D72168C}
+	EndGlobalSection
+EndGlobal
