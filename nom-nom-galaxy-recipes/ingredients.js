@@ -1,0 +1,22 @@
+﻿const allIngredients = [
+    { name: "Bluecap"         , src: "bluecap.png"          },
+    { name: "Greenstalk"      , src: "greenstalk.png"       },
+    { name: "Stabgrass"       , src: "stabgrass.png"        },
+    { name: "Brineweed"       , src: "brineweed.png"        },
+    { name: "Tsutavine"       , src: "tsutavine.png"        },
+    { name: "Tomaty Steak"    , src: "tomaty_steak.png"     },
+    { name: "Oxygrass"        , src: "oxygrass.png"         },
+    { name: "Corn Shell"      , src: "corn_shell.png"       },
+    { name: "Chickenberry"    , src: "chickenberry.png"     },
+    { name: "Bisausage"       , src: "bisausage.png"        },
+    { name: "Strawburi Filet" , src: "strawburi_filet.png"  },
+    { name: "Sunblossom"      , src: "sunblossom.png"       },
+    { name: "Squidfly Chunk"  , src: "squidfly_chunk.png"   },
+    { name: "Pinapurana Filet", src: "pinapurana_filet.png" },
+    { name: "Poisonpuff"      , src: "poisonpuff.png"       },
+    { name: "Kabo Chunk"      , src: "kabo_chunk.png"       },
+    { name: "Thornstalk"      , src: "thornstalk.png"       },
+    { name: "Thornbloom"      , src: "thornbloom.png"       },
+    { name: "Masher Yam"      , src: "masher_yam.png"       },
+    { name: "Mammoth Meat"    , src: "mammoth_meat.png"     }
+];
