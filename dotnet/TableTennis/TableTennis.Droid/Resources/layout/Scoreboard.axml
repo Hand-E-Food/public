@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scoreboard_rootLayout"
+    android:gravity="fill"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <TextView
+        android:id="@+id/scoreboard_team1Name"
+        android:background="@color/team1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/team_1_name_placeholder"
+        style="@style/Scoreboard_Name" />
+    <LinearLayout
+        android:id="@+id/scoreboard_matchesLayout"
+        android:layout_below="@+id/scoreboard_team1Name"
+        android:layout_above="@+id/scoreboard_team2Name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:scrollbars="horizontal" />
+    <TextView
+        android:id="@+id/scoreboard_team2Name"
+        android:background="@color/team2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/team_2_name_placeholder"
+        style="@style/Scoreboard_Name" />
+</RelativeLayout>

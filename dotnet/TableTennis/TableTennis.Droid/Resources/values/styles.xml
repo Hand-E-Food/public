@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Scoreboard_Name" parent="@android:style/TextAppearance.Large">
+    <item name="android:gravity">center</item>
+    <item name="android:singleLine">true</item>
+    <item name="android:textSize">25dp</item>
+  </style>
+  <style name="Scoreboard_Score" parent="@android:style/TextAppearance.Large">
+    <item name="android:gravity">center</item>
+    <item name="android:singleLine">true</item>
+    <item name="android:textSize">40dp</item>
+  </style>
+</resources>

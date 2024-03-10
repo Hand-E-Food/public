@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enabled="false"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/grid_line_width"
+    android:visibility="visible">
+    <TextView
+        style="@style/Scoreboard_Score"
+        android:id="@+id/gameFragment_player1Score"
+        android:background="@color/team1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="@dimen/grid_line_width"
+        android:text="-" />
+    <TextView
+        style="@style/Scoreboard_Score"
+        android:id="@+id/gameFragment_player2Score"
+        android:background="@color/team2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="@dimen/grid_line_width"
+        android:text="-" />
+</RelativeLayout>

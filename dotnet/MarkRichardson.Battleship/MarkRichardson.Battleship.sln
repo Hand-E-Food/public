@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkRichardson.Battleship.Navy", "MarkRichardson.Battleship.Navy\MarkRichardson.Battleship.Navy.csproj", "{989E1E0B-91D2-4943-9E7C-11BE84C34CDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkRichardson.Battleship.Playback", "MarkRichardson.Battleship.Playback\MarkRichardson.Battleship.Playback.csproj", "{A038F9ED-D159-4DB6-A45D-5FFD2C3C60E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkRichardson.Battleship.Gunners", "MarkRichardson.Battleship.Gunners\MarkRichardson.Battleship.Gunners.csproj", "{8743FAAC-4574-426F-8081-F4117000DD1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkRichardson.Battleship", "MarkRichardson.Battleship\MarkRichardson.Battleship.csproj", "{4905A615-0B12-4ED5-8F47-7B975B5F93CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkRichardson.Battleship.Comparison", "MarkRichardson.Battleship.Comparison\MarkRichardson.Battleship.Comparison.csproj", "{C0E873C7-1438-46E1-B1DD-1057109F2FB6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{989E1E0B-91D2-4943-9E7C-11BE84C34CDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989E1E0B-91D2-4943-9E7C-11BE84C34CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989E1E0B-91D2-4943-9E7C-11BE84C34CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989E1E0B-91D2-4943-9E7C-11BE84C34CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A038F9ED-D159-4DB6-A45D-5FFD2C3C60E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A038F9ED-D159-4DB6-A45D-5FFD2C3C60E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A038F9ED-D159-4DB6-A45D-5FFD2C3C60E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A038F9ED-D159-4DB6-A45D-5FFD2C3C60E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8743FAAC-4574-426F-8081-F4117000DD1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8743FAAC-4574-426F-8081-F4117000DD1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8743FAAC-4574-426F-8081-F4117000DD1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8743FAAC-4574-426F-8081-F4117000DD1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4905A615-0B12-4ED5-8F47-7B975B5F93CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4905A615-0B12-4ED5-8F47-7B975B5F93CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4905A615-0B12-4ED5-8F47-7B975B5F93CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4905A615-0B12-4ED5-8F47-7B975B5F93CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0E873C7-1438-46E1-B1DD-1057109F2FB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0E873C7-1438-46E1-B1DD-1057109F2FB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0E873C7-1438-46E1-B1DD-1057109F2FB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0E873C7-1438-46E1-B1DD-1057109F2FB6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

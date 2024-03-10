@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeNetwork", "NodeNetwork.csproj", "{3BDD9AB8-4EAD-4F74-A33E-8CC7D587BD7A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3BDD9AB8-4EAD-4F74-A33E-8CC7D587BD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BDD9AB8-4EAD-4F74-A33E-8CC7D587BD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BDD9AB8-4EAD-4F74-A33E-8CC7D587BD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BDD9AB8-4EAD-4F74-A33E-8CC7D587BD7A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {322BCEDD-D925-4EE6-9B39-DE2B8C40A78F}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,22 @@
+﻿[
+	{
+		"Size": 7,
+		"Count": 1,
+		"Required": true
+	},
+	{
+		"Size": 6,
+		"Count": 5,
+		"Required": true
+	},
+	{
+		"Size": 5,
+		"Count": 18,
+		"Required": true
+	},
+	{
+		"Size": 5,
+		"Count": 7,
+		"Required": false
+	}
+]

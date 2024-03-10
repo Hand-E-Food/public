@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrixoSolver", "OrixoSolver\OrixoSolver.csproj", "{D5D98245-9808-4D0A-9CE5-EA2531811537}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrixoSolver.Tests", "OrixoSolver.Tests\OrixoSolver.Tests.csproj", "{E5F759D9-6556-4243-8C09-2AAD5CD1BAEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5D98245-9808-4D0A-9CE5-EA2531811537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5D98245-9808-4D0A-9CE5-EA2531811537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5D98245-9808-4D0A-9CE5-EA2531811537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5D98245-9808-4D0A-9CE5-EA2531811537}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F759D9-6556-4243-8C09-2AAD5CD1BAEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F759D9-6556-4243-8C09-2AAD5CD1BAEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F759D9-6556-4243-8C09-2AAD5CD1BAEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F759D9-6556-4243-8C09-2AAD5CD1BAEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {741FD2AB-CEB1-4C9A-87C4-C07C527BD8A9}
+	EndGlobalSection
+EndGlobal

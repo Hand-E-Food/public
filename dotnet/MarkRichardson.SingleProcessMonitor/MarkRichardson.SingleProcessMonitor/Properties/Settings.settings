@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MarkRichardson.SingleProcessMonitor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="UserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SYSTEM</Value>
+    </Setting>
+    <Setting Name="UpdateInterval" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="ImageName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">WRSA</Value>
+    </Setting>
+    <Setting Name="CpuUsageWarning" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="CpuUsageCritical" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:background="@color/team1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/Team1Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/team_1_name_placeholder" />
+        <EditText
+            android:id="@+id/Team1Player1Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_1_name_placeholder" />
+        <EditText
+            android:id="@+id/Team1Player2Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_2_name_placeholder" />
+        <EditText
+            android:id="@+id/Team1Player3Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_3_name_placeholder" />
+    </LinearLayout>
+    <LinearLayout
+        android:background="@color/team2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/Team2Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/team_2_name_placeholder" />
+        <EditText
+            android:id="@+id/Team2Player1Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_1_name_placeholder" />
+        <EditText
+            android:id="@+id/Team2Player2Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_2_name_placeholder" />
+        <EditText
+            android:id="@+id/Team2Player3Name"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:inputType="textCapWords"
+            android:hint="@string/player_3_name_placeholder" />
+    </LinearLayout>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="0">
+        <TableRow>
+            <TextView
+                android:labelFor="@+id/Games"
+                android:layout_column="0"
+                android:text="@string/games_prompt" />
+            <Spinner
+                android:id="@+id/Games"
+                android:layout_column="1"
+                android:prompt="@string/games_prompt"
+                android:textAlignment="viewEnd" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:labelFor="@+id/Goal"
+                android:layout_column="0"
+                android:text="@string/goal_prompt" />
+            <Spinner
+                android:id="@+id/Goal"
+                android:layout_column="1"
+                android:prompt="@string/goal_prompt"
+                android:textAlignment="viewEnd" />
+        </TableRow>
+    </TableLayout>
+    <Button
+        android:enabled="false"
+        android:id="@+id/PlayButton"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/play_button" />
+</LinearLayout>

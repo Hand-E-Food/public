@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="fill"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <TextView
+        android:id="@+id/matchFragment_player1Name"
+        android:background="@color/team1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Player 1's Name"
+        style="@style/Scoreboard_Name" />
+    <LinearLayout
+        android:id="@+id/matchFragment_gamesLayout"
+        android:layout_below="@+id/matchFragment_player1Name"
+        android:layout_above="@+id/matchFragment_player2Name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:padding="@dimen/grid_line_width" />
+    <TextView
+        android:id="@+id/matchFragment_player2Name"
+        android:background="@color/team2"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Player 2's Name"
+        style="@style/Scoreboard_Name" />
+</RelativeLayout>

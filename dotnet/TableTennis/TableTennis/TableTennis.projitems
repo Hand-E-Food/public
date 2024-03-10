@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>fbd884ff-a024-4c23-9762-93c9120c1a24</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>TableTennis</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\IContestReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\IGameReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\IMatchReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\IValidation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\TeamInputValidation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\Transform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\WinContestByMajorityReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\WinGameBy2PointsReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Engines\WinMatchByMajorityReferee.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Contest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Game.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Match.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\RoundRobinContest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Player.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Team.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\TeamInput.cs" />
+  </ItemGroup>
+</Project>

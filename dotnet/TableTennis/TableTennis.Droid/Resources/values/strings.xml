@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">TableTennis.Droid</string>
+  <string name="main_activity">TableTennis</string>
+  <string name="team_input_activity">TableTennis.TeamInput</string>
+  <string name="scoreboard_activity">TableTennis.Scoreboard</string>
+
+  <string name="title">Table Tennis Scoreboard</string>
+  <string name="copyright">© 2015 Mark Richardson</string>
+  <string name="start_button">Start!</string>
+
+  <string name="team_1_name_placeholder">Red Team\'s name</string>
+  <string name="team_2_name_placeholder">Blue Team\'s name</string>
+  <string name="player_1_name_placeholder">Player 1\'s name</string>
+  <string name="player_2_name_placeholder">Player 2\'s name</string>
+  <string name="player_3_name_placeholder">Player 3\'s name</string>
+  <string name="games_prompt">Games per Match</string>
+  <string name="goal_prompt">Points to win each Game</string>
+  <string name="play_button">Play!</string>
+
+  <string-array name="games_options">
+    <item>1</item>
+    <item>3</item>
+    <item>5</item>
+  </string-array>
+  <string name="default_games_option">5</string>
+
+  <string-array name="goal_options">
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>9</item>
+    <item>11</item>
+    <item>13</item>
+    <item>15</item>
+    <item>17</item>
+    <item>19</item>
+    <item>21</item>
+  </string-array>
+  <string name="default_goal_option">11</string>
+</resources>
