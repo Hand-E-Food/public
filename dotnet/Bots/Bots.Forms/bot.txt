@@ -1,0 +1,4 @@
+if cell(1,0) is walkable:
+	walk
+else:
+	turn right
