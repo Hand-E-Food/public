@@ -1,40 +1,37 @@
-﻿namespace RandomVectorMap.Mapping
+﻿namespace RandomVectorMap.Mapping;
+
+/// <summary>
+/// Enumerates the possible settlement sizes.
+/// </summary>
+public enum SettlementSize
 {
+    /// <summary>
+    /// No settlement is defined.
+    /// </summary>
+    Undefined,
 
     /// <summary>
-    /// Enumerates the possible settlement sizes.
+    /// No settlement.
     /// </summary>
-    public enum SettlementSize
-    {
+    None,
 
-        /// <summary>
-        /// No settlement is defined.
-        /// </summary>
-        Undefined,
+    /// <summary>
+    /// A service station.
+    /// </summary>
+    Service,
 
-        /// <summary>
-        /// No settlement.
-        /// </summary>
-        None,
+    /// <summary>
+    /// A homestead.
+    /// </summary>
+    Homestead,
 
-        /// <summary>
-        /// A service station.
-        /// </summary>
-        Service,
+    /// <summary>
+    /// A sizable town.
+    /// </summary>
+    Town,
 
-        /// <summary>
-        /// A homestead.
-        /// </summary>
-        Homestead,
-
-        /// <summary>
-        /// A sizable town.
-        /// </summary>
-        Town,
-
-        /// <summary>
-        /// A sprawling city.
-        /// </summary>
-        City,
-    }
+    /// <summary>
+    /// A sprawling city.
+    /// </summary>
+    City,
 }

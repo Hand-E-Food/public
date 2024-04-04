@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
-namespace System.Collections.Generic
+/// <summary>
+/// Provides a base class for implementations of the System.Collections.Generic.IComparer<T> generic
+/// interface.
+/// </summary>
+/// <typeparam name="T">The type of objects to compare.</typeparam>
+public class ReversedComparer<T> : Comparer<T> where T : IComparable<T>
 {
-
     /// <summary>
-    /// Provides a base class for implementations of the System.Collections.Generic.IComparer<T> generic
-    /// interface.
+    /// Performs a comparison of two objects of the same type and returns a value indicating whether one
+    /// object is less than, equal to, or greater than the other.
     /// </summary>
-    /// <typeparam name="T">The type of objects to compare.</typeparam>
-    public class ReversedComparer<T> : Comparer<T> where T : IComparable<T>
+    /// <param name="x">The first object to compare.</param>
+    /// <param name="y">The second object to compare.</param>
+    /// <returns>A signed integer that indicates the relative values of x and y.</returns>
+    public override int Compare(T? x, T? y)
     {
-
-        /// <summary>
-        /// Performs a comparison of two objects of the same type and returns a value indicating whether one
-        /// object is less than, equal to, or greater than the other.
-        /// </summary>
-        /// <param name="x">The first object to compare.</param>
-        /// <param name="y">The second object to compare.</param>
-        /// <returns>A signed integer that indicates the relative values of x and y.</returns>
-        public override int Compare(T x, T y)
-        {
+        if (y is null)
+            return x is null ? 0 : -1;
+        else
             return y.CompareTo(x);
-        }
     }
 }

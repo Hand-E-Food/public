@@ -1,46 +1,41 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using RandomVectorMap.Mapping;
+﻿using RandomVectorMap.Mapping;
 
-namespace RandomVectorMap.Generation
+namespace RandomVectorMap.Generation;
+
+/// <summary>
+/// Creates base implementations of base mapping objects.
+/// </summary>
+public class DefaultMappingObjectFactory : IMappingObjectFactory
 {
+    private int junctionCount = 0;
+    private int zoneCount = 0;
+
+    public Junction CreateJunction(Point location, string? name = null) => new(location, name ?? NextJunctionName());
+
+    public Road CreateRoad(Junction j1, Junction j2, string? name = null) => new(j1, j2, name ?? $"{j1.Name} - {j2.Name}");
+
+    public Zone CreateZone(IEnumerable<Road> roads, string? name = null) => new(roads, name ?? NextZoneName());
 
     /// <summary>
-    /// Creates base implementations of base mapping objects.
+    /// Gets the next junction's default name.
     /// </summary>
-    public class DefaultMappingObjectFactory : IMappingObjectFactory
+    /// <returns>The next junction's name.</returns>
+    private string NextJunctionName() => (++junctionCount).ToString();
+
+    /// <summary>
+    /// Gets the next zone's default name.
+    /// </summary>
+    /// <returns>The next zone's name.</returns>
+    private string NextZoneName()
     {
-
-        /// <summary>
-        /// Creates a new junction.
-        /// </summary>
-        /// <param name="Location">The junction's location.</param>
-        /// <returns>An initialised instance of a Junction object.</returns>
-        public Junction CreateJunction(Point location)
+        int value = ++zoneCount;
+        string name = string.Empty;
+        do
         {
-            return new Junction(location);
+            name = char.ConvertFromUtf32((value % 26) + 65) + name;
+            value /= 26;
         }
-
-        /// <summary>
-        /// Creates a new road.
-        /// </summary>
-        /// <param name="j1">The first junction endpoint.</param>
-        /// <param name="j2">The second junction endpoint.</param>
-        /// <returns>An initialised instance of a Road object.</returns>
-        public Road CreateRoad(Junction j1, Junction j2)
-        {
-            return new Road(j1, j2);
-        }
-
-        /// <summary>
-        /// Creates a new Zone.
-        /// </summary>
-        /// <param name="roads">The zone's bordering roads.  The roads must form a closed loop but may be in
-        /// any order.</param>
-        /// <returns>An initialised instance of a Zone object.</returns>
-        public Zone CreateZone(IEnumerable<Road> roads)
-        {
-            return new Zone(roads);
-        }
+        while (value > 0);
+        return name;
     }
 }

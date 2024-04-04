@@ -1,117 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using RandomVectorMap.Mapping;
+﻿using RandomVectorMap.Mapping;
+using System.Diagnostics.CodeAnalysis;
 
-namespace RandomVectorMap.Generation
+namespace RandomVectorMap.Generation;
+
+/// <summary>
+/// Builds cities.
+/// </summary>
+public class SettlementBuilder : MapGeneratorComponent
 {
 
     /// <summary>
-    /// Builds cities.
+    /// Gets a value indicating whether this stepper has finished its task.
     /// </summary>
-    public class SettlementBuilder : MapGeneratorComponent
+    /// <value>True if this stepper has finished its task; otherwise, false.</value>
+    public override bool IsFinished => IsInitialized && (junctions!.Count == 0 || Map.Junctions.Count(junction => junction.Size != SettlementSize.Undefined) >= MaximumCities);
+
+    /// <summary>
+    /// The junctions available to be used as a city.
+    /// </summary>
+    private List<Junction>? junctions = null;
+
+    /// <summary>
+    /// Gets or sets the maximum number of cities.
+    /// </summary>
+    public int MaximumCities { get; set; } = int.MaxValue;
+
+    /// <summary>
+    /// Gets or sets the minimnum distance between cities.
+    /// </summary>
+    public double MinimumDistance { get; set; } = 0;
+
+    /// <summary>
+    /// Gets the list of names that can be used for cities.
+    /// </summary>
+    public List<string> Names { get; } = [];
+
+    /// <summary>
+    /// Gets a dictionary of settlement sizes and the biomes they can spread to.
+    /// </summary>
+    public Dictionary<SettlementSize, Biome[]> SettleableBiomes { get; } = [];
+
+    /// <summary>
+    /// The list of settlement sizes and how often they occur.
+    /// </summary>
+    public WeightedRandomSet<SettlementSize> SettlementSizeWeights { get; } = [];
+
+    /// <summary>
+    /// Initialises the class after properties have been set.
+    /// </summary>
+    [MemberNotNull(nameof(junctions))]
+    public override void Initialize()
     {
+        base.Initialize();
 
-        /// <summary>
-        /// Initialises a new instance of the <see cref="SettlementBuilder"/> class.
-        /// </summary>
-        public SettlementBuilder()
+        // Get a list of all unassigned junctions.
+        junctions = Map.Junctions.Where(j => j.Size == SettlementSize.Undefined).ToList();
+    }
+
+    /// <summary>
+    /// Performs a single step of map generation.
+    /// </summary>
+    public override void Step()
+    {
+        if (junctions is null) throw new InvalidOperationException("Class is not initialized.");
+        // Build the settlement.
+        var junction = Random.Next(junctions);
+        junction.Size = Random.Next(SettlementSizeWeights);
+        junction.DebugColor = Color.Red;
+        if (SettleableBiomes.TryGetValue(junction.Size, out var affectedBiomes))
         {
-            MaximumCities = int.MaxValue;
-            MinimumDistance = 0;
-            Names = new List<string>();
-            SettleableBiomes = new Dictionary<SettlementSize, Biome[]>();
-            SettlementSizeWeights = new WeightedRandomSet<SettlementSize>();
-        }
-
-        #region Properties ...
-
-        /// <summary>
-        /// Gets a value indicating whether this stepper has finished its task.
-        /// </summary>
-        /// <value>True if this stepper has finished its task; otherwise, false.</value>
-        public override bool IsFinished 
-        { 
-            get 
-            { 
-                return IsInitialized 
-                    && (    Junctions.Count == 0
-                         || Map.Junctions.Count((j) => j.Size != SettlementSize.Undefined) >= MaximumCities
-                       ); 
-            }
-        }
-
-        /// <summary>
-        /// The junctions available to be used as a city.
-        /// </summary>
-        private List<Junction> Junctions;
-
-        /// <summary>
-        /// Gets or sets the maximum number of cities.
-        /// </summary>
-        public int MaximumCities { get; set; }
-
-        /// <summary>
-        /// Gets or sets the minimnum distance between cities.
-        /// </summary>
-        public double MinimumDistance { get; set; }
-
-        /// <summary>
-        /// Gets the list of names that can be used for cities.
-        /// </summary>
-        public List<string> Names { get; private set; }
-
-        /// <summary>
-        /// Gets a dictionary of settlement sizes and the biomes they can spread to.
-        /// </summary>
-        public Dictionary<SettlementSize, Biome[]> SettleableBiomes { get; private set; }
-
-        /// <summary>
-        /// The list of settlement sizes and how often they occur.
-        /// </summary>
-        public WeightedRandomSet<SettlementSize> SettlementSizeWeights;
-
-        #endregion
-
-        /// <summary>
-        /// Initialises the class after properties have been set.
-        /// </summary>
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            // Get a list of all unassigned junctions.
-            Junctions = new List<Junction>(Map.Junctions.Where((j) => j.Size == SettlementSize.Undefined));
-
-            // Apply the random number generator to the weighted lists.
-            SettlementSizeWeights.Random = Random;
-        }
-
-        /// <summary>
-        /// Performs a single step of map generation.
-        /// </summary>
-        public override void Step()
-        {
-            // Build the settlement.
-            var junction = Junctions[Random.Next(Junctions.Count)];
-            junction.Size = SettlementSizeWeights.Select();
-            junction.DebugColor = Color.Red;
-            Biome[] affectedBiomes;
-            if (SettleableBiomes.TryGetValue(junction.Size, out affectedBiomes)) 
+            foreach (var zone in junction.Zones)
             {
-                foreach (var zone in junction.Zones)
+                if (affectedBiomes.Contains(zone.Biome) && zone.SettlementSize < junction.Size)
                 {
-                    if (affectedBiomes.Contains(zone.Biome) && zone.SettlementSize < junction.Size)
-                    {
-                        zone.SettlementSize = junction.Size;
-                        zone.DebugColor = Color.Red;
-                    }
+                    zone.SettlementSize = junction.Size;
+                    zone.DebugColor = Color.Red;
                 }
             }
-
-            // Remove all nearby junctions from the candidate list.
-            Junctions.RemoveAll((j) => new Vector(j, junction).Length < MinimumDistance);
         }
+
+        // Remove all nearby junctions from the candidate list.
+        junctions.RemoveAll(j => new Vector(j, junction).Length < MinimumDistance);
     }
 }

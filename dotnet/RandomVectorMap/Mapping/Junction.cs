@@ -1,78 +1,50 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿namespace RandomVectorMap.Mapping;
 
-namespace RandomVectorMap.Mapping
+/// <summary>
+/// Represents a junction of two or more roads.
+/// </summary>
+/// <param name="location">The junction's location.</param>
+[System.Diagnostics.DebuggerDisplay("{Name}")]
+public class Junction(Point location, string name)
 {
+    /// <summary>
+    /// Gets or sets the colour to paint this juction.
+    /// </summary>
+    public Color DebugColor { get; set; } = Color.Transparent;
 
     /// <summary>
-    /// Represents a junction of two or more roads.
+    /// Gets this junction's coordinates.
     /// </summary>
-    [System.Diagnostics.DebuggerDisplay("{Name}")]
-    public class Junction
-    {
+    /// <value>A coordinate.</value>
+    public Point Location { get; set; } = location;
 
-        /// <summary>
-        /// Initialises a new instance of the <see cref="Junction"/> class.
-        /// </summary>
-        /// <param name="location">The junction's location.</param>
-        public Junction(Point location)
-        {
-            DebugColor = Color.Transparent;
-            Location = location;
-            Roads = new List<Road>();
-            Size = SettlementSize.Undefined;
-        }
+    /// <summary>
+    /// Gets or sets this junction's name.
+    /// </summary>
+    /// <value>This junction's name.</value>
+    public string Name { get; set; } = name;
 
-        #region Properties ...
+    /// <summary>
+    /// Gets a collection of the roads that meet at this junction.
+    /// </summary>
+    /// <value>A collection of roads.</value>
+    public List<Road> Roads { get; } = [];
 
-        /// <summary>
-        /// Gets or sets the colour to paint this juction.
-        /// </summary>
-        public Color DebugColor { get; set; }
+    /// <summary>
+    /// Gets or sets the size of this junction's settlement.
+    /// </summary>
+    public SettlementSize Size { get; set; } = SettlementSize.Undefined;
 
-        /// <summary>
-        /// Gets or sets this junction's coordinates.
-        /// </summary>
-        /// <value>A coordinate.</value>
-        public Point Location { get; set; }
+    /// <summary>
+    /// Gets a collection of all zones bordering this junction.
+    /// </summary>
+    /// <value>A collection of zones.</value>
+    public IEnumerable<Zone> Zones => Roads.SelectMany(road => road.Zones.WhereNotNull()).Distinct();
 
-        /// <summary>
-        /// Gets or sets this junction's name.
-        /// </summary>
-        /// <value>This junction's name.</value>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets a collection of the roads that meet at this junction.
-        /// </summary>
-        /// <value>A collection of roads.</value>
-        public List<Road> Roads { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the size of this junction's settlement.
-        /// </summary>
-        public SettlementSize Size { get; set; }
-
-        /// <summary>
-        /// Gets a collection of all zones bordering this junction.
-        /// </summary>
-        /// <value>A collection of zones.</value>
-        public IEnumerable<Zone> Zones { get { return Roads.SelectMany((r) => r.Zones.Where((z) => z != null)).Distinct(); } }
-
-        #endregion
-
-        /// <summary>
-        /// Returns the junction's location.
-        /// </summary>
-        /// <param name="j">The junction to convert.</param>
-        /// <returns>The junciton's location.</returns>
-        public static implicit operator Point(Junction j)
-        {
-            if (j == null)
-                return Point.Empty;
-            else
-                return j.Location;
-        }
-    }
+    /// <summary>
+    /// Returns the junction's location.
+    /// </summary>
+    /// <param name="junction">The junction to convert.</param>
+    /// <returns>The junction's location.</returns>
+    public static implicit operator Point(Junction junction) => junction.Location;
 }

@@ -1,55 +1,52 @@
-﻿namespace RandomVectorMap.Mapping
+﻿namespace RandomVectorMap.Mapping;
+
+/// <summary>
+/// Enumeration of the possible biomes.
+/// </summary>
+public enum Biome
 {
+    /// <summary>
+    /// No biome is defined.
+    /// </summary>
+    Undefined,
 
     /// <summary>
-    /// Enumeration of the possible biomes.
+    /// Unpassable salt water.
     /// </summary>
-    public enum Biome
-    {
+    Ocean,
 
-        /// <summary>
-        /// No biome is defined.
-        /// </summary>
-        Undefined,
+    /// <summary>
+    /// Unpassable fresh water.
+    /// </summary>
+    Lake,
 
-        /// <summary>
-        /// Unpassable salt water.
-        /// </summary>
-        Ocean,
+    /// <summary>
+    /// A dry desert.
+    /// </summary>
+    Desert,
 
-        /// <summary>
-        /// Unpassable fresh water.
-        /// </summary>
-        Lake,
+    /// <summary>
+    /// Fertile pastures.
+    /// </summary>
+    Pasture,
 
-        /// <summary>
-        /// A dry desert.
-        /// </summary>
-        Desert,
+    /// <summary>
+    /// A thick and tretcherous swamp or mangrove.
+    /// </summary>
+    Swamp,
 
-        /// <summary>
-        /// Fertile pastures.
-        /// </summary>
-        Pasture,
+    /// <summary>
+    /// A lush forest.
+    /// </summary>
+    Forest,
 
-        /// <summary>
-        /// A thick and tretcherous swamp or mangrove.
-        /// </summary>
-        Swamp,
+    /// <summary>
+    /// A steep mountain-side.
+    /// </summary>
+    Mountain,
 
-        /// <summary>
-        /// A lush forest.
-        /// </summary>
-        Forest,
-
-        /// <summary>
-        /// A steep mountain-side.
-        /// </summary>
-        Mountain,
-
-        /// <summary>
-        /// A cold and icy mountain peak.
-        /// </summary>
-        Snow,
-    }
+    /// <summary>
+    /// A cold and icy mountain peak.
+    /// </summary>
+    Snow,
 }
