@@ -6,31 +6,42 @@
 public class Coder
 {
     /// <summary>
+    /// Creates a coder for a new game.
+    /// </summary>
+    /// <param name="settings">The game's settings.</param>
+    public Coder(GameSettings settings)
+    {
+        Burnout = 0;
+        Cash = 0;
+        Frameworks = [];
+        Languages = new(settings.DeckSize, settings.HandLimit);
+        Language firstLanguage = new() {
+            Name = "Read Documentation",
+            Abbreviation = "ReadDocs",
+            Production = [],
+        };
+        for (int i = settings.DeckSize; i > 0; i--)
+            Languages.DrawPile.Add(firstLanguage);
+        Languages.Draw(settings.HandLimit);
+    }
+
+    /// <summary>
     /// This coder's level of burnout.
     /// </summary>
-    public int Burnout { get; set; } = 0;
+    public int Burnout { get; set; }
 
     /// <summary>
     /// This coder's available cash.
     /// </summary>
-    public int Cash { get; set; } = 0;
+    public int Cash { get; set; }
 
     /// <summary>
     /// This coder's completed frameworks.
     /// </summary>
-    public List<Framework> Frameworks { get; } = [];
+    public List<Framework> Frameworks { get; }
 
     /// <summary>
     /// This coder's known languages.
     /// </summary>
-    public Deck<Language> Languages { get; } = new();
-
-    /// <summary>
-    /// Applies burnout and replenished hand.
-    /// </summary>
-    public void NextWeek()
-    {
-        Burnout = Math.Min(0, Burnout + Languages.Hand.Count - 5);
-        Languages.Draw(Math.Min(6, 10 - Languages.Hand.Count));
-    }
+    public Deck<Language> Languages { get; init; }
 }

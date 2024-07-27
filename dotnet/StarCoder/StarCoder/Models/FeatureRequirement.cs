@@ -31,13 +31,16 @@ public class FeatureRequirement
     /// </summary>
     public int Required { get; }
 
+    /// <summary>
+    /// Creates a feature requirement for a contract.
+    /// </summary>
     /// <param name="quantity">The quantity of this feature that is required.</param>
     /// <param name="feature">The feature that is required.</param>
     /// <param name="language">The specific language required, if any.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="quantity"/> is not positive.</exception>
     public FeatureRequirement(int quantity, Feature feature, Language? language = null)
     {
         if (quantity <= 0) throw new ArgumentOutOfRangeException(nameof(quantity), "Must be positive.");
-        if (feature == Feature.Any) throw new ArgumentException("Feature must be a specific feature.", nameof(feature));
         Feature = feature;
         Language = language;
         Required = quantity;
@@ -46,14 +49,15 @@ public class FeatureRequirement
     /// <summary>
     /// Adds production to this requirement.
     /// </summary>
+    /// <param name="language">The language used to produce.</param>
     /// <param name="production">The production to add.</param>
     /// <returns>The remaining production.</returns>
-    public FeatureProduction Produce(FeatureProduction production)
+    public FeatureProduction Produce(Language language, FeatureProduction production)
     {
-        if (production.Feature != Feature.Any && production.Feature != Feature) return production;
-        if (Language is not null && production.Language != Language) return production;
+        if (production.Feature != Feature) return production;
+        if (Language is not null && language != Language) return production;
         int quantity = Math.Max(0, Math.Min(Required - Produced, production.Quantity));
         Produced += quantity;
-        return new FeatureProduction(production.Quantity - quantity, production.Feature, production.Language);
+        return new FeatureProduction(production.Quantity - quantity, production.Feature);
     }
 }

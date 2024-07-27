@@ -12,13 +12,12 @@ public abstract class FeatureProject : Project
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentException"><paramref name="production"/> must be for a specific feature, not 'any' feature.</exception>
-    public override void Produce(FeatureProduction production)
+    public override void Produce(Language language, FeatureProduction production)
     {
-        if (production.IsAnyFeature)
-            throw new ArgumentException("Must produce a specific feature, not 'any' feature.");
+        base.Produce(language, production);
 
         foreach (var requirement in Features)
-            production = requirement.Produce(production);
+            production = requirement.Produce(language, production);
 
         if (Features.All(feature => feature.IsCompleted))
             State = ProjectState.Completed;

@@ -35,9 +35,10 @@ public abstract class Project
     /// <summary>
     /// The coder produces some of this project's features.
     /// </summary>
+    /// <param name="language">The language used to produce.</param>
     /// <param name="production">The feature to produce.</param>
     /// <exception cref="InvalidOperationException">The project is in an invalid state.</exception>
-    public virtual void Produce(FeatureProduction production)
+    public virtual void Produce(Language language, FeatureProduction production)
     {
         if (State != ProjectState.Accepted)
             throw new InvalidOperationException($"Cannot produce this project because it is {State}.");

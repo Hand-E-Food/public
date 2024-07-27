@@ -5,8 +5,7 @@
 /// </summary>
 /// <param name="quantity">The quantity of understanding required to learn the language.</param>
 /// <param name="language">The language to learn.</param>
-/// <param name="roots">The new language's roots. Using these languages helps to learn the new language faster.</param>
-public class EducationProject(int quantity, Language language, params Language[] roots) : Project, IProject
+public class EducationProject(int quantity, Language language) : Project, IProject
 {
     /// <summary>
     /// The language to learn.
@@ -30,10 +29,10 @@ public class EducationProject(int quantity, Language language, params Language[]
     /// </summary>
     public ICollection<Language> Roots { get; } = [language, .. language.Roots];
 
-    public override void Produce(FeatureProduction production)
+    public override void Produce(Language language, FeatureProduction production)
     {
-        base.Produce(production);
-        QuantityProduced += Roots.Contains(production.Language) ? 2 : 1;
+        base.Produce(language, production);
+        QuantityProduced += Roots.Contains(language) ? 2 : 1;
         if (QuantityProduced >= QuantityRequired)
         {
             QuantityProduced = QuantityRequired;

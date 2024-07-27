@@ -11,14 +11,19 @@ public sealed class Language
     public required string Name { get; init; }
 
     /// <summary>
+    /// This language's abbreviation. Should be no more than 8 characters long.
+    /// </summary>
+    public required string Abbreviation { get; init; }
+
+    /// <summary>
     /// The features this language can produce.
     /// </summary>
-    public required ICollection<FeatureProduction> Features { get; init; }
+    public required IList<FeatureProduction> Production { get; init; }
 
     /// <summary>
     /// This language's roots. Knowing these languages helps to learn this language faster.
     /// </summary>
-    public ICollection<Language> Roots { get; init; } = [];
+    public IList<Language> Roots { get; init; } = [];
 
     public override string ToString() => Name;
 }

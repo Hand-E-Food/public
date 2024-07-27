@@ -1,45 +1,36 @@
-﻿namespace StarCoder.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace StarCoder.Models;
 
 /// <summary>
 /// Measures a quantity of a feature that is produced.
 /// </summary>
-/// <param name="quantity">The quantity of this feature that is produced.</param>
-/// <param name="feature">The feature that is produced.</param>
-/// <param name="language">The specific language produced.</param>
-public class FeatureProduction(int quantity, Feature feature, Language language)
+public class FeatureProduction
 {
     /// <summary>
-    /// The quantity of this feature that is produced.
+    /// Creates a feature production metric.
     /// </summary>
-    public int Quantity { get; } = quantity;
+    public FeatureProduction() { }
+
+    /// <summary>
+    /// Creates a feature production metric.
+    /// </summary>
+    /// <param name="production">The quantity of this feature that is produced.</param>
+    /// <param name="feature">The feature that is produced.</param>
+    [SetsRequiredMembers]
+    public FeatureProduction(int production, Feature feature)
+    {
+        Feature = feature;
+        Quantity = production;
+    }
 
     /// <summary>
     /// The feature that is produced.
     /// </summary>
-    public Feature Feature { get; } = feature;
+    public required Feature Feature { get; init; }
 
     /// <summary>
-    /// True if this is a quantity of `any` feature.
-    /// False if this is a quantity of a specific feature.
+    /// The quantity of this feature that is produced.
     /// </summary>
-    public bool IsAnyFeature => Feature == Feature.Any;
-
-    /// <summary>
-    /// The specific language produced.
-    /// </summary>
-    public Language Language { get; } = language;
-
-    /// <summary>
-    /// Converts this quantity of 'any' feature into a specific feature.
-    /// </summary>
-    /// <param name="feature">The feature to convert to.</param>
-    /// <returns>This quantity of the specified feature.</returns>
-    /// <exception cref="InvalidOperationException">This is not a quantity of 'any' feature.</exception>
-    public FeatureProduction For(Feature feature)
-    {
-        if (IsAnyFeature)
-            return new(Quantity, feature, Language);
-
-        throw new InvalidOperationException("Only a quantity of 'any' feature can be changed into a specific feature.");
-    }
+    public required int Quantity { get; init; }
 }
