@@ -14,7 +14,8 @@ public class Coder
         Burnout = 0;
         Cash = 0;
         Frameworks = [];
-        Languages = new(settings.DeckSize, settings.HandLimit);
+        Languages = new(settings.DeckSize, settings.MaximumHandSize);
+
         Language firstLanguage = new() {
             Name = "Read Documentation",
             Abbreviation = "ReadDocs",
@@ -22,7 +23,7 @@ public class Coder
         };
         for (int i = settings.DeckSize; i > 0; i--)
             Languages.DrawPile.Add(firstLanguage);
-        Languages.Draw(settings.HandLimit);
+        Languages.Draw(settings.MaximumHandSize);
     }
 
     /// <summary>
@@ -43,5 +44,5 @@ public class Coder
     /// <summary>
     /// This coder's known languages.
     /// </summary>
-    public Deck<Language> Languages { get; init; }
+    public Deck<Language> Languages { get; }
 }

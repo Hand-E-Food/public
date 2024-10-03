@@ -25,5 +25,10 @@ public class GameSettings
     /// <summary>
     /// The maximum number of cards the coder can have in their hand.
     /// </summary>
-    public int HandLimit { get; set; } = 10;
+    public int MaximumHandSize { get; set; } = 10;
+
+    /// <summary>
+    /// The maximum number of simultaneous active projects the coder can have.
+    /// </summary>
+    public int MaximumProjectCount { get; set; } = 5;
 }

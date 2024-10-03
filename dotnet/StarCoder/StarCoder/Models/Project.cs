@@ -33,6 +33,12 @@ public abstract class Project
     }
 
     /// <summary>
+    /// Gets the reward or penalty for this project given its current state.
+    /// </summary>
+    /// <returns>This project's outcome.</returns>
+    public abstract ProjectOutcome GetOutcome();
+
+    /// <summary>
     /// The coder produces some of this project's features.
     /// </summary>
     /// <param name="language">The language used to produce.</param>

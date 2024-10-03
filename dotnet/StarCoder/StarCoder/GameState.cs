@@ -15,7 +15,7 @@ public class GameState
     public GameState(GameSettings gameSettings)
     {
         Coder = new(gameSettings);
-        Plan = new(gameSettings.HandLimit);
+        Plan = new(gameSettings.MaximumHandSize);
         Projects = new();
         Week = 0;
     }

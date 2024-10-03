@@ -26,6 +26,11 @@ public enum ProjectState
     Completed,
 
     /// <summary>
+    /// The coder has formally abandoned the project. There may be penalties.
+    /// </summary>
+    Abandoned,
+
+    /// <summary>
     /// The coder has failed to complete the project within the contractural requirements.
     /// </summary>
     Failed,

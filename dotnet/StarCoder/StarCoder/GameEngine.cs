@@ -1,4 +1,5 @@
-﻿using StarCoder.View;
+﻿using StarCoder.Models;
+using StarCoder.View;
 
 namespace StarCoder;
 
@@ -37,9 +38,11 @@ public class GameEngine
             AdjustWeek();
             AdjustDifficulty();
             PublishContracts();
+            ManageContracts();
             PlanWeek();
             ExecutePlan();
             AdjustBurnout();
+            EndProjects();
             ReplenishHand();
         }
     }
@@ -49,7 +52,7 @@ public class GameEngine
         mainScreen.Focus();
         mainScreen.DrawWeek(State.Week);
         mainScreen.DrawBurnout(State.Coder.Burnout);
-        mainScreen.DrawHand(State.Coder.Languages.Hand);
+        mainScreen.DrawHandCards(State.Coder.Languages.Hand);
     }
 
     private void AdjustWeek()
@@ -65,6 +68,9 @@ public class GameEngine
     private void PublishContracts()
     { }
 
+    private void ManageContracts()
+    { }
+
     private void PlanWeek()
     { }
 
@@ -77,10 +83,21 @@ public class GameEngine
         mainScreen.DrawBurnout(State.Coder.Burnout);
     }
 
+    private void EndProjects()
+    {
+        foreach (Project project in State.Projects)
+        {
+            switch (project.State)
+            {
+                case ProjectState.
+            }
+        }
+    }
+
     private void ReplenishHand()
     {
-        State.Coder.Languages.Draw(Math.Min(Settings.DrawPerTurn, Settings.HandLimit - State.Coder.Languages.Hand.Count));
-        mainScreen.DrawHand(State.Coder.Languages.Hand);
+        State.Coder.Languages.Draw(Math.Min(Settings.DrawPerTurn, Settings.MaximumHandSize - State.Coder.Languages.Hand.Count));
+        mainScreen.DrawHandCards(State.Coder.Languages.Hand);
     }
 
     private bool GameContinues()

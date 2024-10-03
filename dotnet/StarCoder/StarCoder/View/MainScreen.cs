@@ -6,20 +6,27 @@ public interface IMainScreen
 {
     void Focus();
     void DrawBurnout(int burnout);
-    void DrawHand(IList<Language> cards);
+    void DrawHandCards(IList<Language> cards);
+    void DrawHandCard(int position, Language? card, bool isSelected = false);
     void DrawMessage(string message);
+    void DrawProjects(IList<Project> projects);
+    void DrawProject(int position, Project? projects, bool isSelected = false);
     void DrawWeek(int week);
 }
 
-public class MainScreen : IMainScreen
+public class MainScreen(GameSettings settings) : IMainScreen
 {
+    private static readonly char[] CardKeys = "1234567890".ToCharArray();
+    private const int CardWidth = 10;
+    private readonly GameSettings settings = settings;
+
     public void Focus()
     {
+        int width = settings.MaximumHandSize * CardWidth;
         Console.CursorVisible = false;
-        Console.SetWindowSize(100, 25);
-        Console.SetBufferSize(100, 26);
+        Console.SetWindowSize(width, 25);
+        Console.SetBufferSize(width, 26);
         Console.Clear();
-        Console.SetWindowPosition(0, 0);
     }
 
     public void DrawBurnout(int burnout)
@@ -40,18 +47,31 @@ public class MainScreen : IMainScreen
         Console.Write(mood);
     }
 
-    public void DrawHand(IList<Language> cards)
+    public void DrawHandCards(IList<Language> cards)
     {
-        const int MaxCards = 10;
-        const int CardWidth = 10;
-        int i;
-        for (i = 0; i < cards.Count; i++)
+        int position;
+        for (position = 0; position < cards.Count; position++)
+            DrawHandCard(position, cards[position]);
+        for (; position < settings.MaximumHandSize; position++)
+            DrawHandCard(position, null);
+    }
+
+    public void DrawHandCard(int position, Language? card, bool isSelected = false)
+    {
+        int x = position * CardWidth;
+        if (card is null)
         {
-            int x = i * CardWidth;
-            char key = "1234567890"[i];
-            var card = cards[i];
+            for (int y = 18; y < 24; y++)
+            {
+                Console.SetCursorPosition(position * CardWidth, y);
+                Console.Write("          ");
+            }
+        }
+        else
+        {
+            string key = isSelected ? "vv" : $"#{CardKeys[position]}";
             Console.SetCursorPosition(x, 18);
-            Console.Write($"┌───#{key}───┐");
+            Console.Write($"┌───{key}───┐");
             Console.SetCursorPosition(x, 19);
             Console.Write($"│{AlignCentre(8, card.Abbreviation)}│");
             int y;
@@ -67,15 +87,6 @@ public class MainScreen : IMainScreen
                 Console.Write("│        │");
             }
         }
-        if (i < MaxCards)
-        {
-            string padding = new string(' ', (MaxCards - i) * CardWidth);
-            for (int y = 18; y < 24; y++)
-            {
-                Console.SetCursorPosition(i * CardWidth, y);
-                Console.Write(padding);
-            }
-        }
     }
 
     public void DrawMessage(string message)
@@ -83,6 +94,18 @@ public class MainScreen : IMainScreen
         Console.SetCursorPosition(0, 1);
         Console.Write(message.PadRight(Console.BufferWidth));
     }
+
+    public void DrawProjects(IList<Project> projects)
+    {
+        int position;
+        for (position = 0; position < projects.Count; position++)
+            DrawProject(position, projects[position]);
+        for (; position < settings.MaximumProjectCount; position++)
+            DrawProject(position, null);
+    }
+
+    public void DrawProject(int position, Project? projects, bool isSelected = false)
+    { }
 
     public void DrawWeek(int week)
     {

@@ -7,6 +7,14 @@
 /// <param name="language">The language to learn.</param>
 public class EducationProject(int quantity, Language language) : Project, IProject
 {
+    public override ProjectOutcome GetOutcome()
+    {
+        if (State == ProjectState.Completed)
+            return new() { Language = Language };
+        else
+            return ProjectOutcome.None;
+    }
+
     /// <summary>
     /// The language to learn.
     /// </summary>

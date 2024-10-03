@@ -6,9 +6,17 @@
 public class FrameworkProject : FeatureProject, IProject
 {
     /// <summary>
-    /// The framework rewarded by completing this project.
+    /// The framework awarded by completing this project.
     /// </summary>
     public required Framework Framework { get; init; }
+
+    public override ProjectOutcome GetOutcome()
+    {
+        if (State == ProjectState.Completed)
+            return new() { Framework = Framework };
+        else
+            return ProjectOutcome.None;
+    }
 
     public string Name => Framework.Name;
 }
