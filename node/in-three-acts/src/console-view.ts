@@ -1,5 +1,5 @@
 import { Console } from './console';
-import { Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "./model";
+import { BookChapter, Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "./model";
 import { View } from "./view";
 import color from "cli-color";
 
@@ -13,12 +13,12 @@ export class ConsoleView implements View {
     public showGame(publicKnowledge: PublicKnowledge): void {
         Console.write('\n');
         Console.write(color.whiteBright('P1     P2      Next Chapter') + '\n');
-        Suits.forEach(suit => {
+        for (const suit of Suits) {
             const player1 = this.formatPlayer(suit, publicKnowledge, 0);
             const player2 = this.formatPlayer(suit, publicKnowledge, 1);
             const nextChapter = this.formatChapter(publicKnowledge.nextChapters[suit], true);
             Console.write(this.colorize(suit, `${player1}   ${player2}   `) + nextChapter + '\n');
-        }, this);
+        }
         Console.write('\n');
         for (let i = 0; i < MaxGoals; i++) {
             let result = '';
@@ -35,16 +35,38 @@ export class ConsoleView implements View {
 
     public async chooseChapter(chapters: Chapter[]): Promise<Chapter> {
         const suits: string[] = [];
-        chapters.forEach(chapter => {
+        for (const chapter of chapters) {
             suits.push(chapter.suit);
             Console.write(this.formatChapter(chapter, true) + '\n');
-        }, this);
+        };
         const answer = await this.question("Write which chapter", suits);
         return chapters[suits.indexOf(answer)];
     }
 
     public chooseSuit(suits: Suit[]): Promise<Suit> {
         return this.question("Write as which suit", suits);
+    }
+
+    public showBookChapter(chapter: BookChapter): void {
+        const MAX_WIDTH = 80;
+        Console.write('\n');
+        Console.write(`${this.colorize(chapter.chapter.suit, `${chapter.number}. ${chapter.chapter.name}`)}\n`);
+        let text = chapter.text;
+        const lines: string[] = [];
+        while (text.length > MAX_WIDTH) {
+            const line = text.substring(0, MAX_WIDTH);
+            const lastSpace = line.lastIndexOf(' ');
+            if (lastSpace > 0) {
+                lines.push(line.substring(0, lastSpace));
+                text = text.substring(lastSpace + 1);
+            } else {
+                lines.push(line);
+                text = text.substring(MAX_WIDTH);
+            }
+        }
+        lines.push(text);
+        for (const line of lines)
+            Console.write(line + '\n');
     }
 
     public showWinner(player: Player): void {

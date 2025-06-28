@@ -17,7 +17,7 @@ export class Survival extends Instinct {
         const minCount = MaxChapters - this.buffer - 1;
         let bestSuits: Suit[] = [];
         let bestCount = MaxChapters;
-        Suits.forEach(suit => {
+        for (const suit of Suits) {
             const count = Math.max(minCount, characterChapters[suit].length);
             if (count === bestCount) {
                 bestSuits.push(suit);
@@ -25,7 +25,7 @@ export class Survival extends Instinct {
                 bestSuits = [suit];
                 bestCount = count;
             }
-        });
+        };
 
         const safeChoices = choices.filter(choice => bestSuits.includes(choice.asSuit));
         if (safeChoices.length > 0) choices = safeChoices;

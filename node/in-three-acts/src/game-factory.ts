@@ -4,7 +4,8 @@ export class GameFactory {
     public createGame(players: Player[], openHand: boolean = false): Game {
         const game: Game = new Game(players, openHand);
         this.createGoalDeck(game.goals);
-        Suits.forEach(suit => this.createChapterDeck(game.chapters[suit], Chapters[suit]), this);
+        for (const suit of Suits)
+            this.createChapterDeck(game.chapters[suit], Chapters[suit]);
         return game;
     }
 

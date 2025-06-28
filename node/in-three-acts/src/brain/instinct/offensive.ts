@@ -24,8 +24,8 @@ export class Offensive extends Instinct {
     public chooseFrom(choices: ChapterChoice[], publicKnowledge: PublicKnowledge): ChapterChoice {
         let infos: SuitInfo[] = [];
         const characterChapters = publicKnowledge.character.chapters;
-        this.player.goals.forEach(goal => {
-            Object.keys(goal.suitCounts).forEach(suit => {
+        for (const goal of this.player.goals) {
+            for (const suit in goal.suitCounts) {
                 const target = goal.suitCounts[suit];
                 const have = characterChapters[suit].length;
                 const need = target - have;
@@ -41,8 +41,8 @@ export class Offensive extends Instinct {
                     })();
                     infos.push({ suit, target, have, need, score });
                 }
-            });
-        });
+            };
+        };
 
         const availableSuits = choices.map(choice => choice.asSuit);
         infos = infos.filter(info => availableSuits.includes(info.suit));

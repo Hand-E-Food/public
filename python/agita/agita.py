@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from itertools import combinations
 from typing import Iterable, List, Literal, Optional, get_args
 

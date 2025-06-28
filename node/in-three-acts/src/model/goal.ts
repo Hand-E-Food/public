@@ -32,10 +32,10 @@ export class Goal {
     public getOutstanding(chapters: ChapterDecks): SuitCount {
         const suitCounts = this.suitCounts;
         const result: SuitCount = {};
-        Object.keys(suitCounts).forEach(suit => {
+        for (const suit in suitCounts) {
             const count = suitCounts[suit] - chapters[suit].length;
             if (count > 0) result[suit] = count;
-        });
+        };
         return result;
     }
 }

@@ -1,4 +1,4 @@
-import { Chapter, ChapterChoice, Game, Goal, Player, Suits, MaxGoals, MaxChapters } from "./model";
+import { Chapter, ChapterChoice, Game, Goal, Player, Suits, MaxGoals, MaxChapters, StoryPhase } from "./model";
 
 export class Engine {
     private readonly game: Game;
@@ -8,7 +8,8 @@ export class Engine {
     }
 
     public async start(): Promise<Player> {
-        this.game.players.forEach(player => this.drawGoal(player), this);
+        for (const player of this.game.players)
+            this.drawGoal(player);
         let winner: Player | undefined = undefined;
         while(true) {
             await this.nextTurn();
@@ -27,7 +28,23 @@ export class Engine {
             : this.firstChapter();
         const chapter = await chapterPromise;
         character.receiveChapter(chapter);
-        if (author.hasCompletedAllGoals(character) && author.goals.length < MaxGoals) this.drawGoal(author);
+
+        let phase: StoryPhase;
+        if (author.goals.length < MaxGoals) {
+            if (!author.hasCompletedAllGoals(character)) {
+                phase = StoryPhase.Exposition;
+            } else {
+                phase = StoryPhase.PlotTwist;
+                this.drawGoal(author);
+            }
+        } else {
+            if (!author.hasCompletedAllGoals(character)) {
+                phase = StoryPhase.Resoultion;
+            } else {
+                phase = StoryPhase.Conclusion;
+            }
+        }
+        await author.brain.writeChapter(chapter.chapter, phase);
     }
 
     private async firstChapter(): Promise<ChapterChoice> {
@@ -43,7 +60,8 @@ export class Engine {
         const choice = await this.chooseChapter(chapters);
         const i = chapters.indexOf(choice.chapter);
         chapters.splice(i, 1);
-        chapters.forEach(chapter => chapterDecks[chapter.suit].push(chapter));
+        for (const chapter of chapters)
+            chapterDecks[chapter.suit].push(chapter);
         return choice;
     }
 

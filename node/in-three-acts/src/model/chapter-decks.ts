@@ -5,5 +5,6 @@ export type ChapterDecks = { [suit: string]: ChapterDeck };
 
 export const ChapterDecks = function(this: ChapterDecks) {
     if (!new.target) throw new Error(`Constructor cannot be invoked without 'new'`);
-    Suits.forEach(suit => this[suit] = [], this);
+    for (const suit of Suits)
+        this[suit] = [];
 } as unknown as new() => ChapterDecks;

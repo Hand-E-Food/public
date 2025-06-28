@@ -13,9 +13,8 @@ export class Controlling extends Instinct {
 
         if (desiredSuits.length > 0) {
             const suitDanger: SuitCount = {};
-            Suits.forEach(suit => {
+            for (const suit of Suits)
                 suitDanger[suit] = desiredSuits.includes(suit) ? publicKnowledge.author.chapters[suit].length : 0;
-            });
             function dangerousness(choice: ChapterChoice): number {
                 return choice.chapter.inspires.reduce((total, suit) => total + suitDanger[suit], 0);
             }

@@ -1,19 +1,27 @@
-import { Brain, Instinct } from "./brain";
-import { Controlling, Wild, Offensive, Prefer, Random, Survival } from "./brain/instinct";
-import { InstinctBrain } from "./brain/instinct-brain";
+import { Author } from "./author";
+import { Brain, Instinct, InstinctBrain } from "./brain";
+import { Controlling, Offensive, Prefer, Random, Survival, Wild } from "./brain/instinct";
 import { MaxChapters } from "./model";
+import { View } from "./view";
 
 export class BrainFactory {
-    public createCpuBrain(): Brain {
+    private readonly view: View;
+
+    public constructor(view: View) {
+        this.view = view;
+    }
+
+    public createCpuBrain(author: Author, level: number): Brain {
+        if (!author) throw new Error("A CPU brain must have an author.");
         // The brain at the bottom of this list is questioned first.
         let instinct: Instinct;
         instinct = new Random();
-        instinct = new Wild(instinct);
-        instinct = new Survival(instinct, MaxChapters);
-        instinct = new Offensive(instinct, Prefer.Furthest);
-        instinct = new Controlling(instinct);
-        instinct = new Offensive(instinct);
-        instinct = new Survival(instinct, 0);
-        return new InstinctBrain(instinct);
+        if (level >= 1) instinct = new Wild(instinct);
+        if (level >= 2) instinct = new Survival(instinct, MaxChapters);
+        if (level >= 3) instinct = new Offensive(instinct, Prefer.Furthest);
+        if (level >= 4) instinct = new Controlling(instinct);
+        if (level >= 5) instinct = new Offensive(instinct);
+        if (level >= 6) instinct = new Survival(instinct, 0);
+        return new InstinctBrain(this.view, author, instinct);
     }
 }

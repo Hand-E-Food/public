@@ -1,23 +1,23 @@
+import { Brain } from "../brain";
+import { Book } from "./book";
 import { Chapter } from "./chapter";
-import { ChapterDecks } from "./chapter-decks";
 import { ChapterChoice } from "./chapter-choice";
+import { ChapterDecks } from "./chapter-decks";
 import { Goal } from "./goal";
-import { Brain } from "../brain/brain";
 
 export class Player {
+    public get book(): Book { return this.brain.book; }
     public readonly brain: Brain;
     public readonly chapters: ChapterDecks = new ChapterDecks();
     public readonly goals: Goal[] = [];
     public readonly id: Object = new Object();
-    public readonly name: string;
-    
+    public get name(): string { return this.book.authorName; }
+
     public lastChapter: Chapter = undefined!;
 
-    public constructor(name: string, brain: Brain) {
-        if (!name) throw new Error("A player must have a name.");
+    public constructor(brain: Brain) {
         if (!brain) throw new Error("A player must have a brain.");
         this.brain = brain;
-        this.name = name;
         brain.initPlayer(this);
     }
 

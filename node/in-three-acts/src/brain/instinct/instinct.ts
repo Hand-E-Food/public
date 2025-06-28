@@ -25,6 +25,6 @@ export abstract class Instinct {
     public static log(name: string, choices: ChapterChoice[]): void {
         const strings = choices.map(choice => `[${choice.chapter.wild ? `${choice.chapter.suit}@${choice.asSuit}` : ` ${choice.chapter.suit} `} => ${choice.chapter.inspires[0]} ${choice.chapter.inspires[1]}]`);
         const message = `${name.padEnd(20)}: ` + strings.join(', ') + '\n';
-        process.stdout.write(message);
+        //process.stdout.write(message);
     }
 }
