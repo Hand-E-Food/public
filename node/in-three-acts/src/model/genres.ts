@@ -19,7 +19,7 @@ export class Genres {
         'thriller',
     ];
 
-    public static random(): string {
+    public static getRandom(): string {
         const index = Math.floor(Math.random() * Genres.All.length);
         return Genres.All[index];
     }

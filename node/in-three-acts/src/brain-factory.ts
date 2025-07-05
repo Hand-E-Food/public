@@ -1,4 +1,4 @@
-import { Author } from "./author";
+import { IAuthor } from "./author";
 import { Brain, Instinct, InstinctBrain } from "./brain";
 import { Controlling, Offensive, Prefer, Random, Survival, Wild } from "./brain/instinct";
 import { MaxChapters } from "./model";
@@ -11,7 +11,7 @@ export class BrainFactory {
         this.view = view;
     }
 
-    public createCpuBrain(author: Author, level: number): Brain {
+    public createCpuBrain(author: IAuthor, level: number): Brain {
         if (!author) throw new Error("A CPU brain must have an author.");
         // The brain at the bottom of this list is questioned first.
         let instinct: Instinct;

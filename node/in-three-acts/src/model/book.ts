@@ -3,7 +3,9 @@ import { Chapter } from "./chapter";
 export class Book {
     public readonly authorName: string;
     public readonly chapters: BookChapter[] = [];
-    public title?: string;
+
+    public ending: string = 'To Be Continued?';
+    public title: string = 'Untitled Magnum Opus';
 
     public constructor(authorName: string) {
         if (!authorName) throw new Error("A book must have an author name.");

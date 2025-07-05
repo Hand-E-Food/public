@@ -4,4 +4,5 @@ export enum StoryPhase {
     PlotTwist,
     Resoultion,
     Conclusion,
+    Failure,
 }

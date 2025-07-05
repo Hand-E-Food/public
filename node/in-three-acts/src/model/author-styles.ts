@@ -9,7 +9,7 @@ export class AuthorStyles {
         'whimsical',
     ];
 
-    public static random(): string {
+    public static getRandom(): string {
         const index = Math.floor(Math.random() * AuthorStyles.All.length);
         return AuthorStyles.All[index];
     }

@@ -26,7 +26,9 @@ export class ConsoleView implements View {
                 const goals = publicKnowledge.players[j].id === this.player?.id
                     ? this.player.goals
                     : publicKnowledge.players[j].goals;
-                if (goals.length > i) result = result.padEnd(j * 35) + this.formatGoal(goals[i], true);
+                if (goals.length > i) {
+                    result += this.formatGoal(goals[i]);
+                }
             }
             Console.write(result + '\n');
         }
@@ -99,13 +101,15 @@ export class ConsoleView implements View {
         return result;
     }
 
-    private formatGoal(goal: Goal, showName?: boolean): string {
+    private formatGoal(goal: Goal): string {
+        const Padding = 35;
         const suitCounts = goal.suitCounts;
-        let result = Object.keys(suitCounts)
-            .map(suit => `${this.formatSuit(suit)}:${suitCounts[suit]}`, this)
-            .join(' ');
-        if (showName) result += ' - ' + goal.name;
-        return result;
+        const length = Object.keys(suitCounts).length * 4 + 2 + goal.name.length;
+        return [
+            ...Object.keys(suitCounts).map(suit => `${this.formatSuit(suit)}:${suitCounts[suit]}`, this),
+            '-',
+            goal.name,
+        ].join(' ') + ' '.repeat(Math.max(Padding - length, 0));
     }
 
     private formatSuit(suit: Suit): string {

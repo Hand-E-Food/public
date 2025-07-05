@@ -30,7 +30,10 @@ export class Engine {
         character.receiveChapter(chapter);
 
         let phase: StoryPhase;
-        if (author.goals.length < MaxGoals) {
+        if (character.chapters[character.lastChapter.suit].length > MaxChapters) {
+            phase = StoryPhase.Failure;
+            author.book.ending = '...'
+        } else if (author.goals.length < MaxGoals) {
             if (!author.hasCompletedAllGoals(character)) {
                 phase = StoryPhase.Exposition;
             } else {
@@ -42,6 +45,7 @@ export class Engine {
                 phase = StoryPhase.Resoultion;
             } else {
                 phase = StoryPhase.Conclusion;
+                author.book.ending = 'The End';
             }
         }
         await author.brain.writeChapter(chapter.chapter, phase);
