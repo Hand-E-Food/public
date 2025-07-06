@@ -6,6 +6,10 @@ import color from "cli-color";
 export class ConsoleView implements View {
     public player?: Player = undefined;
 
+    public startGame(): void {
+        this.clearConsole();
+    }
+
     public setPlayer(player: Player): void {
         this.player = player;
     }
@@ -52,6 +56,7 @@ export class ConsoleView implements View {
     public showBookChapter(chapter: BookChapter): void {
         const MAX_WIDTH = 80;
         Console.write('\n');
+        this.clearConsole();
         Console.write(`${this.colorize(chapter.chapter.suit, `${chapter.number}. ${chapter.chapter.name}`)}\n`);
         let text = chapter.text;
         const lines: string[] = [];
@@ -125,6 +130,10 @@ export class ConsoleView implements View {
             case 's': return color.blueBright(text);
             default : return text;
         }
+    }
+
+    private clearConsole(): void {
+        process.stdout.write('\x1B[2J\x1B[H');
     }
 
     private async question(prompt: string, valid: string[]): Promise<string> {

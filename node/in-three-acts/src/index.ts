@@ -57,6 +57,7 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
         const gameFactory = new GameFactory();
         const game = gameFactory.createGame(players, false);
         const engine = new Engine(game);
+        view.startGame();
         view.setPlayer(player1);
         const winner = await engine.start();
         view.showGame(game.getPublicKnowledge(true));
