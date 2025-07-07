@@ -1,3 +1,4 @@
+import { Chapter } from "./chapter";
 import { ChapterDecks } from "./chapter-decks";
 import { Goal } from "./goal";
 import { GoalDeck } from "./goal-deck";
@@ -12,6 +13,9 @@ export class Game {
     public readonly goals: GoalDeck = [];
     public readonly openHand: boolean;
     public readonly players: Player[];
+
+    /** The last written chapter. */
+    public lastChapter?: Chapter;
 
     public constructor(players: Player[], openHand: boolean = false) {
         if (players.length != 2 || players[0] === players[1]) throw Error("Two different players must be specified.");

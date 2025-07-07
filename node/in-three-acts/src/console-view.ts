@@ -1,7 +1,7 @@
+import color from "cli-color";
 import { Console } from './console';
 import { BookChapter, Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "./model";
 import { View } from "./view";
-import color from "cli-color";
 
 export class ConsoleView implements View {
     public player?: Player = undefined;
@@ -84,7 +84,7 @@ export class ConsoleView implements View {
         const my = publicKnowledge.players[index];
         const your = publicKnowledge.players[1 - index];
         const chapters = this.formatChapterCount(suit, my.chapters);
-        const goals = this.player?.id === your.id ? this.player.goals : your.goals;
+        const goals = this.player?.id === my.id ? this.player.goals : your.goals;
         const goal = this.formatGoalCount(suit, goals);
         return chapters + goal;
     }
@@ -144,6 +144,10 @@ export class ConsoleView implements View {
             Console.moveCursor(0, -1).clearLine(0);
         }
         return answer;
+    }
+
+    public waitForClose(): Promise<void> {
+        return Promise.resolve();
     }
 
     public dispose(): void {

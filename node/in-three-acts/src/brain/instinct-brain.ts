@@ -1,15 +1,15 @@
-import { IAuthor } from "../author";
+import { Author } from "../author";
 import { Book, BookChapter, Chapter, ChapterChoice, Player, PublicKnowledge, StoryPhase, Suit } from "../model";
 import { View } from "../view";
 import { Brain } from "./brain";
 import { Instinct } from "./instinct";
 
 export class InstinctBrain extends Brain {
-    private readonly author: IAuthor;
+    private readonly author: Author;
     private readonly instinct: Instinct;
     private readonly view: View;
 
-    public constructor(view: View, author: IAuthor, instinct: Instinct) {
+    public constructor(view: View, author: Author, instinct: Instinct) {
         if (!author) throw new Error("An instinct brain must have an author.");
         if (!instinct) throw new Error("An instinct brain must have an instinct.");
         if (!view) throw new Error("An instinct brain must have a view to interact with.");

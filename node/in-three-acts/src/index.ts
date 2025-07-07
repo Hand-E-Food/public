@@ -1,11 +1,10 @@
 import { Ollama } from 'ollama';
 import { argv } from 'process';
-import { Author } from './author';
+import { AutoAuthor, DummyAuthor } from './author';
 import { BookPrinter } from './book-printer';
 import { Human } from './brain';
 import { BrainFactory } from './brain-factory';
 import { ConsoleView } from './console-view';
-import { DummyAuthor } from './dummy-author';
 import { Engine } from './engine';
 import { GameFactory } from './game-factory';
 import { Book, Player } from './model';
@@ -32,7 +31,7 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
 
         const book1 = new Book(name1);
         //const author1 = new DummyAuthor({ book: book1, characterName: name2 });
-        const author1 = new Author(ollama, {
+        const author1 = new AutoAuthor(ollama, {
             book: book1,
             characterName: name2,
             genre: undefined,
@@ -44,7 +43,7 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
 
         const book2 = new Book(name2);
         //const author2 = new DummyAuthor(book2);
-        const author2 = new Author(ollama, {
+        const author2 = new AutoAuthor(ollama, {
             book: book2,
             characterName: name1,
             genre: undefined,
@@ -67,11 +66,12 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
         for (const player of players) {
             bookPrinter.printBook(player.book, `${timestamp} ${player.book.authorName}.md`);
         }
-    } catch (e) {
-        process.stdout.write(`${e}`);
+        await view.waitForClose();
     } finally {
         if (view) view.dispose();
     }
 }
 
-main(argv[2], argv[3]);
+main(argv[2], argv[3]).catch(e => {
+    console.error(e);
+});

@@ -1,9 +1,9 @@
-import { PublicKnowledge, ChapterChoice, Player } from "../../model";
+import { ChapterChoice, Player, PublicKnowledge } from "../../model";
 import { Instinct } from "./instinct";
 
 /** Choose one option at random. */
-export class Random extends Instinct {
-    protected readonly name = "Random";
+export class ChooseRandomly extends Instinct {
+    protected readonly name = "Choose randomly";
 
     public constructor() {
         super(undefined!);
@@ -14,7 +14,8 @@ export class Random extends Instinct {
     }
 
     public chooseFrom(choices: ChapterChoice[], publicKnowledge: PublicKnowledge): ChapterChoice {
-        choices = [choices[Math.floor(Math.random() * choices.length)]];
+        const index = Math.floor(Math.random() * choices.length);
+        choices = [choices[index]];
         return this.askSubInstinct(choices, publicKnowledge);
     }
 }

@@ -2,8 +2,8 @@ import { ChapterChoice, MaxChapters, PublicKnowledge, SuitCount, Suits } from ".
 import { Instinct } from "./instinct";
 
 /** Filters in options that we know the opponent doesn't want. */
-export class Controlling extends Instinct {
-    protected readonly name = "Controlling";
+export class EncourageFailure extends Instinct {
+    protected readonly name = "Focus on character's completed goals";
     
     public chooseFrom(choices: ChapterChoice[], publicKnowledge: PublicKnowledge): ChapterChoice {
         const desiredSuits = [

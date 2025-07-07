@@ -1,4 +1,4 @@
-import { Chapter, ChapterChoice, Game, Goal, Player, Suits, MaxGoals, MaxChapters, StoryPhase } from "./model";
+import { Chapter, ChapterChoice, Game, Goal, Player, Suits, StoryPhase } from "./model";
 
 export class Engine {
     private readonly game: Game;
@@ -22,33 +22,37 @@ export class Engine {
 
     private async nextTurn(): Promise<void> {
         const author = this.game.author;
-        const character = this.game.character;
-        const chapterPromise = author.lastChapter
+        const choicePromise = this.game.lastChapter
             ? this.nextChapter()
             : this.firstChapter();
-        const chapter = await chapterPromise;
-        character.receiveChapter(chapter);
+        const choice = await choicePromise;
+        const chapter = choice.chapter;
+        const chapterDeck = author.chapters[choice.asSuit];
+        if (chapter.wild && chapterDeck.some(existing => existing.wild))
+            throw new Error('Cannot play two wild cards to the same suit.');
+        chapterDeck.push(chapter);
+        this.game.lastChapter = chapter;
 
         let phase: StoryPhase;
-        if (character.chapters[character.lastChapter.suit].length > MaxChapters) {
+        if (author.hasFailed) {
+            author.book.ending = '~ Manuscript Rejected ~';
             phase = StoryPhase.Failure;
-            author.book.ending = '...'
-        } else if (author.goals.length < MaxGoals) {
-            if (!author.hasCompletedAllGoals(character)) {
+        } else if (!author.hasAllGoals) {
+            if (!author.hasCompletedCurrentGoals) {
                 phase = StoryPhase.Exposition;
             } else {
-                phase = StoryPhase.PlotTwist;
                 this.drawGoal(author);
+                phase = StoryPhase.PlotTwist;
             }
         } else {
-            if (!author.hasCompletedAllGoals(character)) {
+            if (!author.hasCompletedCurrentGoals) {
                 phase = StoryPhase.Resoultion;
             } else {
-                phase = StoryPhase.Conclusion;
                 author.book.ending = 'The End';
+                phase = StoryPhase.Conclusion;
             }
         }
-        await author.brain.writeChapter(chapter.chapter, phase);
+        await author.brain.writeChapter(choice.chapter, phase);
     }
 
     private async firstChapter(): Promise<ChapterChoice> {
@@ -60,7 +64,7 @@ export class Engine {
 
     private async nextChapter(): Promise<ChapterChoice> {
         const chapterDecks = this.game.chapters;
-        const chapters = this.game.author.lastChapter.inspires.map(suit => chapterDecks[suit].shift()!)
+        const chapters = this.game.lastChapter!.inspires.map(suit => chapterDecks[suit].shift()!)
         const choice = await this.chooseChapter(chapters);
         const i = chapters.indexOf(choice.chapter);
         chapters.splice(i, 1);
@@ -70,9 +74,10 @@ export class Engine {
     }
 
     private async chooseChapter(chapters: Chapter[]): Promise<ChapterChoice> {
-        const characterChapters = this.game.character.chapters;
-        const wildSuits = Suits.filter(suit => characterChapters[suit].every(chapter => !chapter.wild));
-        return await this.game.author.brain.chooseChapter(chapters, wildSuits, this.game.getPublicKnowledge());
+        const author = this.game.author;
+        const writtenChapters = author.chapters;
+        const wildSuits = Suits.filter(suit => writtenChapters[suit].every(chapter => !chapter.wild));
+        return await author.brain.chooseChapter(chapters, wildSuits, this.game.getPublicKnowledge());
     }
 
     private drawGoal(author: Player) {
@@ -88,10 +93,10 @@ export class Engine {
     }
 
     private getWinner(): Player | undefined {
-        const character = this.game.character;
-        if (character.chapters[character.lastChapter.suit].length > MaxChapters) return character;
         const author = this.game.author;
-        if (author.hasCompletedAllGoals(character) && author.goals.length === MaxGoals) return author;
+        const character = this.game.character;
+        if (author.hasFailed) return character;
+        if (author.hasAllGoals && author.hasCompletedCurrentGoals) return author;
         return undefined;
     }
 }

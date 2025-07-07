@@ -1,3 +1,4 @@
+import { Book } from "./book";
 import { Chapter } from "./chapter";
 import { ChapterDecks } from "./chapter-decks";
 import { Game } from "./game";
@@ -23,13 +24,13 @@ export class PublicKnowledge {
             s: chapterDecks.s[0],
         };
         this.players = [0, 1].map(i => {
-            const my = game.players[i];
-            const your = game.players[1 - i];
+            const player = game.players[i];
             return {
-                chapters: my.chapters,
-                goals: expose ? my.goals : my.goals.filter(goal => goal.isCompleted(your.chapters)),
-                id: my.id,
-                name: my.name,
+                book: player.book,
+                chapters: player.chapters,
+                goals: player.goals.filter(goal => expose || goal.isCompleted),
+                id: player.id,
+                name: player.name,
             }
         });
         this.author = this.players[game.currentPlayerIndex];
@@ -38,6 +39,7 @@ export class PublicKnowledge {
 }
 
 export interface PublicKnowledgePlayer {
+    book: Book;
     chapters: ChapterDecks;
     goals: Goal[];
     id: Object;

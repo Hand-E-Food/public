@@ -1,21 +1,9 @@
 import { Message, Ollama } from "ollama";
-import { AuthorStyles, Book, BookChapter, Chapter, Genres, StoryPhase } from "./model";
+import { AuthorStyles, Book, BookChapter, Chapter, Genres, StoryPhase } from "../model";
+import { Author } from "./author";
 import { AuthorPhaseInstructions } from "./author-phase-instructions";
 
-export interface IAuthor {
-    /** The book being written in by this author. */
-    readonly book: Book;
-
-    /**
-     * Writes the next chapter of the story into the book.
-     * @param chapter The chapter to write.
-     * @param phase The current phase of the story.
-     * @returns The written chapter.
-     */
-    writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter>;
-}
-
-export interface AuthorProps {
+export interface AutoAuthorProps {
     /** An initialised book that this author will write in. */
     readonly book: Book;
 
@@ -35,7 +23,7 @@ export interface AuthorProps {
     readonly style?: string;
 }
 
-export class Author implements IAuthor {
+export class AutoAuthor implements Author {
     public readonly book: Book;
     private readonly instructions: AuthorPhaseInstructions;
     private maximumWordCount = 50;
@@ -50,7 +38,7 @@ export class Author implements IAuthor {
      * @param ollama The instance that communicates with Ollama.
      * @param props The initialisation properties.
      */
-    public constructor(ollama: Ollama, props: AuthorProps) {
+    public constructor(ollama: Ollama, props: AutoAuthorProps) {
         this.ollama = ollama;
         this.book = props.book;
         const genre = props.genre || Genres.getRandom();
@@ -75,7 +63,7 @@ export class Author implements IAuthor {
         const instruction = this.instructions.getInstruction(phase);
         this.messages.push({
             role: 'user',
-            content: `Write a paragraph on the topic "${chapter.name}" that ${instruction}.`,
+            content: `Write a paragraph on the topic "${chapter.name}" that ${instruction}`,
         });
         let text: string;
         while(true) {

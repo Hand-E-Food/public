@@ -1,7 +1,7 @@
 export enum Prefer {
-    None = "none",
-    Lowest = "lowest",
-    Highest = "highest",
-    Closest = "closest",
-    Furthest = "furthest",
+    None = "with no preference",
+    Lowest = "with least chapters",
+    Highest = "with most chapters",
+    Closest = "closest to goals",
+    Furthest = "furthest from goals",
 }

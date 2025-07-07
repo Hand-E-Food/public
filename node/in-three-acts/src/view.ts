@@ -8,5 +8,6 @@ export interface View {
     chooseSuit(suits: Suit[]): Promise<Suit>;
     showBookChapter(chapter: BookChapter): void;
     showWinner(player: Player): void;
+    waitForClose(): Promise<void>;
     dispose(): void;
 }

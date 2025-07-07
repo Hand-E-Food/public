@@ -1,15 +1,13 @@
-import { IAuthor } from "./author";
+import { Book, BookChapter, Chapter, StoryPhase } from "../model";
+import { Author } from "./author";
 import { AuthorPhaseInstructions } from "./author-phase-instructions";
-import { Book, BookChapter } from "./model/book";
-import { Chapter } from "./model/chapter";
-import { StoryPhase } from "./model/story-phase";
 
 export interface DummyAuthorProps {
     readonly book: Book;
     readonly characterName: string;
 }
 
-export class DummyAuthor implements IAuthor {
+export class DummyAuthor implements Author {
     public readonly book: Book;
     private readonly instructions: AuthorPhaseInstructions;
 
@@ -25,7 +23,7 @@ export class DummyAuthor implements IAuthor {
 
     public writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter> {
         const instruction = this.instructions.getInstruction(phase);
-        const bookChapter = this.book.writeChapter(chapter, `This chapter ${instruction}.`);
+        const bookChapter = this.book.writeChapter(chapter, `This chapter ${instruction}`);
         return Promise.resolve(bookChapter);
     }
 }

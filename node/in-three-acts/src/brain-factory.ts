@@ -1,6 +1,6 @@
-import { IAuthor } from "./author";
+import { Author } from "./author";
 import { Brain, Instinct, InstinctBrain } from "./brain";
-import { Controlling, Offensive, Prefer, Random, Survival, Wild } from "./brain/instinct";
+import { AvoidFailure, ChooseRandomly, ConsiderWild, EncourageFailure, FocusOnGoal, Prefer } from "./brain/instinct";
 import { MaxChapters } from "./model";
 import { View } from "./view";
 
@@ -11,17 +11,17 @@ export class BrainFactory {
         this.view = view;
     }
 
-    public createCpuBrain(author: IAuthor, level: number): Brain {
+    public createCpuBrain(author: Author, level: number): Brain {
         if (!author) throw new Error("A CPU brain must have an author.");
-        // The brain at the bottom of this list is questioned first.
-        let instinct: Instinct;
-        instinct = new Random();
-        if (level >= 1) instinct = new Wild(instinct);
-        if (level >= 2) instinct = new Survival(instinct, MaxChapters);
-        if (level >= 3) instinct = new Offensive(instinct, Prefer.Furthest);
-        if (level >= 4) instinct = new Controlling(instinct);
-        if (level >= 5) instinct = new Offensive(instinct);
-        if (level >= 6) instinct = new Survival(instinct, 0);
+        // The instinct at the bottom of this list is questioned first.
+        // The list is intentionally not in level order. Higher levels insert instincts where they are most appropriate.
+        let instinct: Instinct = new ChooseRandomly();
+        if (level >= 1) instinct = new ConsiderWild(instinct);
+        if (level >= 2) instinct = new AvoidFailure(instinct, MaxChapters);
+        if (level >= 4) instinct = new FocusOnGoal(instinct, Prefer.Furthest);
+        if (level >= 5) instinct = new EncourageFailure(instinct);
+        if (level >= 3) instinct = new FocusOnGoal(instinct);
+        if (level >= 6) instinct = new AvoidFailure(instinct, 0);
         return new InstinctBrain(this.view, author, instinct);
     }
 }

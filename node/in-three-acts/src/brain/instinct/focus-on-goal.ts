@@ -11,23 +11,23 @@ interface SuitInfo {
 }
 
 /** Filter in options that contribute to my goals. */
-export class Offensive extends Instinct {
+export class FocusOnGoal extends Instinct {
     protected readonly name: string;
     protected readonly prefer: Prefer;
 
     public constructor(subInstinct: Instinct, prefer: Prefer = Prefer.None) {
         super(subInstinct);
         this.prefer = prefer;
-        this.name = `Offensive(${prefer})`;
+        this.name = `Focus on suit ${prefer}`;
     }
 
     public chooseFrom(choices: ChapterChoice[], publicKnowledge: PublicKnowledge): ChapterChoice {
         let infos: SuitInfo[] = [];
-        const characterChapters = publicKnowledge.character.chapters;
+        const writtenChapters = publicKnowledge.author.chapters;
         for (const goal of this.player.goals) {
             for (const suit in goal.suitCounts) {
                 const target = goal.suitCounts[suit];
-                const have = characterChapters[suit].length;
+                const have = writtenChapters[suit].length;
                 const need = target - have;
                 if (need > 0) {
                     const score = (() => {
