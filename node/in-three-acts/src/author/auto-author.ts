@@ -4,6 +4,7 @@ import { Author } from "./author";
 import { AuthorPhaseInstructions } from "./author-phase-instructions";
 import { LlmClient, Message } from "../llm/llm-client";
 
+const MaxAttempts = 3;
 const MaxWordCount = 50;
 
 const Token = {
@@ -111,14 +112,30 @@ export class AutoAuthor implements Author {
             this.systemPrompt,
             { role: 'user', content: userPrompt.join('\n') },
         ];
-        const response = await this.llmClient.chat(messages);
-        messages.push(response);
-        const text = this.parseChatResponse(response.content);
+        const text = await this.callLlm(messages, text => this.parseChapterResponse(text, chapter));
 
         const bookChapter = this.book.writeChapter(chapter, text);
         if (phase == StoryPhase.Conclusion) await this.writeTitle();
-        
+
         return bookChapter;
+    }
+
+    private parseChapterResponse(text: string, chapter: Chapter): string {
+        // Find the start of the story.
+        const index = text.indexOf(Token.NextChapter);
+        if (index < 0)
+            throw new RetryLlmError(`Your response did not include the start token "${Token.NextChapter}". I do not know where your chapter text starts.`);
+        text = text.substring(index + Token.NextChapter.length);
+        // Perform common normalisation.
+        text = this.normaliseChatResponse(text);
+        // Detect chapter name.
+        if (text.toLowerCase().startsWith(chapter.name.toLowerCase()))
+            throw new RetryLlmError(`Your chapter text must not include the chapter title.`);
+        // Count words.
+        if (text.split(' ').filter(word => word.length > 1).length > MaxWordCount)
+            throw new RetryLlmError(`Your chapter text was too long. Edit your chapter text to be more concise. It must be less than 50 words.`);
+
+        return text;
     }
 
     private async writeTitle(): Promise<void> {
@@ -133,49 +150,50 @@ export class AutoAuthor implements Author {
             this.systemPrompt,
             { role: 'user', content: userPrompt.join('\n') },
         ]
-        let attempts = 3;
-        let text: string | undefined = undefined;
-        while (!text) {
+        const text = await this.callLlm(messages, this.parseTitleResponse.bind(this));
+        this.book.title = text;
+    }
+
+    private parseTitleResponse(text: string): string {
+        // Perform common normalisation.
+        text = this.normaliseChatResponse(text);
+
+        return text;
+    }
+
+    private async callLlm(messages: Message[], callback: { (text: string): string }): Promise<string> {
+        let attempts = MaxAttempts;
+        while (true) {
             try {
                 attempts--;
                 const response = await this.llmClient.chat(messages);
                 messages.push(response);
-                let text = this.parseChatResponse(response.content);
-                this.book.title = text;
+                const text = response.content;
+                debugLog(text);
+                return callback(text);
             } catch (error) {
-                if (attempts <= 0)
-                    throw error;
-                if (error instanceof PromptRetryError)
-                    messages.push({ role: 'user', content: error.message });
-                else
-                    throw error;
+                if (attempts <= 0 || !(error instanceof RetryLlmError)) throw error;
+                messages.push({ role: 'user', content: error.message });
             }
         }
     }
 
-    private parseChatResponse(text: string): string {
-        debugLog(text);
-        // Find the start of the story.
-        const index = text.indexOf(Token.NextChapter);
-        if (index < 0) throw new PromptRetryError(`Your response did not include the start token "${Token.NextChapter}". I do not know where your chapter text starts.`);
-        text = text.substring(index + Token.NextChapter.length);
-        // Remove HTML tags.
-        text = text.replace(/<[^>]*>/g, '');
+    private normaliseChatResponse(text: string): string {
+        // Detect HTML tags.
+        if (text.match(/<[^>]*>/g))
+            throw new RetryLlmError(`Your response included HTML tags. The chapter text must be plain text.`);
         // Add space around em-dashes.
         text = text.replace(/—/g, ' — ');
         // Remove newlines and unnecessary whitespace.
         text = text.replace(/\s+/g, ' ')
         // Trim leading and trailing whitespace.
         text = text.trim();
-        // Count words.
-        if (text.split(' ').filter(word => word.length > 1).length > MaxWordCount)
-            throw new PromptRetryError(`Your chapter text was too long. Edit your chapter text to be more concise. It must be less than 50 words.`);
 
         return text;
     }
 }
 
-class PromptRetryError extends Error {
+class RetryLlmError extends Error {
     public constructor(message: string) {
         super(message);
         this.name = 'PromptRetryError';
