@@ -124,7 +124,7 @@ export class AutoAuthor implements Author {
         // Find the start of the story.
         const index = text.indexOf(Token.NextChapter);
         if (index < 0)
-            throw new RetryLlmError(`Your response did not include the start token "${Token.NextChapter}". I do not know where your chapter text starts.`);
+            throw new RetryLlmError(`Your response did not include the start token "${Token.NextChapter}". I do not know where your chapter text starts.`, true);
         text = text.substring(index + Token.NextChapter.length);
         // Perform common normalisation.
         text = this.normaliseChatResponse(text);
@@ -168,12 +168,15 @@ export class AutoAuthor implements Author {
                 attempts--;
                 const response = await this.llmClient.chat(messages);
                 messages.push(response);
-                const text = response.content;
-                debugLog(text);
-                return callback(text);
+                const content = response.content;
+                debugLog(content);
+                return callback(content);
             } catch (error) {
-                if (attempts <= 0 || !(error instanceof RetryLlmError)) throw error;
-                messages.push({ role: 'user', content: error.message });
+                if (!(error instanceof RetryLlmError)) throw error;
+                if (!error.force && attempts <= 0) throw error;
+                const content = error.message;
+                messages.push({ role: 'user', content });
+                debugLog(content);
             }
         }
     }
@@ -194,8 +197,11 @@ export class AutoAuthor implements Author {
 }
 
 class RetryLlmError extends Error {
-    public constructor(message: string) {
+    public readonly force: boolean;
+
+    public constructor(message: string, force: boolean = false) {
         super(message);
+        this.force = force;
         this.name = 'PromptRetryError';
     }
 }

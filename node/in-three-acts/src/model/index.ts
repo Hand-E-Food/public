@@ -11,6 +11,7 @@ export * from './genres';
 export * from './goal';
 export * from './goals';
 export * from './goal-deck';
+export * from './names';
 export * from './player';
 export * from './public-knowledge';
 export * from './story-phase';

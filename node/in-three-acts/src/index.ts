@@ -6,7 +6,7 @@ import { BrainFactory } from './brain-factory';
 import { ConsoleView } from './console-view';
 import { Engine } from './engine';
 import { GameFactory } from './game-factory';
-import { Book, Player } from './model';
+import { Book, Names, Player } from './model';
 import { View } from './view';
 import { OllamaClient } from './llm/ollama-client';
 import { promises as fs } from 'fs';
@@ -29,10 +29,19 @@ function getTimestamp(): string {
     return `${year}-${month}-${day}-${hours}-${minutes}`;
 }
 
-async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promise<void> {
+async function main(name1?: string, name2?: string): Promise<void> {
     let llmClient: LlmClient | undefined;
     let view: View | undefined;
     try {
+        if (!name1) {
+            do name1 = Names.getRandom();
+            while (name1 === name2);
+        }
+        if (!name2) {
+            do name2 = Names.getRandom();
+            while (name2 === name2);
+        }
+
         view = new ConsoleView();
         const brainFactory = new BrainFactory(view);
         const model = await getModel();

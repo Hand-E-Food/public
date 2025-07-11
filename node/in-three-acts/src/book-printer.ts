@@ -1,5 +1,8 @@
 import { promises as fs } from 'fs';
 import { Book } from "./model";
+import { wrapLines } from './monospace';
+
+const LineWidth = 40;
 
 export class BookPrinter {
     public async printBook(book: Book, filePath: string): Promise<void> {
@@ -8,12 +11,9 @@ export class BookPrinter {
             `by ${book.authorName}`,
             ...book.chapters.flatMap(chapter => [
                 '',
-                '',
                 `## ${chapter.number}. ${chapter.chapter.name}`,
-                '',
-                chapter.text,
+                ...wrapLines(LineWidth, chapter.text),
             ]),
-            '',
             '',
             `# ${book.ending}`,
         ].join('\n');

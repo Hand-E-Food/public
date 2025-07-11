@@ -2,6 +2,7 @@ import color from "cli-color";
 import { Console } from './console';
 import { BookChapter, Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "./model";
 import { View } from "./view";
+import { wrapLines } from "./monospace";
 
 export class ConsoleView implements View {
     public player?: Player = undefined;
@@ -54,25 +55,11 @@ export class ConsoleView implements View {
     }
 
     public showBookChapter(chapter: BookChapter): void {
-        const MAX_WIDTH = 80;
+        const LineWidth = 80;
         Console.write('\n');
         this.clearConsole();
         Console.write(`${this.colorize(chapter.chapter.suit, `${chapter.number}. ${chapter.chapter.name}`)}\n`);
-        let text = chapter.text;
-        const lines: string[] = [];
-        while (text.length > MAX_WIDTH) {
-            const line = text.substring(0, MAX_WIDTH);
-            const lastSpace = line.lastIndexOf(' ');
-            if (lastSpace > 0) {
-                lines.push(line.substring(0, lastSpace));
-                text = text.substring(lastSpace + 1);
-            } else {
-                lines.push(line);
-                text = text.substring(MAX_WIDTH);
-            }
-        }
-        lines.push(text);
-        for (const line of lines)
+        for (const line of wrapLines(LineWidth, chapter.text))
             Console.write(line + '\n');
     }
 
