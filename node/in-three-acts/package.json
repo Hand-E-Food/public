@@ -6,9 +6,15 @@
   "license": "ISC",
   "main": "out/index.js",
   "scripts": {
-    "preapp": "npm run build",
-    "app": "node out/index.js",
-    "build": "tsc"
+    "app": "npm run build && node out/index.js",
+    "app:mac": "npm run ollama:start:mac; npm run app",
+    "app:win": "npm run ollama:start:win; npm run app",
+    "build": "tsc; cp src/*.txt out/",
+    "ollama:install": "ollama pull $(cat src/model.txt)",
+    "ollama:install:mac": "brew install ollama && npm run ollama:start:mac && npm run ollama:install",
+    "ollama:install:win": "winget install --id=Ollama.Ollama -e && npm run ollama:start:win && npm run ollama:install",
+    "ollama:start:mac": "brew services start ollama",
+    "ollama:start:win": "ollama serve || true"
   },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",

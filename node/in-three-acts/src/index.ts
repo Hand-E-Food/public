@@ -1,4 +1,3 @@
-import { Ollama } from 'ollama';
 import { argv } from 'process';
 import { AutoAuthor, DummyAuthor } from './author';
 import { BookPrinter } from './book-printer';
@@ -9,6 +8,14 @@ import { Engine } from './engine';
 import { GameFactory } from './game-factory';
 import { Book, Player } from './model';
 import { View } from './view';
+import { OllamaClient } from './llm/ollama-client';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { LlmClient } from './llm/llm-client';
+
+function getModel(): Promise<string> {
+    return fs.readFile(path.join(__dirname, 'model.txt'), { encoding: 'utf8' });
+}
 
 function getTimestamp(): string {
     const now = new Date();
@@ -23,18 +30,21 @@ function getTimestamp(): string {
 }
 
 async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promise<void> {
+    let llmClient: LlmClient | undefined;
     let view: View | undefined;
     try {
         view = new ConsoleView();
         const brainFactory = new BrainFactory(view);
-        const ollama = new Ollama();
+        const model = await getModel();
+        llmClient = new OllamaClient(model);
 
         const book1 = new Book(name1);
         //const author1 = new DummyAuthor({ book: book1, characterName: name2 });
-        const author1 = new AutoAuthor(ollama, {
+        const author1 = new AutoAuthor({
             book: book1,
             characterName: name2,
             genre: undefined,
+            llmClient,
             style: undefined,
         });
         const brain1 = brainFactory.createCpuBrain(author1, 6);
@@ -43,10 +53,11 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
 
         const book2 = new Book(name2);
         //const author2 = new DummyAuthor(book2);
-        const author2 = new AutoAuthor(ollama, {
+        const author2 = new AutoAuthor({
             book: book2,
             characterName: name1,
             genre: undefined,
+            llmClient,
             style: undefined,
         });
         const brain2 = brainFactory.createCpuBrain(author2, 6);
@@ -68,6 +79,7 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
         }
         await view.waitForClose();
     } finally {
+        llmClient?.dispose();
         view?.dispose();
     }
 }
