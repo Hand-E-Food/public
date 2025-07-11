@@ -81,10 +81,11 @@ export class ConsoleView implements View {
     }
 
     private formatPlayer(suit: Suit, publicKnowledge: PublicKnowledge, index: 0 | 1): string {
-        const my = publicKnowledge.players[index];
-        const your = publicKnowledge.players[1 - index];
-        const chapters = this.formatChapterCount(suit, my.chapters);
-        const goals = this.player?.id === my.id ? this.player.goals : your.goals;
+        const publicKnowledgeOfPlayer = publicKnowledge.players[index];
+        const chapters = this.formatChapterCount(suit, publicKnowledgeOfPlayer.chapters);
+        const goals = this.player?.id === publicKnowledgeOfPlayer.id
+            ? this.player.goals
+            : publicKnowledgeOfPlayer.goals;
         const goal = this.formatGoalCount(suit, goals);
         return chapters + goal;
     }

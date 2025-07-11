@@ -68,7 +68,7 @@ async function main(name1: string = 'Human', name2: string = 'AuthorBot'): Promi
         }
         await view.waitForClose();
     } finally {
-        if (view) view.dispose();
+        view?.dispose();
     }
 }
 
