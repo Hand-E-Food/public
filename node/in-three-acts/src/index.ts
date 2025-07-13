@@ -39,7 +39,7 @@ async function main(name1?: string, name2?: string): Promise<void> {
         }
         if (!name2) {
             do name2 = Names.getRandom();
-            while (name2 === name2);
+            while (name1 === name2);
         }
 
         view = new ConsoleView();
