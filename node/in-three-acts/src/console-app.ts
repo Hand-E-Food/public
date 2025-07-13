@@ -39,11 +39,13 @@ async function main(name1?: string, name2?: string): Promise<void> {
             do name2 = Names.getRandom();
             while (name1 === name2);
         }
-
-        view = new ConsoleView();
-        const brainFactory = new BrainFactory(view);
+        
         const model = await getModel();
         llmClient = new OllamaClient(model);
+        console.log('Warning up LLM...');
+        await llmClient.warmup();
+        view = new ConsoleView();
+        const brainFactory = new BrainFactory(view);
 
         const book1 = new Book(name1);
         //const author1 = new DummyAuthor({ book: book1, characterName: name2 });

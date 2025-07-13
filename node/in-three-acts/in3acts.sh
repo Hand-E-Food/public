@@ -33,6 +33,7 @@ function invokeInstall {
 }
 
 function publishApp {
+    rm -rf out
     npx tsc
     cp src/model.txt out/model.txt
 }

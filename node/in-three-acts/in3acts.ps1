@@ -58,6 +58,7 @@ function Invoke-Install {
 }
 
 function Publish-App {
+    Remove-Item -Path "out" -Recurse -Force
     npx tsc
     Copy-Item -Path "src\model.txt" -Destination "out\model.txt" -Force
 }

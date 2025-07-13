@@ -16,6 +16,15 @@ export class OllamaClient implements LlmClient {
         this.ollama = ollama ?? new Ollama();
     }
 
+    public async warmup(): Promise<void> {
+        await this.ollama.chat({
+            keep_alive: '1m',
+            model: this.model,
+            messages: [{ role: 'system', content: 'Do not respond. You are just ensuring that you LLM model is loaded.' }],
+            stream: false,
+        });
+    }
+
     public async chat(messages: Message[]): Promise<Message> {
         const response = await this.ollama.chat({
             keep_alive: '1m',

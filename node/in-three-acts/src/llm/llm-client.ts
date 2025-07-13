@@ -15,4 +15,9 @@ export interface LlmClient {
      * Ensures all resources are correctly disposed.
      */
     dispose(): void;
+
+    /**
+     * Prepares the LLM client for use, including any necessary warmup steps.
+     */
+    warmup(): Promise<void>;
 }
