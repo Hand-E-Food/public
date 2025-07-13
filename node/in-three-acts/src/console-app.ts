@@ -3,15 +3,13 @@ import { AutoAuthor, DummyAuthor } from './author';
 import { BookPrinter } from './book-printer';
 import { Human } from './brain';
 import { BrainFactory } from './brain-factory';
-import { ConsoleView } from './console-view';
 import { Engine } from './engine';
 import { GameFactory } from './game-factory';
+import { LlmClient, OllamaClient } from './llm';
 import { Book, Names, Player } from './model';
-import { View } from './view';
-import { OllamaClient } from './llm/ollama-client';
+import { ConsoleView, View } from './view';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { LlmClient } from './llm/llm-client';
 
 function getModel(): Promise<string> {
     return fs.readFile(path.join(__dirname, 'model.txt'), { encoding: 'utf8' });

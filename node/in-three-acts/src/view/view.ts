@@ -1,4 +1,4 @@
-import { BookChapter, Chapter, Player, PublicKnowledge, Suit } from "./model";
+import { BookChapter, Chapter, Player, PublicKnowledge, Suit } from "../model";
 
 export interface View {
     startGame(): void;

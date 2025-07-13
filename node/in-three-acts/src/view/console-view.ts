@@ -1,8 +1,8 @@
 import color from "cli-color";
 import { Console } from './console';
-import { BookChapter, Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "./model";
+import { BookChapter, Chapter, ChapterDecks, Goal, MaxGoals, Player, PublicKnowledge, Suit, Suits } from "../model";
 import { View } from "./view";
-import { wrapLines } from "./monospace";
+import { wrapLines } from "../monospace";
 
 export class ConsoleView implements View {
     public player?: Player = undefined;

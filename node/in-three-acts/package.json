@@ -5,16 +5,6 @@
   "author": "Mark Richardson",
   "license": "ISC",
   "main": "out/index.js",
-  "scripts": {
-    "app": "npm run build && node out/index.js",
-    "app:mac": "npm run ollama:start:mac; npm run app",
-    "app:win": "npm run ollama:start:win & npm run app",
-    "build": "tsc; cp src/*.txt out/",
-    "ollama:install:mac": "brew install ollama && npm run ollama:start:mac && ollama pull $(cat src/model.txt)",
-    "ollama:install:win": "winget install --exact --id=Ollama.Ollama & npm run ollama:start:win & for /f \"delims=\" %m in (src\\model.txt) do ollama pull %m",
-    "ollama:start:mac": "brew services start ollama",
-    "ollama:start:win": "ollama serve"
-  },
   "devDependencies": {
     "@types/cli-color": "^2.0.6",
     "@types/node": "^18.14.4",
