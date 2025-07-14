@@ -1,0 +1,1 @@
+Now that you have a plan for the story, write the story in full. Be elaborate. Your response must only include the story, no other text.

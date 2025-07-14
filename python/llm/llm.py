@@ -1,60 +1,63 @@
 #!/usr/bin/env python3
-import os
-import sys
 from typing import List, Optional
 
 import ollama
 from ollama import Message
 
-MODEL = 'llama3.2:latest'
-TOKEN = 'THE STORY:'
 
-def pop_arg(args: List[str], filename: str) -> str:
-    return args.pop(0) if len(args) > 0 else os.path.join(os.path.dirname(__file__), filename)
+def read_file(path: str) -> str:
+    with open(path, 'r') as file:
+        return file.read()
 
-def get_prompts(system_prompt_path: str, user_prompt_path: str) -> List[Message]:
-    with open(system_prompt_path, 'r') as file:
-        system_prompt = file.read()
-    with open(user_prompt_path, 'r') as file:
-        user_prompt = file.read()
+def write_file(path: str, content: str) -> None:
+    with open(path, 'w') as file:
+        file.write(content)
 
-    return [
-        Message(role='system', content=system_prompt),
-        Message(role='user', content=user_prompt),
-    ]
-
-def call_llm(messages: List[Message]) -> Optional[str]:
-    messages = messages.copy()
-    response = ollama.chat(MODEL, messages)
-    messages.append(response.message)
-    output = response.message.content
-    if not output: return None
-
-    index = output.find(TOKEN)
-    if index != -1: output = output[index + len(TOKEN):]
-    output = output.strip() + '\n'
-    return output
-
-def save_output(output_path: str, output: Optional[str]):
-    if output:
-        with open(output_path, 'w') as file:
-            file.write(output)
-
-def print_output(output: str, width: int = 40) -> None:
-    while output:
-        index = output.rindex(' ', 0, width)
-        line = output[:index]
-        output = output[index + 1:]
+def print_wrapped(text: str, width: int = 40) -> None:
+    while text:
+        index = text.rindex(' ', 0, width)
+        line = text[:index]
+        text = text[index + 1:]
         print(line)
-    print(output)
+    print(text)
 
-def main(args: List[str]) -> None:
-    system_prompt_path = pop_arg(args, 'system.md')
-    user_prompt_path = pop_arg(args, 'user.md')
-    output_path = pop_arg(args, 'output.txt')
-    messages = get_prompts(system_prompt_path, user_prompt_path)
-    output = call_llm(messages)
-    save_output(output_path, output)
+def get_text_after(token: str, text: Optional[str]) -> Optional[str]:
+    if not text: return None
+    index = text.find(token)
+    if index == -1: return None
+    return text[index + len(token):].strip()
 
-if __name__ == '__main__':
-    main(sys.argv[1:])
+def get_text_between(start_token: str, end_token: str, text: Optional[str]) -> Optional[str]:
+    if not text: return None
+    start_index = text.find(start_token)
+    if start_index == -1: return None
+    start_index += len(start_token)
+    end_index = text.find(end_token, start_index)
+    if end_index == -1: end_index = len(text)
+    return text[start_index:end_index].strip()
+
+class Llm:
+    def __init__(self, model: Optional[str] = None):
+        if model:
+            self._model: str = model
+            if not any(m for m in ollama.list().models if m.model == model):
+                print(f'Pulling model {model}...')
+                ollama.pull(model)
+        else:
+            models = [m for m in ollama.list().models if m.model]
+            if not models:
+                raise ValueError('No models available. Please pull a model first.')
+            models.sort(key=lambda m: m.size or 10**12)
+            self._model: str = models[0].model # type: ignore
+        self._messages: List[Message] = []
+
+    def new_session(self, system_prompt: str) -> None:
+        self._messages.clear()
+        self._messages.append(Message(role='system', content=system_prompt))
+
+    def chat(self, user_prompt: str) -> Optional[str]:
+        if len(self._messages) == 0: raise ValueError('Call "new_session(system_prompt)" first.')
+        self._messages.append(Message(role='user', content=user_prompt))
+        response = ollama.chat(self._model, self._messages)
+        self._messages.append(response.message)
+        return response.message.content

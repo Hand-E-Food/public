@@ -1,0 +1,1 @@
+The story is a short story about two animals who are freinds.
