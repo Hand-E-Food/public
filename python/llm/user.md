@@ -1,0 +1,1 @@
+Write a short story about a otter and a seal. It only needs to be a couple of paragrahps long.
