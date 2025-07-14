@@ -1,7 +1,11 @@
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, Position = 0)]
     [ValidateSet("install", "console", "html")]
-    [string]$Command
+    [string]$Command,
+    [Parameter(Mandatory = $false, Position = 1)]
+    [string]$Name1,
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$Name2
 )
 
 function Install-LlmModel {
@@ -38,10 +42,10 @@ function Install-WinGet {
     }
 }
 
-function Invoke-Console {
+function Invoke-Console([string] $Name1, [string] $Name2) {
     Publish-App
     Start-Ollama
-    node out\console-app.js
+    node out\console-app.js $Name1 $Name2
 }
 
 function Invoke-HtmlHost {
@@ -79,7 +83,7 @@ function Start-Ollama {
 Set-Location -Path $PSScriptRoot
 switch ($Command.ToLower()) {
     "install"  { Invoke-Install }
-    "console"  { Invoke-Console }
+    "console"  { Invoke-Console $Name1 $Name2 }
     "html"     { Invoke-HtmlHost }
     default    {
         Write-Host "Unknown command: $Command"

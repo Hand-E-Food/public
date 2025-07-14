@@ -17,7 +17,7 @@ function installOllama {
 function invokeConsole {
     publishApp
     startOllama
-    node out/console-app.js
+    node out/console-app.js -- "$1" "$2"
 }
 
 function invokeHtmlHost {
@@ -44,7 +44,7 @@ function startOllama {
 
 case "$1" in
     "install") invokeInstall;;
-    "console") invokeConsole;;
+    "console") invokeConsole "$2" "$3";;
     "html") invokeHtmlHost;;
     *)
         echo "Unknown command: $1"
