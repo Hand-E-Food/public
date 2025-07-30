@@ -31,6 +31,8 @@ This must be the first block in the file. It may be specified again later in the
 
 Starts a new conversation with a system prompt.
 This must be specified before any **user** or **assistant** blocks.
+The text in this block is the new system prompt.
+This block may be empty to restart the conversation but keep the previous system prompt. The first system block cannot be empty because there is no previous system prompt.
 
 ### user
 

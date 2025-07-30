@@ -3,7 +3,7 @@
 import sys
 from typing import List, Optional
 
-from ollama import Message
+from ollama import ChatResponse, Message, Options
 import ollama
 
 block_delimiter = '---\n# '
@@ -13,8 +13,11 @@ class _Chatbot:
         self.inputs: List[Message] = inputs
         self.messages: List[Message] = []
         self.model: str
+        self.options: Options
         self.outputs: List[Message] = []
         self.reset_assistant: bool = False
+        self.user_messages_count: int = 0
+        self.user_messages_total: int = len([input for input in inputs if input.role == 'user' and input.content])
 
     def converse(self) -> List[Message]:
         do_block = {
@@ -31,7 +34,7 @@ class _Chatbot:
         if self.messages and self.messages[-1].role != 'user':
             self.outputs.append(Message(role='user'))
 
-        print('Added empty user message for user to continue thew conversation')
+        print('Added empty user message for user to continue the conversation')
         return self.outputs
 
     def _do_assistant_block(self, input: Message):
@@ -53,6 +56,8 @@ class _Chatbot:
 
         if not self.model in (m.model for m in ollama.list().models):
             pull_model(self.model)
+
+        self.options = Options()
 
         self.outputs.append(input)
         print('Set config')
@@ -80,11 +85,16 @@ class _Chatbot:
         self._respond_to_previous_user_message()
 
         self.reset_assistant = False
-        self.messages.clear()
-
-        self.messages.append(input)
+        if input.content:
+            self.messages.clear()
+            self.messages.append(input)
+            print('Started a new conversation with a new system prompt')
+        else:
+            if not self.messages:
+                raise ValueError('The first system prompt must not be empty.')
+            self.messages = self.messages[:1]
+            print('Started a new conversation with the same system prompt')
         self.outputs.append(input)
-        print('Started new conversation with a system prompt')
 
     def _do_user_block(self, input: Message):
         if not self.messages:
@@ -92,6 +102,7 @@ class _Chatbot:
 
         self._respond_to_previous_user_message()
 
+        self.user_messages_count += 1
         self.messages.append(input)
         self.outputs.append(input)
         print('Added user message')
@@ -100,23 +111,29 @@ class _Chatbot:
         raise ValueError(f'Unexpected block "{input.role}"')
 
     def _respond_to_previous_user_message(self) -> None:
-        if not self.messages or self.messages[-1].role != 'user' or not self.messages[-1].content:
+        last_message = self.messages[-1] if self.messages else Message(role='')
+        if last_message.role != 'user' or not last_message.content:
             return
 
         if not self.model:
             raise ValueError('A config message must come before all user messages.')
 
-        print('Asking assistant for response')
-        response = ollama.chat(self.model, self.messages)
-
-        message = response.message
+        print(f'Asking assistant for response to user message {self.user_messages_count} of {self.user_messages_total}')
+        # Stream the response so this can respond to Ctrl+C immediately.
+        responses = ollama.chat(self.model, self.messages, options=self.options, keep_alive='10m', stream=True)
+        
+        content: str = ''
+        for response in responses:
+            content += response.message.content or ''
+        content = content.strip()
+        message = Message(role='assistant', content=content)
         self.messages.append(message)
         self.outputs.append(message)
 
 def converse(inputs: List[Message]) -> List[Message]:
     return _Chatbot(inputs).converse()
 
-def use_file(path: str) -> None:
+def converse_in_file(path: str) -> None:
     inputs: List[Message] = []
     with open(path, 'r') as file:
         text = file.read()
@@ -174,4 +191,4 @@ if __name__ == '__main__':
     if len(args) < 1: raise ValueError('Provide a path to the chat file.')
     path = args.pop(0)
     if len(args) > 0: raise ValueError(f'Unexpected argument: {args[0]}')
-    use_file(path)
+    converse_in_file(path)
