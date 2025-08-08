@@ -1,4 +1,4 @@
-import { Book, BookChapter, Chapter, StoryPhase } from "../model";
+import { Book, BookChapter, Chapter, Completion } from "../model";
 import { Author } from "./author";
 import { AuthorPhaseInstructions } from "./author-phase-instructions";
 
@@ -21,8 +21,8 @@ export class DummyAuthor implements Author {
         this.instructions = new AuthorPhaseInstructions(props.characterName);
     }
 
-    public writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter> {
-        const instruction = this.instructions.getInstruction(phase);
+    public writeChapter(chapter: Chapter, completion: Completion): Promise<BookChapter> {
+        const instruction = this.instructions.popInstruction(completion);
         const bookChapter = this.book.writeChapter(chapter, `This chapter ${instruction}`);
         return Promise.resolve(bookChapter);
     }

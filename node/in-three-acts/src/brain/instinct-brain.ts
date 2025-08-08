@@ -1,5 +1,5 @@
 import { Author } from "../author";
-import { Book, BookChapter, Chapter, ChapterChoice, Player, PublicKnowledge, StoryPhase, Suit } from "../model";
+import { Book, BookChapter, Chapter, ChapterChoice, Completion, Player, PublicKnowledge, Suit } from "../model";
 import { View } from "../view";
 import { Brain } from "./brain";
 import { Instinct } from "./instinct";
@@ -45,8 +45,8 @@ export class InstinctBrain extends Brain {
         return Promise.resolve(choice);
     }
 
-    public async writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter> {
-        const bookChapter = await this.author.writeChapter(chapter, phase);
+    public async writeChapter(chapter: Chapter, completion: Completion): Promise<BookChapter> {
+        const bookChapter = await this.author.writeChapter(chapter, completion);
         this.view.showBookChapter(bookChapter);
         return bookChapter;
     }

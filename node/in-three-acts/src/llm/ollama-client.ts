@@ -1,6 +1,10 @@
-import { ChatRequest, ChatResponse, Ollama } from "ollama";
+import { ChatRequest, ChatResponse, Ollama, Options } from "ollama";
 import { LlmClient, Message } from "./llm-client";
-import { debugLog } from "../logger";
+
+const keep_alive = '10m';
+const options: Partial<Options> = {
+    repeat_penalty: 1.2,
+};
 
 export interface IOllama {
     chat(request: ChatRequest & { stream?: false; }): Promise<ChatResponse>;
@@ -18,18 +22,19 @@ export class OllamaClient implements LlmClient {
 
     public async warmup(): Promise<void> {
         await this.ollama.chat({
-            keep_alive: '1m',
+            keep_alive,
+            messages: [{ role: 'system', content: 'Do not respond.' }],
             model: this.model,
-            messages: [{ role: 'system', content: 'Do not respond. You are just ensuring that you LLM model is loaded.' }],
             stream: false,
         });
     }
 
     public async chat(messages: Message[]): Promise<Message> {
         const response = await this.ollama.chat({
-            keep_alive: '1m',
-            model: this.model,
+            keep_alive,
             messages,
+            model: this.model,
+            options,
             stream: false,
         });
         return response.message;

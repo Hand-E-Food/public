@@ -1,4 +1,4 @@
-import { Chapter, ChapterChoice, Game, Goal, Player, Suits, StoryPhase } from "./model";
+import { Chapter, ChapterChoice, Completion, CompletionMilestone, Game, Goal, Player, Suits } from "./model";
 
 export class Engine {
     private readonly game: Game;
@@ -33,26 +33,25 @@ export class Engine {
         chapterDeck.push(chapter);
         this.game.lastChapter = chapter;
 
-        let phase: StoryPhase;
+        let completion: Completion;
         if (author.hasFailed) {
             author.book.ending = '~ Manuscript Rejected ~';
-            phase = StoryPhase.Failure;
-        } else if (!author.hasAllGoals) {
-            if (!author.hasCompletedCurrentGoals) {
-                phase = StoryPhase.Exposition;
-            } else {
-                this.drawGoal(author);
-                phase = StoryPhase.PlotTwist;
-            }
+            completion = CompletionMilestone.failure;
         } else {
-            if (!author.hasCompletedCurrentGoals) {
-                phase = StoryPhase.Resoultion;
-            } else {
-                author.book.ending = 'The End';
-                phase = StoryPhase.Conclusion;
+            if (author.hasCompletedCurrentGoals) {
+                if (author.hasAllGoals) {
+                    author.book.ending = 'The End';
+                } else {
+                    this.drawGoal(author);
+                }
             }
+            const goal_index = author.goals.length - 1;
+            const completedChapters = author.goals[goal_index].chaptersCompleted(author.chapters)
+            const nextMilestone = CompletionMilestone.goals[goal_index];
+            const previousMilestone = goal_index == 0 ? CompletionMilestone.start : CompletionMilestone.goals[goal_index - 1];
+            completion = completedChapters.count / completedChapters.total * (nextMilestone - previousMilestone) + previousMilestone;
         }
-        await author.brain.writeChapter(choice.chapter, phase);
+        await author.brain.writeChapter(choice.chapter, completion);
     }
 
     private async firstChapter(): Promise<ChapterChoice> {

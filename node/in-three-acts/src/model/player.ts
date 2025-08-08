@@ -19,7 +19,10 @@ export class Player {
     }
 
     public get hasCompletedCurrentGoals(): boolean {
-        return this.goals.every(goal => goal.isCompleted(this.chapters));
+        return this.goals.every(goal => {
+            const completion = goal.chaptersCompleted(this.chapters);
+            return completion.count >= completion.total;
+        });
     }
 
     public get hasFailed(): boolean {

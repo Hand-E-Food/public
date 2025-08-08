@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from typing import Any, List, Literal, Mapping, Optional
+from typing import List, Optional
 
 from ollama import ChatResponse, Message, Options
 import ollama

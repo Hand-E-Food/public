@@ -1,8 +1,8 @@
+import { LlmClient, Message } from "../llm/llm-client";
 import { debugLog } from "../logger";
-import { AuthorStyles, Book, BookChapter, Chapter, Genres, StoryPhase } from "../model";
+import { AuthorStyles, Book, BookChapter, Chapter, Completion, CompletionMilestone, Genres } from "../model";
 import { Author } from "./author";
 import { AuthorPhaseInstructions } from "./author-phase-instructions";
-import { LlmClient, Message } from "../llm/llm-client";
 
 const MaxAttempts = 3;
 const MaxWordCount = 50;
@@ -87,15 +87,9 @@ export class AutoAuthor implements Author {
         this.instructions = new AuthorPhaseInstructions(props.characterName);
     }
 
-    /**
-     * Writes a chapter of the story into the book.
-     * @param chapter The chapter to write.
-     * @param phase The current phase of the story.
-     * @returns The written chapter.
-     */
-    public async writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter> {
+    public async writeChapter(chapter: Chapter, completion: Completion): Promise<BookChapter> {
         const userPrompt: string[] = [];
-        const instruction = this.instructions.getInstruction(phase);
+        const instruction = this.instructions.popInstruction(completion);
         if (this.book.chapters.length > 0) {
             userPrompt.push(
                 `Here is the story so far:`,
@@ -115,7 +109,7 @@ export class AutoAuthor implements Author {
         const text = await this.callLlm(messages, text => this.parseChapterResponse(text, chapter));
 
         const bookChapter = this.book.writeChapter(chapter, text);
-        if (phase == StoryPhase.Conclusion) await this.writeTitle();
+        if (completion == CompletionMilestone.completed) await this.writeTitle();
 
         return bookChapter;
     }

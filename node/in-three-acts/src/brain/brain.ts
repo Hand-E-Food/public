@@ -1,4 +1,4 @@
-import { Book, BookChapter, Chapter, ChapterChoice, Player, PublicKnowledge, StoryPhase, Suit } from "../model";
+import { Book, BookChapter, Chapter, ChapterChoice, Player, PublicKnowledge, Completions, Suit } from "../model";
 
 export abstract class Brain {
     protected player: Player = undefined!;

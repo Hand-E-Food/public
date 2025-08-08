@@ -1,14 +1,14 @@
-import { Book, BookChapter, Chapter, StoryPhase } from "../model";
+import { Book, BookChapter, Chapter, Completion } from "../model";
 
 export interface Author {
     /** The book being written in by this author. */
     readonly book: Book;
 
     /**
-     * Writes the next chapter of the story into the book.
+     * Writes a chapter of the story into the book.
      * @param chapter The chapter to write.
-     * @param phase The current phase of the story.
+     * @param completion How complete the story is on a scale of 0.0 to 1.0. See `Completion`.
      * @returns The written chapter.
      */
-    writeChapter(chapter: Chapter, phase: StoryPhase): Promise<BookChapter>;
+    writeChapter(chapter: Chapter, completion: Completion): Promise<BookChapter>;
 }

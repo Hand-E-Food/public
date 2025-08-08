@@ -20,22 +20,19 @@ export class Goal {
         this.suitCounts = suitCounts;
     }
 
-    public isCompleted(chapters: ChapterDecks): boolean {
-        return Object.keys(this.getOutstanding(chapters)).length === 0;
+    public chaptersCompleted(chapters: ChapterDecks): {count: number, total: number} {
+        const suitCounts = this.suitCounts;
+        let count = 0;
+        let total = 0;
+        for (const suit in suitCounts) {
+            count += Math.min(suitCounts[suit], chapters[suit].length);
+            total += suitCounts[suit];
+        };
+        return { count, total };
     }
 
     public getCompletedSuits(chapters: ChapterDecks): Suit[] {
         const suitCounts = this.suitCounts;
         return Object.keys(suitCounts).filter(suit => suitCounts[suit] <= chapters[suit].length);
-    }
-
-    public getOutstanding(chapters: ChapterDecks): SuitCount {
-        const suitCounts = this.suitCounts;
-        const result: SuitCount = {};
-        for (const suit in suitCounts) {
-            const count = suitCounts[suit] - chapters[suit].length;
-            if (count > 0) result[suit] = count;
-        };
-        return result;
     }
 }

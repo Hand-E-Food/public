@@ -28,7 +28,7 @@ export class PublicKnowledge {
             return {
                 book: player.book,
                 chapters: player.chapters,
-                goals: player.goals.filter(goal => expose || goal.isCompleted),
+                goals: player.goals.filter(goal => expose || goal.chaptersCompleted),
                 id: player.id,
                 name: player.name,
             }
