@@ -39,6 +39,8 @@ class _Chatbot:
         self.user_messages_count: int = 0
         self.user_messages_total: int = len([input for input in inputs if input.title == 'user' and input.content])
 
+        self.chat_request.messages = self.messages
+
     def converse(self) -> List[Block]:
         do_block = {
             'assistant': self._do_assistant_block,
@@ -70,15 +72,10 @@ class _Chatbot:
     def _do_config_block(self, input: Block):
         self._respond_to_previous_user_message()
 
-        if input.content:
-            model = input.content.strip()
-        else:
-            input.content = model = get_smallest_model()
+        if not input.content:
+            raise ValueError('Config block must specify the model to use.')
 
-        if model not in (m.model.split(':')[0] for m in ollama.list().models if m.model):
-            pull_model(model)
-
-
+        model = input.content.strip()
         self.chat_request.model = model
         self.model = ollama.show(model)
         self.chat_request.think = think = any(
@@ -115,11 +112,13 @@ class _Chatbot:
             self.messages.clear()
             self.messages.append(Message(role=input.title, content=input.content))
             print('Started a new conversation with a new system prompt')
-        else:
-            if not self.messages:
-                raise ValueError('The first system prompt must not be empty.')
+        elif self.messages and self.messages[0].role == 'system':
             self.messages = self.messages[:1]
             print('Started a new conversation with the same system prompt')
+        else:
+            self.messages = []
+            print('Started a new conversation with no system prompt')
+
         self.outputs.append(input)
 
     def _do_thinking_block(self, input: Block):
@@ -134,9 +133,6 @@ class _Chatbot:
         print('Added existing thinking')
 
     def _do_user_block(self, input: Block):
-        if not self.messages:
-            raise ValueError('A system message must come before all user messages.')
-
         self._respond_to_previous_user_message()
 
         self.user_messages_count += 1
@@ -157,18 +153,28 @@ class _Chatbot:
 
         print(f'Asking assistant for response to user message {self.user_messages_count} of {self.user_messages_total}')
 
+        content: Optional[str]
         if self.chat_request.stream:
             # Stream the response so this can respond to Ctrl+C immediately.
-            responses = ollama.chat(**self.chat_request, stream=True)
+            responses = ollama.chat(**self.chat_request)
 
-            content: str = ''
+            content = ''
             for response in responses:
                 content += response.message.content or ''
+                if response.done:
+                    print(f'Successfully streamed response: {response.done_reason}')
+                    break
+            
             content = content.strip()
             message = Message(role='assistant', content=content)
         else:
             # Get the full response at once.
-            response: ChatResponse = ollama.chat(**self.chat_request, stream=False)
+            response: ChatResponse = ollama.chat(**self.chat_request)
+            if response.done:
+                print(f'Successful response: {response.done_reason}')
+            else:
+                print(f'Unsuccessful response.')
+
             content = response.message.content
             message = response.message
 
