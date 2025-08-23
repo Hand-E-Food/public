@@ -15,7 +15,7 @@ class Block:
 
 class _ChatRequest:
     def __init__(self) -> None:
-        self.keep_alive: str = '10m'
+        self.keep_alive: str = '30m'
         self.messages: List[Message] = []
         self.model: str = ''
         self.options: Options = Options()
@@ -44,6 +44,7 @@ class _Chatbot:
     def converse(self) -> List[Block]:
         do_block = {
             'assistant': self._do_assistant_block,
+            '//': self._do_comment_block,
             'config': self._do_config_block,
             'copy': self._do_copy_block,
             'reset': self._do_reset_block,
@@ -68,6 +69,10 @@ class _Chatbot:
         self.messages.append(Message(role=input.title, content=input.content))
         self.outputs.append(input)
         print('Added existing assistant message')
+
+    def _do_comment_block(self, input: Block):
+        self._respond_to_previous_user_message()
+        self.outputs.append(input)
 
     def _do_config_block(self, input: Block):
         self._respond_to_previous_user_message()
