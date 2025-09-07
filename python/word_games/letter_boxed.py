@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+import sys
 from typing import Dict, Iterable, List, Optional
 
 
@@ -103,7 +104,7 @@ def get_unique_letters(words: List[str]) -> str:
     return ''.join(sorted(letters))
 
 if __name__ == '__main__':
-    puzzle = None
+    puzzle = sys.argv[1:]
     #puzzle = ['yye', 'jmi', 'ncr', 'wxs']
     #puzzle = ['ymz', 'jfc', 'ohl', 'rtb']
     #puzzle = ['yzl', 'ufj', 'yhx', 'ces']
