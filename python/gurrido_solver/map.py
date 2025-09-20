@@ -16,7 +16,7 @@ class Map:
         ]
         self.runs = [run for row in self.rows for run in row.runs]
 
-    def cell(self, x, y) -> Cell:
+    def cell(self, x: int, y: int) -> Cell:
         if 0 <= x <= 9:
             if 0 <= y <= 9:
                 return self.cells[y * 9 + x]

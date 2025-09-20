@@ -10,8 +10,8 @@ def load_map(path: str) -> List[RawCell]:
 
 cells = load_map('map2.txt')
 solver = Solver(cells)
-output.print_map(solver.map, rewind=False)
+output.print_small(solver.map, rewind=False)
 print()
 solver.solve()
 print()
-output.print_map(solver.map)
+output.print_big(solver.map)

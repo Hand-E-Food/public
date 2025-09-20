@@ -1,4 +1,6 @@
-from typing import List, Optional, TYPE_CHECKING
+from itertools import combinations
+from typing import List, Optional
+from all_numbers import AllNumbers
 from cell import Cell
 from raw_cell import RawCell
 from run import Run
@@ -36,8 +38,37 @@ class Row:
         return runs
 
     def clean(self) -> None:
-        #TODO
-        pass
+        # Find cells in this row where it's certain that all of its numbmers are required in its run.
+        known_cells = [
+            cell
+            for run in self.runs
+            for cell in run.cells
+            if all(
+                run.hard_min <= number <= run.hard_max
+                for number in cell.numbers
+            )
+        ]
+        known_cells.sort(key=lambda cell: len(cell.numbers))
+        length = 1
+        while length < len(known_cells):
+            targets = combinations(AllNumbers(), length)
+            for target in targets:
+                target_cells = [
+                    cell
+                    for cell in known_cells
+                    if all(
+                        number in target
+                        for number in cell.numbers
+                    )
+                ]
+                if len(target_cells) == len(target):
+                    for row_cell in self.cells:
+                        if row_cell not in target_cells:
+                            for number in target:
+                                row_cell.eliminate(number)
+                    for target_cell in target_cells:
+                        known_cells.remove(target_cell)
+            length += 1
 
     @property
     def is_decided(self) -> bool:

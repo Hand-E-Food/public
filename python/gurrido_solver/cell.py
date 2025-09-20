@@ -23,8 +23,6 @@ class Cell:
             self.numbers = AllNumbers()
 
     def clean(self) -> None:
-        for row in self.rows:
-            row.soil()
         for run in self.runs:
             run.trim_permutations()
 
@@ -41,7 +39,7 @@ class Cell:
                 raise ValueError("Cannot eliminate a wall's own number.")
             if self.decision:
                 raise ValueError("Cannot eliminate a cell's last number.")
-            print(f'{self.name} is not {number}')
+            print(f'{self.name} ≠ {number}')
             self.numbers.remove(number)
             self.soil()
 
