@@ -1,5 +1,30 @@
 #!/usr/bin/env python3
 
+
+'''
+# Summary
+
+## Hacks
+- Launch Payload
+- Execute Injection
+
+## Skills
+1. First buy Infect Payload.
+2. Spend the other four points on Critical Payloads and place them before Infect Payload. The means infection will also gain the critical bonus.
+
+## Upgrades
+1. Never buy Infection Damage or Infection Specialist. They only apply to the Build Infection hack, not the Infect Payload skill.
+2. Level 1-10: Before you have 3 Critical Payloads, spend up to 10 points on Payload Damage.
+3. Level 1-20: When you have 3 Critical Payloads, focus on getting to 10 Critical Chance instead.
+4. Level 11-20: Get to 10 Payload Damage.
+5. Level 21-55: Alternate between Sneak Attack, Critical Multiplier, and Payload Damage. You should end with:
+   - 15 Payload Damage
+   - 5 Critical Multiplier
+   - 5 Sneak Attack
+6. Level 56-60: Get to 20 Payload Damage.
+7. Level 61+: Alternate between Payload Damage and Breach Speed. Payload Damage should always be 20 to 21 points higher than Breach Speed.
+'''
+
 import math
 from itertools import product
 from typing import Any, Callable, Iterator, List, Optional, Tuple
@@ -48,6 +73,7 @@ class Hacks:
     def is_valid(self) -> bool:
         return all([
             *map(lambda x: x.is_valid, self.all),
+            # Must have at least one source of damage.
             self.launch_payload.count + self.build_infection.count > 0
         ])
 
@@ -160,8 +186,11 @@ class State:
             self.hacks.is_valid,
             self.skills.is_valid,
             self.upgrades.is_valid,
+            # Cannot infect a payload if there is no payload.
             not (self.hacks.launch_payload.count == 0 and self.skills.infect_payload.count > 0),
+            # Cannot get a critical payload if there is no payload.
             not (self.hacks.launch_payload.count == 0 and self.skills.critical_payload.count > 0),
+            # Infections can only be delivered from one source.
             not (self.hacks.build_infection.count > 0 and self.skills.infect_payload.count > 0),
         ])
 
@@ -207,9 +236,10 @@ class Calculator:
         self.payload_damage = self.payload_damage_per_attack * self.attacks
 
         self.infection_damage_per_attack = state.hacks.build_infection.count * 0.50 / state.hacks.count
-        self.infection_damage_per_attack += state.skills.infect_payload.count * self.payload_damage_per_attack * 0.20
         self.infection_damage_per_attack *= state.upgrades.infection_damage.linear(1.00, 0.10)
         self.infection_damage_per_attack *= state.upgrades.infection_specialist.linear(1.00, 1.00)
+        # Sadly, infection upgrades only apply to the Build Infection node.
+        self.infection_damage_per_attack += state.skills.infect_payload.count * self.payload_damage_per_attack * 0.20
         self.infection_duration = sum(
             self.total_seconds - attack / self.attacks_per_second
             for attack in range(self.attacks)
@@ -352,18 +382,22 @@ def report(title: str, calculations: List[Calculator]) -> None:
 
 
 base_state = State()
-base_state.upgrades.payload_damage.count = 10
+base_state.hacks.launch_payload.count = 1
+base_state.hacks.execute_injection.count = 1
+base_state.skills.infect_payload.count = 1
+base_state.skills.critical_payload.count = 4
+base_state.upgrades.payload_damage.count = 20
 base_state.upgrades.breach_speed.count = 0
 base_state.upgrades.critical_chance.count = 10
-base_state.upgrades.critical_multiplier.count = 1
+base_state.upgrades.critical_multiplier.count = 5
 base_state.upgrades.infection_damage.count = 0
 base_state.upgrades.infection_specialist.count = 0
-base_state.upgrades.sneak_attack.count = 2
+base_state.upgrades.sneak_attack.count = 5
 
 if True:
-    hacks = list(buy_hacks())
-    skills = list(buy_skills(5))
-    upgrades = list(buy_upgrades(base_state.upgrades, 4))
+    hacks = [base_state.hacks] # list(buy_hacks())
+    skills = [base_state.skills] # list(buy_skills(5))
+    upgrades = list(buy_upgrades(base_state.upgrades, 1))
     states = (State(*x) for x in product(hacks, skills, upgrades))
     calculations = [Calculator(state) for state in states if state.is_valid]
     best_overall = find_best(calculations, key=lambda x: x.targets.total_damage)
