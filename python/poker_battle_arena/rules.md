@@ -36,8 +36,8 @@ lowest card.
 Unlike common Poker rules, you do not always play five cards. Only play the cards that fit the formation, even if it's
 just one card for a "Single" formation.
 
-You may have a maximum of one army on each step of each lane. You may play one army each turn. You may play an army in
-any lane, even if the lane already has another of your armies advancing across the battlefield.
+You may play one army each turn. You may play an army in any lane, even if the lane already has another of your armies
+advancing across the battlefield.
 
 Keep your armies to the left side of the lane that it is in, to help distinguish which armies are yours or your
 opponent's.
