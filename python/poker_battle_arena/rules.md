@@ -1,5 +1,7 @@
 # Poker Battle Arena
 
+© 2025 Mark Richardson
+
 ## Setup
 
 Each player needs a full poker deck, preferably with different back art to distinguish the two decks. You may choose to
@@ -10,14 +12,14 @@ Place three pieces of A4/Letter paper between the players, short edges closest t
 each page, dividing it into three sections. Each page is a lane of the battlefield, and each section is a step of the
 lane.
 
-Shuffle your deck and place it face down next to you. This is your draw pile. You will also have a retreat pile and a
+Shuffle your deck and place it face-down next to you. This is your draw pile. You will also have a retreat pile and a
 discard pile.
 
 Choose a player to go first.
 
 ## Play
 
-There are five phases in each turn: draw, play, advance, combat, and success. After you have performed all five phases,
+There are five phases in each turn: draw, play, advance, combat, and conquest. After you have performed all five phases,
 it is your opponent's turn.
 
 ### 1. Draw
@@ -28,17 +30,13 @@ retreat pile is also empty, then draw as many cards as you can.
 
 ### 2. Play
 
-Play between one and five cards on your outside edge of one of the lanes. This is an army. The army must conform to one
-of the formations described in Armies below. Jokers are wild cards and can be any suit and number you wish. The numbers
-in a "Straight" cannot wrap, i.e. an Ace is always the highest card and can not be used in a "Straight" with a 2, the
-lowest card.
+Play between one and five cards face-down on your outside edge of one of the lanes. This is an army. The army must
+conform to one of the formations described in Armies below. You may look at your face-down armies at any time.
 
 Unlike common Poker rules, you do not always play five cards. Only play the cards that fit the formation, even if it's
 just one card for a "Single" formation.
 
-You may play one army each turn. You may play an army in any lane, even if the lane already has another of your armies
-advancing across the battlefield.
-
+You may play one army in each lane, each turn, even if you have other armies in those lanes already on the battlefield.
 Keep your armies to the left side of the lane that it is in, to help distinguish which armies are yours or your
 opponent's.
 
@@ -52,32 +50,37 @@ Armies in the final step will advance off the battlefield onto your opponent's o
 
 ### 4. Combat
 
-If opposing armies are in the same step of the same lane, they fight. The highest ranked army wins (see Armies below.)
-If there is a draw, compare the highest card of each army, the winner being the higher of the two cards. If there is
-still a draw, compare the second highest in each army, and so on. If the two armies come to an ultimate tie, both lose.
+If opposing armies are in the same step of the same lane, they fight. Turn both armies face-up. The highest ranked army
+wins (see Armies below.) If there is a draw, compare the highest card of each army, the winner being the higher of the
+two cards. If there is still a draw, compare the second highest card in each army, and so on. If the two armies come to
+an ultimate tie, both lose.
 
-The highest individual card is an Ace, followed by King, Queen, Jack, and 10 down to 2.
+The highest individual card is an Ace, followed by King, Queen, Jack, and 10 down to 2. All suits are equal.
 
 The losing army retreats and is placed face-up in the retreat pile of the player owning the army. The winning army
-remains on the battlefield.
+remains on the battlefield, face-up.
 
-### 5. Success
+### 5. Conquest
 
-An army that has past the last step of the battlefield damages the opponent.
+An army that has past the last step of the battlefield damages the opponent. The opponent must discard as many cards as
+the army's rank (see Discarding Cards and Armies below.) If you cannot discard enough cards, you immediately lose the
+game.
 
-The opponent must discard as many cards as the army's rank (see Armies below.) The opponent may choose to discard any
-number of the cards from his hand, or from the top of his draw pile. Discarded cards are placed face-down in the discard
-pile. Do not look at cards that you discard from your draw deck. If the draw pile is or becomes empty, shuffle the
-retreat pile into a new draw pile.
+The successful army is placed face-up in the owning player's retreat pile.
 
-If you cannot discard enough cards, you immediately lose the game. 
+## Discarding Cards
 
-The successful army then is then placed face-up in the owning player's retreat pile.
+When you are damaged by a conquest, you must discard a number of cards. You may choose cards in your hand to discard, or
+discard cards directly from the top of your draw pile. All discarded cards are placed face-down in your discard pile. Do
+not look at cards yuou discard from your draw pile. If your draw pile is empty, shuffle your retreat pile to create a
+new draw pile. If your draw pile, retreat pile and hand are all empty and you still need to discard a card, you
+immediately lose the game.
 
 ## Armies
 
 Each army must conform to one of the following formations. Each formation has a rank, with higher rank numbers being
-better.
+better. Jokers are wild cards and can be any suit and number you wish. The numbers in a "Straight" cannot wrap, i.e. an
+Ace is always the highest card and can not be used in a "Straight" with a 2, the lowest card.
 
 There are different Army Ranking lists depending on how many Jokers you are using. Statistically, Jokers have a stronger
 impact on Straights, so their rank is reduced. I recommend you choose a setup you like and stick with it, to not become
@@ -144,3 +147,12 @@ Rank |   Sample   | Name
  14  |  9 9 9 9   | Four of a Kind
  15  | ♥︎9♥︎8♥︎7♥︎6♥︎5 | Straight Flush of Five
  16  |  9 9 9 9 9 | Five of a Kind
+
+## Foul
+
+If an army is revealed during combat or conquest, and it does not conform to one of the army formations, it is
+disqualified. The army is immediately placed in the discard pile, not the retreat pile, face-down. Additionally, the
+same number of cards are also discarded from the top of the player's draw pile. You may only discard from your hand if
+your draw pile and retreat pile are empty.
+
+If the opponent's army was revealed and is a valid formation, it remains face-up despite this foul.
