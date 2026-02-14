@@ -157,24 +157,26 @@ your draw pile and retreat pile are empty.
 
 If the opponent's army was revealed and is a valid formation, it remains face-up despite this foul.
 
-## Advanced Mode: Gambling
+## Advanced Game: Gambling
 
 ### Setup
 
-Each player starts with a supply of chips. Chips can be anything from poker chips, to candies, to actual money.
-Ensure each player starts with the same number of chips. You'll need approximately 50 chips each.
+Choose something to use as poker chips. This can be anything from poker chips (unsurprisingly), to candies, to cash.
+It's recommended to use poker chips which you could later convert into something more valuable. Each player will need
+about 30 chips. Ensure each player starts with the same number of chips. 
 
-**IMPORTANT:** Only gamble what you're willing to lose.
+**IMPORTANT: Only gamble what you are willing to lose.**
 
 ### Armies
 
 To summarise:
 * All armies must carry an **ante** of 1 chip.
-* You may not **bet** or **raise** above your army's betting limit.
+* An army's betting limit equals the number of cards in that army.
+* You may not **bet** or **raise** if it means your army would carry more chips than its betting limit.
 * When placing an army with no opposing army, you may place a **bet** on it.
-* When placing an army facing an opposing army, you must **call** or **raise**.
-* When placing an army behind a friendly army, do not place additional chips on it.
-* Do not **call**, **raise** or **fold** against a face-up army you can **see**.
+* When placing an army facing an opposing army, you must **call** its bet and may **raise** it.
+* When placing an army behind a friendly army, do not place more than the **ante** on it.
+* Never **call**, **raise** or **fold** against a face-up army you can **see**.
 * You collect all chips on your army when it achieves conquest.
 
 Each army must carry at least 1 chip across the battlefield. When armies do combat, the winning army takes the losing
@@ -185,8 +187,9 @@ betting limit of 4. You may not willingly place more chips on an army than its b
 
 When an army is placed, its owner must place at least 1 chip on it as **ante**.
 
-When you place an army, if there is no army in front of it, you may pace a **bet** on it up to its betting limit. Your
-opponent will need to match this bet to place any armies in opposition to yours.
+When you place an army, if there is no army in front of it, you may pace a **bet** on it from 0 up (so it only carries
+its **ante**) to its betting limit. Your opponent will need to match this bet to place any armies in opposition to
+yours.
 
 When you place an army and there's an opposing army directly in front of it, you must **call** their bet and place the
 same number of chips on your army, even if it exceeds its betting limit. If you haven't reached your betting limit, you
@@ -203,4 +206,4 @@ face-up to **see** it, the opposing army may **call** or **fold**, but may not *
 ### Ending the Game
 
 When you must discard a card and cannot, the game immediately ends but you do not necessarily lose. Players collect all
-chips on their armies. The player with the most chips wins.
+chips currently on their armies. The player with the most chips wins.
