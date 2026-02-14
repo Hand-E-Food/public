@@ -1,0 +1,13 @@
+ #   Count     Sample    Name
+ 1    65780   9          Single
+ 2    65780  ♥︎ ♥︎ ♥︎       Flush of Three
+ 3    24596   9 9        Pair
+ 4    21164  ♥︎ ♥︎ ♥︎ ♥︎     Flush of Four
+ 5    16226   9 8 7      Straight of Three
+ 6     5126  ♥︎9♥︎8♥︎7      Straight Flush of Three
+ 7     2912   9 8 7 6    Straight of Four
+ 8     2574  ♥︎ ♥︎ ♥︎ ♥︎ ♥︎   Flush of Five
+ 9     1716   9 9 7 7    Two Pair
+10      422  ♥︎9♥︎8♥︎7♥︎6    Straight Flush of Four
+11      288   9 8 7 6 5  Straight of Five
+12       18  ♥︎9♥︎8♥︎7♥︎6♥︎5  Straight Flush of Five

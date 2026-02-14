@@ -14,4 +14,3 @@
 13     1884  ♥︎9♥︎8♥︎7♥︎6    Straight Flush of Four
 14      624   9 9 9 9    Four of a Kind
 15       36  ♥︎9♥︎8♥︎7♥︎6♥︎5  Straight Flush of Five
-16        0   9 9 9 9 *  Five of a Kind
