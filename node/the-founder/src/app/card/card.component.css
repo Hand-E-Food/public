@@ -7,9 +7,10 @@ div.card {
     border-width: 2px;
     transition-duration: 0.5s;
     transition-property: left, top, width, height;
+    background-color: beige;
 }
 
-div.card > div {
+div.card>div {
     position: absolute;
     display: block;
     left: 10px;
@@ -17,13 +18,14 @@ div.card > div {
     width: 106px;
 }
 
-div.card > div > span {
+div.card>div>span {
     display: block;
     width: 100%;
+    font-size: small;
     text-align: center;
 }
 
-div.card > img {
+div.card>img {
     position: absolute;
     display: block;
     left: 10px;

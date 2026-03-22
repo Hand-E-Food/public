@@ -1,5 +1,8 @@
+/*
 :host {
+  Add global variables here.
 }
+*/
 
 div.app {
   width: 100vw;

@@ -1,0 +1,7 @@
+<div class="card" [style.left]="data.left + 'px'" [style.top]="data.top + 'px'" [style.width]="data.width + 'px'"
+    [style.height]="data.height + 'px'">
+    <div>
+        <span>{{ data.name }}</span>
+    </div>
+    <img [src]="'/assets/' + data.imageUrl" />
+</div>

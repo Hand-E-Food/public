@@ -1,2 +1,4 @@
-<div #cardHost class="app" (click)="onClick($event)">
+<div class="app" (click)="onClick($event)">
+  <positive-stack [data]="positiveStack" [left]="252" [top]="30"></positive-stack>
+  <negative-stack [data]="negativeStack" [left]="189" [top]="30"></negative-stack>
 </div>
