@@ -1,0 +1,12 @@
+<div
+    class="card"
+    [style.left]="x + 'px'"
+    [style.top]="y + 'px'"
+    [style.width]="width + 'px'"
+    [style.height]="height + 'px'"
+>
+    <div>
+        <span>{{ name }}</span>
+    </div>
+    <img [src]="'/assets/' + imageUrl" />
+</div>
