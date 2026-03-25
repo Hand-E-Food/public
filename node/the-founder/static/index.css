@@ -1,0 +1,67 @@
+body {
+    margin: 0px;
+}
+
+div.game {
+    position: absolute;
+    margin: 0px;
+    width: 100vw;
+    height: 100vh;
+    background-color: #006000;
+    /*transform: scale(calc(100vw / 1000mm));*/
+}
+
+div.card {
+    position: absolute;
+    width: 150px;
+    height: 250px;
+    transition-property: left, top, width, height;
+    transition-duration: 0.5s;
+}
+
+div.card>div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+}
+
+div.card .flipped {
+    transform: rotateY(180deg);
+}
+
+div.card-side {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    backface-visibility: hidden;
+    background-color: beige;
+    border-color: black;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 3px;
+    transition-property: left, width;
+    transition-duration: 0.5s;
+}
+
+div.card-side>img:first-of-type {
+    position: absolute;
+    left: 0mm;
+    top: 0mm;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+div.card-face>span {
+    position: absolute;
+    margin: 10px;
+    width: 130px;
+    height: 20px;
+    align-content: center;
+    background-color: #bb876f;
+    text-align: center;
+    font-size: 16px;
+}
