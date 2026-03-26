@@ -1,5 +1,6 @@
 import { Card } from "../card.js";
 import { CardFace } from "./card-face.js";
+import { NegativeCardFace } from "./negative-card-face.js";
 
 export class Family extends Card {
     public constructor() {
@@ -10,9 +11,9 @@ export class Family extends Card {
     }
 }
 
-class HungryFamily extends CardFace {
+class HungryFamily extends NegativeCardFace {
     public constructor() {
-        super('family.jpg', 'Hungry Family');
+        super({ image: 'hungry-family.jpg', name: 'Hungry Family' });
     }
 
     public override onCardClicked(event: MouseEvent): void {
@@ -22,7 +23,7 @@ class HungryFamily extends CardFace {
 
 class FedFamily extends CardFace {
     public constructor() {
-        super('family.jpg', 'Fed Family');
+        super({ image: 'fed-family.jpg', name: 'Fed Family' });
     }
 
     public override onCardClicked(event: MouseEvent): void {
