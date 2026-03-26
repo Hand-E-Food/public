@@ -1,4 +1,4 @@
-import { CardSide } from "../card-side.js";
+import { CardSide } from "./card-side.js";
 
 /** Factory methods for creating the back side of cards. */
 export class CardBack {

@@ -1,4 +1,4 @@
-import { CardSide, type CardSideParams } from "../card-side.js";
+import { CardSide, type CardSideParams } from "./card-side.js";
 
 export interface CardFaceParams extends CardSideParams {
     /** This card's corner icon. */

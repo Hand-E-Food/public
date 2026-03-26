@@ -57,17 +57,19 @@ div.card-side>img:first-of-type {
 
 div.title {
     position: absolute;
-    margin: 10px;
-    width: calc(100% - 20px);
+    margin: 7px;
+    width: calc(100% - 14px);
     height: 20px;
     display: flex;
     background-color: #bb876f;
+    border-radius: 5px;
     align-items: center;
 }
 
 div.title>img {
-    width: 20px;
-    height: 20px;
+    margin: -5px;
+    width: 30px;
+    height: 30px;
     flex: 0 0 20px;
 }
 

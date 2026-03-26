@@ -1,4 +1,4 @@
-import { Card } from "../card.js";
+import { Card } from "./card.js";
 import { CardFace, type CardFaceParams } from "./card-face.js";
 
 type PositiveCardParams = Omit<CardFaceParams, 'icon'>;

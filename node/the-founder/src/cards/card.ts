@@ -1,3 +1,4 @@
+import type { CardContainer } from "../containers/card-container.js";
 import type { CardSide } from "./card-side.js";
 
 /** One card. */
@@ -5,6 +6,9 @@ export class Card {
     private _activeSide: number = 0;
     private readonly flipDiv: HTMLDivElement;
     private readonly sides: CardSide[];
+
+    /** The container currently holding this card. */
+    public container: CardContainer | undefined = undefined;
 
     /** This card's HTML element. */
     public readonly htmlElement: HTMLDivElement;
@@ -58,6 +62,6 @@ export class Card {
     public reposition(left: number, top: number, zIndex: number): void {
         this.htmlElement.style.left = `${left}px`;
         this.htmlElement.style.top = `${top}px`;
-        this.htmlElement.style.zIndex = `${zIndex}`;
+        setTimeout(() => this.htmlElement.style.zIndex = `${zIndex}`, 250);
     }
 }
