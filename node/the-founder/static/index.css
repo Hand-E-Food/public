@@ -11,12 +11,20 @@ div.game {
     /*transform: scale(calc(100vw / 1000mm));*/
 }
 
-div.card {
+div.item {
     position: absolute;
-    width: 150px;
-    height: 250px;
     transition-property: left, top, width, height;
     transition-duration: 0.5s;
+}
+
+div.booster {
+    width: 170px;
+    height: 270px;
+}
+
+div.card {
+    width: 150px;
+    height: 250px;
 }
 
 div.card>div {
@@ -27,11 +35,11 @@ div.card>div {
     transition: transform 0.5s;
 }
 
-div.card .flipped {
+.flipped {
     transform: rotateY(180deg);
 }
 
-div.card-side {
+div.card div.side {
     position: absolute;
     width: calc(100% - 6px);
     height: calc(100% - 6px);
@@ -46,7 +54,7 @@ div.card-side {
     transition-duration: 0.5s;
 }
 
-div.card-side>img:first-of-type {
+div.side>img:first-of-type {
     position: absolute;
     left: 0mm;
     top: 0mm;
@@ -70,7 +78,9 @@ div.title>img {
     margin: -5px;
     width: 30px;
     height: 30px;
-    flex: 0 0 20px;
+    flex-basis: 20px;
+    flex-grow: 0px;
+    flex-shrink: 0px;
 }
 
 div.title>span {

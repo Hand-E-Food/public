@@ -22,7 +22,7 @@ export class CardSide {
      */
     public constructor(params: CardSideParams) {
         this.htmlElement = document.createElement('div');
-        this.htmlElement.classList.add('card-side');
+        this.htmlElement.classList.add('side');
         this.htmlElement.innerHTML = `<img src="assets/${params.image}" />`;
         this.htmlElement.onclick = (event) => this.onCardClicked(event);
     }

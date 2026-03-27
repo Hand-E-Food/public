@@ -19,7 +19,7 @@ class HungryFamily extends NegativeCardFace {
 
     public override onCardClicked(event: MouseEvent): void {
         this.card.flip();
-        game.containers.fedFamilyStack.addCards(this.card);
+        game.containers.fedFamilyStack.addItems(this.card);
     }
 }
 
@@ -30,6 +30,6 @@ class FedFamily extends CardFace {
 
     public override onCardClicked(event: MouseEvent): void {
         this.card.flip();
-        game.containers.negativeStack.addCards(this.card);
+        game.containers.negativeStack.addItems(this.card);
     }
 }

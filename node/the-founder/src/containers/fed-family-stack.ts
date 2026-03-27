@@ -1,17 +1,17 @@
-import { CardContainer } from "./card-container.js";
+import { Container } from "./container.js";
+import { Spacing } from "./constants.js";
+import { Card } from "../cards/card.js";
 
 /** Contains families that have been fed. */
-export class FedFamilyStack extends CardContainer {
-    protected arrangeCards(): void {
-        const step = 30;
-        const left = 245;
-        let top = 10 - step;
-        let zIndex = 300;
-        for (const card of this.cards) {
+export class FedFamilyStack extends Container {
+    protected arrange(): void {
+        const step = Card.titleHeight;
+        const left = Spacing * 2 + Card.width * 1.5;
+        let top = Spacing - step;
+        let zIndex = 200;
+        for (const item of this.items) {
             top += step;
-            card.htmlElement.style.left = `${left}px`;
-            card.htmlElement.style.top = `${top}px`;
-            card.htmlElement.style.zIndex = `${zIndex}`;
+            item.reposition(left, top, zIndex);
             zIndex++;
         }
     }

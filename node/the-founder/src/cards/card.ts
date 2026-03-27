@@ -1,17 +1,17 @@
-import type { CardContainer } from "../containers/card-container.js";
 import type { CardSide } from "./card-side.js";
+import { Item } from "../item.js";
 
 /** One card. */
-export class Card {
+export class Card extends Item {
+    public static readonly height = 250;
+    public static readonly width = 150;
+
     private _activeSide: number = 0;
     private readonly flipDiv: HTMLDivElement;
     private readonly sides: CardSide[];
 
-    /** The container currently holding this card. */
-    public container: CardContainer | undefined = undefined;
-
-    /** This card's HTML element. */
-    public readonly htmlElement: HTMLDivElement;
+    public override readonly height = Card.height;
+    public override readonly width = Card.width;
 
     /**
      * Creates a new card.
@@ -19,6 +19,7 @@ export class Card {
      */
     public constructor(...sides: CardSide[]) {
         if (sides.length < 1 || sides.length > 2) throw new Error('A card must have one or two sides.');
+        super();
         this.sides = sides;
         this.flipDiv = document.createElement('div');
         let first = true;
@@ -28,10 +29,8 @@ export class Card {
             (side as any).card = this;
             this.flipDiv.appendChild(side.htmlElement);
         }
-        this.htmlElement = document.createElement("div");
-        this.htmlElement.classList.add('card');
+        this.htmlElement.classList.add('item', 'card');
         this.htmlElement.appendChild(this.flipDiv);
-        this.reposition(200, 100, 0);
     }
 
     /** This card's face-up side. */
@@ -51,17 +50,5 @@ export class Card {
             classList.add('flipped');
         }
         this._activeSide = 1 - this._activeSide;
-    }
-
-    /**
-     * Set this card's physical position.
-     * @param left The x-coordinate of this card's left side.
-     * @param top The y-coordinate of this card's top side.
-     * @param zIndex This card's Z index. Higher numbers are on top.
-     */
-    public reposition(left: number, top: number, zIndex: number): void {
-        this.htmlElement.style.left = `${left}px`;
-        this.htmlElement.style.top = `${top}px`;
-        setTimeout(() => this.htmlElement.style.zIndex = `${zIndex}`, 250);
     }
 }
