@@ -1,6 +1,6 @@
-import { Card } from "../cards/index.js";
-import { Spacing } from "./constants.js";
-import { Container } from "./container.js";
+import { Card } from '../cards/index.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 
 export class DiscardPile extends Container {
   protected override arrange(): void {

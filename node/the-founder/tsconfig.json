@@ -39,6 +39,6 @@
     // Custom Options
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-  },
+    "forceConsistentCasingInFileNames": true
+  }
 }

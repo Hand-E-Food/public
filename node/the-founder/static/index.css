@@ -1,93 +1,93 @@
 body {
-    margin: 0px;
+  margin: 0px;
 }
 
 div.game {
-    position: absolute;
-    margin: 0px;
-    width: 100vw;
-    height: 100vh;
-    background-color: #006000;
-    /*transform: scale(calc(100vw / 1000mm));*/
+  position: absolute;
+  margin: 0px;
+  width: 100vw;
+  height: 100vh;
+  background-color: #006000;
+  /*transform: scale(calc(100vw / 1000mm));*/
 }
 
 div.item {
-    position: absolute;
-    transition-property: left, top, width, height;
-    transition-duration: 0.5s;
+  position: absolute;
+  transition-property: left, top, width, height;
+  transition-duration: 0.5s;
 }
 
 div.booster {
-    width: 170px;
-    height: 270px;
+  width: 170px;
+  height: 270px;
 }
 
 div.card {
-    width: 150px;
-    height: 250px;
+  width: 150px;
+  height: 250px;
 }
 
-div.card>div {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
+div.card > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
 }
 
 .flipped {
-    transform: rotateY(180deg);
+  transform: rotateY(180deg);
 }
 
 div.card div.side {
-    position: absolute;
-    width: calc(100% - 6px);
-    height: calc(100% - 6px);
-    overflow: hidden;
-    backface-visibility: hidden;
-    background-color: beige;
-    border-color: black;
-    border-radius: 10px;
-    border-style: solid;
-    border-width: 3px;
-    transition-property: left, width;
-    transition-duration: 0.5s;
+  position: absolute;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  overflow: hidden;
+  backface-visibility: hidden;
+  background-color: beige;
+  border-color: black;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 3px;
+  transition-property: left, width;
+  transition-duration: 0.5s;
 }
 
-div.side>img:first-of-type {
-    position: absolute;
-    left: 0mm;
-    top: 0mm;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+div.side > img:first-of-type {
+  position: absolute;
+  left: 0mm;
+  top: 0mm;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 div.title {
-    position: absolute;
-    margin: 7px;
-    width: calc(100% - 14px);
-    height: 20px;
-    display: flex;
-    background-color: #bb876f;
-    border-radius: 5px;
-    align-items: center;
+  position: absolute;
+  margin: 7px;
+  width: calc(100% - 14px);
+  height: 20px;
+  display: flex;
+  background-color: #bb876f;
+  border-radius: 5px;
+  align-items: center;
 }
 
-div.title>img {
-    margin: -5px;
-    width: 30px;
-    height: 30px;
-    flex-basis: 20px;
-    flex-grow: 0px;
-    flex-shrink: 0px;
+div.title > img {
+  margin: -5px;
+  width: 30px;
+  height: 30px;
+  flex-basis: 20px;
+  flex-grow: 0px;
+  flex-shrink: 0px;
 }
 
-div.title>span {
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    align-content: center;
-    text-align: center;
-    font-size: 16px;
+div.title > span {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  align-content: center;
+  text-align: center;
+  font-size: 16px;
 }

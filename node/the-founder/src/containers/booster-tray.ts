@@ -1,6 +1,6 @@
-import type { Item } from "../item.js";
-import { Spacing } from "./constants.js";
-import { Container } from "./container.js";
+import type { Item } from '../item.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 
 export class BoosterTray extends Container {
   override addItems(...items: Item[]): void {
@@ -21,7 +21,8 @@ export class BoosterTray extends Container {
     // Group items of the same type together. Spread out each group.
     const totalWidth = this.items.reduce(
       (width, item, index, array) => width + Spacing + (typeof array[index - 1] === typeof item ? 0 : item.width),
-      -Spacing);
+      -Spacing,
+    );
     let left = -totalWidth / 2;
     for (const item of this.items) {
       item.htmlElement.style.left = `calc(50vw - ${left}px)`;

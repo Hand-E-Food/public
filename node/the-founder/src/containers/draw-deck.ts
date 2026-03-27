@@ -1,6 +1,6 @@
-import { Card } from "../cards/index.js";
-import { Spacing } from "./constants.js";
-import { Container } from "./container.js";
+import { Card } from '../cards/index.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 
 /** The deck of cards to draw from. */
 export class DrawDeck extends Container {

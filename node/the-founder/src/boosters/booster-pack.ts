@@ -1,9 +1,9 @@
-import { game } from "../game.js";
-import { Item } from "../item.js";
+import { game } from '../game.js';
+import { Item } from '../item.js';
 
 export interface BoosterPackParams {
-    readonly image: string,
-    readonly name?: string,
+  readonly image: string;
+  readonly name?: string;
 }
 
 /** A booster pack containing more items. */
@@ -27,5 +27,5 @@ export abstract class BoosterPack extends Item {
     game.addItems(game.containers.boosterTray, ...items);
   }
 
-    protected abstract createItems(): Item[];
+  protected abstract createItems(): Item[];
 }

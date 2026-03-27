@@ -1,5 +1,5 @@
-import { Item } from "../item.js";
-import type { CardSide } from "./card-side.js";
+import { Item } from '../item.js';
+import type { CardSide } from './card-side.js';
 
 /** One card. */
 export class Card extends Item {
@@ -14,9 +14,9 @@ export class Card extends Item {
   public override readonly width = Card.width;
 
   /**
-     * Creates a new card.
-     * @param sides This card's one or two sides.
-     */
+   * Creates a new card.
+   * @param sides This card's one or two sides.
+   */
   public constructor(...sides: CardSide[]) {
     if (sides.length < 1 || sides.length > 2) throw new Error('A card must have one or two sides.');
     super();
@@ -42,7 +42,7 @@ export class Card extends Item {
 
   /** Flip this card to it's other side. */
   public flip(): void {
-    if (this.sides.length === 1) throw new Error("Cannot flip this card.");
+    if (this.sides.length === 1) throw new Error('Cannot flip this card.');
     const classList = this.flipDiv.classList;
     if (classList.contains('flipped')) {
       classList.remove('flipped');

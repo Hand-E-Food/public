@@ -1,4 +1,4 @@
-import type { Item } from "../item.js";
+import type { Item } from '../item.js';
 
 /** Arranges cards on part of the game area. */
 export abstract class Container {
@@ -6,9 +6,9 @@ export abstract class Container {
   public readonly items: Item[] = [];
 
   /**
-     * Move items to this container.
-     * @param items The items to add to this container.
-     */
+   * Move items to this container.
+   * @param items The items to add to this container.
+   */
   public addItems(...items: Item[]): void {
     for (const card of items) {
       card.container?.removeItem(card);
@@ -19,9 +19,9 @@ export abstract class Container {
   }
 
   /**
-     * Remove an item from this container.
-     * @param item The item to remove.
-     */
+   * Remove an item from this container.
+   * @param item The item to remove.
+   */
   public removeItem(item: Item): void {
     const i = this.items.indexOf(item);
     if (i === -1) throw new Error('Cannot remove a item that is not in this container.');
@@ -30,6 +30,6 @@ export abstract class Container {
     this.arrange();
   }
 
-    /** Arranges this container's items. */
-    protected abstract arrange(): void;
+  /** Arranges this container's items. */
+  protected abstract arrange(): void;
 }

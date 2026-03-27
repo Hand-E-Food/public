@@ -1,8 +1,8 @@
-import type { Card } from "./card.js";
+import type { Card } from './card.js';
 
 export interface CardSideParams {
-    /** This card side's background image. */
-    readonly image: string;
+  /** This card side's background image. */
+  readonly image: string;
 }
 
 /** One side of a card. */
@@ -31,5 +31,5 @@ export class CardSide {
    * Triggered when this card side is clicked.
    * @param event This event details.
    */
-  public onCardClicked(_event: MouseEvent): void { }
+  public onCardClicked(_event: MouseEvent): void {}
 }

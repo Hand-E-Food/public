@@ -1,6 +1,6 @@
-import { Card } from "../cards/card.js";
-import { Spacing } from "./constants.js";
-import { Container } from "./container.js";
+import { Card } from '../cards/card.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 
 /** Contains families that have been fed. */
 export class FedFamilyStack extends Container {

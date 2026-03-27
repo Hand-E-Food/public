@@ -1,14 +1,14 @@
-import { Card } from "../cards/index.js";
-import type { Item } from "../item.js";
-import { Spacing } from "./constants.js";
-import { Container } from "./container.js";
+import { Card } from '../cards/index.js';
+import type { Item } from '../item.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 
 /** Contains cards actively providing negative morale. */
 export class NegativeStack extends Container {
   override addItems(...items: Item[]): void {
     for (const item of items) {
       if (!(item instanceof Card) || item.activeSide.morale >= 0) {
-        throw new Error("Only cards with negative morale can be added to the negative stack.");
+        throw new Error('Only cards with negative morale can be added to the negative stack.');
       }
     }
     super.addItems(...items);
@@ -20,7 +20,7 @@ export class NegativeStack extends Container {
     let top = Spacing - step;
     let zIndex = 200;
     for (const item of this.items) {
-      if (!(item instanceof Card)) throw new Error("Negative stack can only contain cards.");
+      if (!(item instanceof Card)) throw new Error('Negative stack can only contain cards.');
       top -= step * item.activeSide.morale;
       item.reposition(left, top, zIndex);
       zIndex++;

@@ -1,4 +1,4 @@
-import { CardFace, type CardFaceParams } from "./card-face.js";
+import { CardFace, type CardFaceParams } from './card-face.js';
 
 type NegativeCardFaceParams = Omit<CardFaceParams, 'icon'>;
 

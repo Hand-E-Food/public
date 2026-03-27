@@ -1,14 +1,11 @@
-import { game } from "../game.js";
-import { CardFace } from "./card-face.js";
-import { Card } from "./card.js";
-import { NegativeCardFace } from "./negative-card-face.js";
+import { game } from '../game.js';
+import { CardFace } from './card-face.js';
+import { Card } from './card.js';
+import { NegativeCardFace } from './negative-card-face.js';
 
 export class Family extends Card {
   public constructor() {
-    super(
-      new HungryFamily(),
-      new FedFamily(),
-    );
+    super(new HungryFamily(), new FedFamily());
   }
 }
 

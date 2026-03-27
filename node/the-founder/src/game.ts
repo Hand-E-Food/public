@@ -1,4 +1,3 @@
-import { DrawDeck } from "./containers/draw-deck.js";
 import {
   BoosterPacks,
   BoosterTray,
@@ -7,9 +6,10 @@ import {
   FedFamilyStack,
   Hand,
   NegativeStack,
-  PositiveStack
-} from "./containers/index.js";
-import type { Item } from "./item.js";
+  PositiveStack,
+} from './containers/index.js';
+import { DrawDeck } from './containers/draw-deck.js';
+import type { Item } from './item.js';
 
 /** A singleton game environment. */
 export class Game {
@@ -23,7 +23,7 @@ export class Game {
     hand: new Hand(),
     negativeStack: new NegativeStack(),
     positiveStack: new PositiveStack(),
-  }
+  };
 
   /** This game's HTML element. */
   public readonly htmlElement: HTMLDivElement;
@@ -34,10 +34,10 @@ export class Game {
   }
 
   /**
-     * Adds items to this game.
-     * @param container The container to add these items to.
-     * @param items The items to add.
-     */
+   * Adds items to this game.
+   * @param container The container to add these items to.
+   * @param items The items to add.
+   */
   public addItems(container: Container, ...items: Item[]): void {
     for (const item of items) {
       if (this.items.includes(item)) throw new Error('Cannot add the same item twice.');
@@ -50,7 +50,7 @@ export class Game {
   /** Removes an item from this game. */
   public removeItem(item: Item): void {
     const i = this.items.indexOf(item);
-    if (i === -1) throw new Error('Cannot remove a item that wasn\'t added.');
+    if (i === -1) throw new Error('Cannot remove an item that was not added.');
     item.htmlElement.remove();
     this.items.splice(i, 1);
   }

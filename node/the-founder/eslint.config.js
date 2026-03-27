@@ -17,7 +17,7 @@ export default defineConfig([
       'max-len': ['error', { code: 120 }],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
   },
 ]);
