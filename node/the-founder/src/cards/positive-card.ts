@@ -4,8 +4,11 @@ import { Card } from './card.js';
 type PositiveCardParams = Omit<CardFaceParams, 'icon'>;
 
 export class PositiveCard extends Card {
+  public override name: string;
+
   public constructor(params: PositiveCardParams) {
-    super(new PositiveCardFace(params));
+    super({ sides: [new PositiveCardFace(params)] });
+    this.name = params.name;
   }
 }
 

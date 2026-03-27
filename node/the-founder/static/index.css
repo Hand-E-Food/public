@@ -19,12 +19,12 @@ div.item {
 
 div.booster {
   width: 170px;
-  height: 270px;
+  height: 230px;
 }
 
 div.card {
   width: 150px;
-  height: 250px;
+  height: 210px;
 }
 
 div.card > div {

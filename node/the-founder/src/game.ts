@@ -14,6 +14,8 @@ import type { Item } from './item.js';
 /** A singleton game environment. */
 export class Game {
   private readonly items: Item[] = [];
+
+  /** This game's item containers. */
   public readonly containers = {
     boosterPacks: new BoosterPacks(),
     boosterTray: new BoosterTray(),
@@ -28,6 +30,8 @@ export class Game {
   /** This game's HTML element. */
   public readonly htmlElement: HTMLDivElement;
 
+  public readonly resourcesPerBooster = 4;
+
   public constructor() {
     this.htmlElement = document.createElement('div');
     this.htmlElement.classList.add('game');
@@ -38,7 +42,7 @@ export class Game {
    * @param container The container to add these items to.
    * @param items The items to add.
    */
-  public addItems(container: Container, ...items: Item[]): void {
+  public addItems(container: Container, items: Item[]): void {
     for (const item of items) {
       if (this.items.includes(item)) throw new Error('Cannot add the same item twice.');
       this.htmlElement.appendChild(item.htmlElement);

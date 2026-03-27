@@ -1,9 +1,13 @@
-import { Item } from '../item.js';
 import type { CardSide } from './card-side.js';
+import { Item } from '../item.js';
+
+export interface CardParams {
+  readonly sides: CardSide[];
+}
 
 /** One card. */
-export class Card extends Item {
-  public static readonly height = 250;
+export abstract class Card extends Item {
+  public static readonly height = 210;
   public static readonly width = 150;
 
   private _activeSide: number = 0;
@@ -17,13 +21,13 @@ export class Card extends Item {
    * Creates a new card.
    * @param sides This card's one or two sides.
    */
-  public constructor(...sides: CardSide[]) {
-    if (sides.length < 1 || sides.length > 2) throw new Error('A card must have one or two sides.');
+  protected constructor(params: CardParams) {
+    if (![1, 2].includes(params.sides.length)) throw new Error('A card must have one or two sides.');
     super();
-    this.sides = sides;
+    this.sides = params.sides;
     this.flipDiv = document.createElement('div');
     let first = true;
-    for (const side of sides) {
+    for (const side of this.sides) {
       if (first) first = false;
       else side.htmlElement.classList.add('flipped');
       (side as any).card = this;

@@ -1,0 +1,37 @@
+import { CardFace } from './card-face.js';
+import { CardBack } from './card-back.js';
+import { Card } from './card.js';
+
+interface ResourceParams {
+  readonly image: string;
+  readonly name: string;
+}
+
+class Resource extends Card {
+  public override readonly name: string;
+
+  public constructor(params: ResourceParams) {
+    super({
+      sides: [new ResourceFace(params), CardBack.standard()],
+    });
+    this.name = params.name;
+  }
+}
+
+class ResourceFace extends CardFace {
+  public constructor(params: ResourceParams) {
+    super({ image: `assets/${params.image}`, name: params.name });
+  }
+}
+
+export class Fish extends Resource {
+  public constructor() {
+    super({ image: 'fish.jpg', name: 'Fish' });
+  }
+}
+
+export class Wood extends Resource {
+  public constructor() {
+    super({ image: 'wood.jpg', name: 'Wood' });
+  }
+}
