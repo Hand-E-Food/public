@@ -3,17 +3,19 @@ import {
   BoosterTray,
   type Container,
   DiscardPile,
+  DrawDeck,
   FedFamilyStack,
   Hand,
   NegativeStack,
   PositiveStack,
 } from './containers/index.js';
-import { DrawDeck } from './containers/draw-deck.js';
+import type { GameState } from './states/index.js';
 import type { Item } from './item.js';
 
 /** A singleton game environment. */
 export class Game {
   private readonly items: Item[] = [];
+  private readonly stateStack: GameState[] = [];
 
   /** This game's item containers. */
   public readonly containers = {
@@ -30,6 +32,7 @@ export class Game {
   /** This game's HTML element. */
   public readonly htmlElement: HTMLDivElement;
 
+  /** The number of resources available per booster pack. */
   public readonly resourcesPerBooster = 4;
 
   public constructor() {
@@ -58,6 +61,44 @@ export class Game {
     item.htmlElement.remove();
     this.items.splice(i, 1);
   }
+
+  /**
+   * Pauses the current state and temporarily enters a new state.
+   * @param nextState The next state to enter.
+   */
+  public pushState(nextState: GameState): void {
+    const prevState = this.stateStack[0];
+    prevState?.pause();
+    this.stateStack.unshift(nextState);
+    nextState.enter();
+  }
+
+  /**
+   * Exits the current state and enters a new state.
+   * @param nextState The next state to enter.
+   */
+  public nextState(nextState: GameState): void {
+    const prevState = this.stateStack[0];
+    if (!prevState) throw new Error('Cannot transition to a new state when there is no current state.');
+    prevState.exit();
+    this.stateStack[0] = nextState;
+    nextState.enter();
+  }
+
+  /** Exits the current state and resumes the previously paused state. */
+  public popState(): void {
+    const prevState = this.stateStack.shift();
+    if (!prevState) throw new Error('Cannot pop a state when there is no current state.');
+    prevState.exit();
+    const nextState = this.stateStack[0];
+    nextState?.resume();
+  }
+
+  /** Passes the click event to the current state. */
+  public onItemClicked(item: Item, modifier: number): void {
+    this.stateStack[0]?.onItemClicked(item, modifier);
+  }
 }
 
+/** A singleton instance of the game. */
 export const game = new Game();

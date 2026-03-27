@@ -1,4 +1,5 @@
 import type { Container } from './containers/container.js';
+import { game } from './game.js';
 
 /** One item, either a booster pack or a single card. */
 export abstract class Item {
@@ -31,6 +32,53 @@ export abstract class Item {
 
   /** This item's width. */
   public abstract readonly width: number;
+
+  protected constructor() {
+    this.htmlElement.onauxclick = (event) => this.onClicked(event);
+    this.htmlElement.onclick = (event) => this.onClicked(event);
+    this.htmlElement.oncontextmenu = (event) => event.preventDefault();
+  }
+
+  private onClicked(event: MouseEvent): void {
+    const modifier = Item.getModifier(event);
+    if (modifier === undefined) return;
+    game.onItemClicked(this, modifier);
+  }
+
+  private static getModifier(event: MouseEvent): number | undefined {
+    console.log(event.button);
+    const keys = (event.shiftKey ? 1 : 0) | (event.ctrlKey ? 2 : 0) | (event.altKey ? 4 : 0);
+    switch (event.button) {
+      case 0:
+        // Left click
+        switch (keys) {
+          case 0:
+            return 0;
+          case 1:
+            return 1;
+          case 2:
+            return 2;
+          case 4:
+            return 3;
+        }
+        break;
+      case 1:
+        // Right click
+        switch (keys) {
+          case 0:
+            return 1;
+        }
+        break;
+      case 2:
+        // Middle click
+        switch (keys) {
+          case 0:
+            return 2;
+        }
+        break;
+    }
+    return undefined;
+  }
 
   /**
    * Set this item's physical position.
