@@ -12,7 +12,7 @@ class Resource extends Card {
 
   public constructor(params: ResourceParams) {
     super({
-      sides: [new ResourceFace(params), CardBack.standard()],
+      sides: [new ResourceFace(params), CardBack.drawDeck()],
     });
     this.name = params.name;
   }
@@ -20,7 +20,7 @@ class Resource extends Card {
 
 class ResourceFace extends CardFace {
   public constructor(params: ResourceParams) {
-    super({ image: `assets/${params.image}`, name: params.name });
+    super(params);
   }
 }
 

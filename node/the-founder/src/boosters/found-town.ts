@@ -3,9 +3,9 @@ import { Family, Fish, PositiveCard, Wood } from '../cards/index.js';
 import { Item } from '../item.js';
 import { game } from '../game.js';
 
-export class Settlement extends BoosterPack {
+export class FoundTown extends BoosterPack {
   public constructor() {
-    super({ image: 'settlement.jpg', name: 'Settlement' });
+    super({ image: 'found-town.jpg', name: 'Found Your Town' });
   }
 
   protected override createItems(): BoosterItemGroup[] {
@@ -19,8 +19,8 @@ export class Settlement extends BoosterPack {
         ],
       },
       {
-        container: game.containers.negativeStack,
-        items: [...Item.multiple(3, () => new Family())],
+        container: game.containers.fedFamilyStack,
+        items: [...Item.multiple(3, FoundTown.createFedFamily)],
       },
       {
         container: game.containers.discardPile,
@@ -30,5 +30,11 @@ export class Settlement extends BoosterPack {
         ],
       },
     ];
+  }
+
+  private static createFedFamily(): Family {
+    const family = new Family();
+    family.flip();
+    return family;
   }
 }

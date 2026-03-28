@@ -3,9 +3,17 @@ import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
 
 export class BoosterTray extends Container {
-  override addItems(...items: Item[]): void {
-    super.addItems(...items);
-    let zIndex = 900 + this.items.length;
+  public readonly htmlElement: HTMLDivElement;
+
+  public constructor() {
+    super();
+    this.htmlElement = document.createElement('div');
+    this.htmlElement.classList.add('booster-tray');
+  }
+
+  override addItems(items: Item[]): void {
+    super.addItems(items);
+    let zIndex = 901 + this.items.length;
     for (const item of items) {
       zIndex--;
       item.reposition(`calc(50vw - ${item.width / 2}px)`, `calc(50vh - ${item.height / 2}px)`, zIndex);
@@ -24,9 +32,11 @@ export class BoosterTray extends Container {
       -Spacing,
     );
     let left = -totalWidth / 2;
+    let prevName: string = '';
     for (const item of this.items) {
-      item.htmlElement.style.left = `calc(50vw - ${left}px)`;
-      left += item.width + Spacing;
+      if (prevName) left += Spacing + (item.name === prevName ? 0 : item.width);
+      item.htmlElement.style.left = `calc(50vw + ${left}px)`;
+      prevName = item.name;
     }
   }
 }

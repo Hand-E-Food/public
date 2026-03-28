@@ -1,7 +1,6 @@
 import type { Container } from '../containers/index.js';
 import { Card } from '../cards/index.js';
 import { Item } from '../item.js';
-import { game } from '../game.js';
 
 export interface BoosterPackParams {
   readonly image: string;
@@ -13,7 +12,7 @@ export abstract class BoosterPack extends Item {
   public static readonly height = Card.height + 20;
   public static readonly width = Card.width + 10;
 
-  private groups: BoosterItemGroup[] | undefined;
+  private isOpen: boolean = false;
 
   public override readonly height = BoosterPack.height;
   public override readonly name: string;
@@ -26,22 +25,13 @@ export abstract class BoosterPack extends Item {
     this.htmlElement.innerHTML += `<img src="assets/${params.image}" /><span class='title'>${params.name}</span>`;
   }
 
-  public open(): void {
-    if (this.groups) throw new Error('Booster pack is already open.');
-    this.groups = this.createItems();
-    const items = this.groups.flatMap((group) => group.items);
-    game.addItems(game.containers.boosterTray, items);
+  public open(): BoosterItemGroup[] {
+    if (this.isOpen) throw new Error('Booster pack is already open.');
+    this.isOpen = true;
+    return this.createItems();
   }
 
   protected abstract createItems(): BoosterItemGroup[];
-
-  public distribute(): void {
-    if (!this.groups) throw new Error('Booster pack is not open.');
-    for (const group of this.groups) {
-      const container = group.container;
-      game.addItems(container, group.items);
-    }
-  }
 }
 
 export type BoosterItemGroup = {

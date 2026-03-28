@@ -9,7 +9,7 @@ export abstract class Container {
    * Move items to this container.
    * @param items The items to add to this container.
    */
-  public addItems(...items: Item[]): void {
+  public addItems(items: Item[]): void {
     for (const card of items) {
       card.container?.removeItem(card);
       card.container = this;

@@ -45,21 +45,25 @@ export class Game {
    * @param container The container to add these items to.
    * @param items The items to add.
    */
-  public addItems(container: Container, items: Item[]): void {
+  public addItems(container: Container | undefined, items: Item[]): void {
     for (const item of items) {
       if (this.items.includes(item)) throw new Error('Cannot add the same item twice.');
+      item.onClickedListener = (item, modifier) => this.onItemClicked(item, modifier);
       this.htmlElement.appendChild(item.htmlElement);
     }
     this.items.push(...items);
-    container.addItems(...items);
+    container?.addItems(items);
   }
 
   /** Removes an item from this game. */
-  public removeItem(item: Item): void {
-    const i = this.items.indexOf(item);
-    if (i === -1) throw new Error('Cannot remove an item that was not added.');
-    item.htmlElement.remove();
-    this.items.splice(i, 1);
+  public removeItems(items: Item[]): void {
+    for (const item of items) {
+      item.container?.removeItem(item);
+      const i = this.items.indexOf(item);
+      if (i === -1) throw new Error('Cannot remove an item that was not added.');
+      item.htmlElement.remove();
+      this.items.splice(i, 1);
+    }
   }
 
   /**
@@ -68,9 +72,13 @@ export class Game {
    */
   public pushState(nextState: GameState): void {
     const prevState = this.stateStack[0];
-    prevState?.pause();
+    if (prevState) {
+      console.log(`Pausing ${prevState.constructor.name}`);
+      prevState.pause?.();
+    }
     this.stateStack.unshift(nextState);
-    nextState.enter();
+    console.log(`Entering ${nextState.constructor.name}`);
+    nextState.enter?.();
   }
 
   /**
@@ -80,23 +88,29 @@ export class Game {
   public nextState(nextState: GameState): void {
     const prevState = this.stateStack[0];
     if (!prevState) throw new Error('Cannot transition to a new state when there is no current state.');
-    prevState.exit();
+    console.log(`Exiting ${prevState.constructor.name}`);
+    prevState.exit?.();
     this.stateStack[0] = nextState;
-    nextState.enter();
+    console.log(`Entering ${nextState.constructor.name}`);
+    nextState.enter?.();
   }
 
   /** Exits the current state and resumes the previously paused state. */
   public popState(): void {
     const prevState = this.stateStack.shift();
     if (!prevState) throw new Error('Cannot pop a state when there is no current state.');
-    prevState.exit();
+    console.log(`Exiting ${prevState.constructor.name}`);
+    prevState.exit?.();
     const nextState = this.stateStack[0];
-    nextState?.resume();
+    if (nextState) {
+      console.log(`Resuming ${nextState.constructor.name}`);
+      nextState.resume?.();
+    }
   }
 
   /** Passes the click event to the current state. */
   public onItemClicked(item: Item, modifier: number): void {
-    this.stateStack[0]?.onItemClicked(item, modifier);
+    this.stateStack[0]?.onItemClicked?.(item, modifier);
   }
 }
 

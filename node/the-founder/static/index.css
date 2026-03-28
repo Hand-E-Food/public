@@ -11,9 +11,25 @@ div.game {
   /*transform: scale(calc(100vw / 1000mm));*/
 }
 
+div.booster-tray {
+  position: absolute;
+  left: 0px;
+  top: calc(50vh - 150px);
+  width: 100vw;
+  height: 300px;
+  z-index: 900;
+  background-color: saddlebrown;
+  border-color: saddlebrown;
+  border-bottom-style: outset;
+  border-top-style: outset;
+  border-width: 5px;
+  transition-duration: 0.5s;
+  transition-property: opacity;
+}
+
 div.item {
   position: absolute;
-  transition-property: left, top, width, height;
+  transition-property: left, top, width, height, opacity;
   transition-duration: 0.5s;
 }
 

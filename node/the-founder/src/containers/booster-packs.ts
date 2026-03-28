@@ -5,11 +5,11 @@ import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
 
 export class BoosterPacks extends Container {
-  override addItems(...items: Item[]): void {
+  override addItems(items: Item[]): void {
     for (const item of items) {
       if (!(item instanceof BoosterPack)) throw new Error('Only boosters can be added to the booster pack container.');
     }
-    super.addItems(...items);
+    super.addItems(items);
   }
 
   protected arrange(): void {

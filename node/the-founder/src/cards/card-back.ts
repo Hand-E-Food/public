@@ -4,8 +4,13 @@ import { CardSide } from './card-side.js';
 export class CardBack {
   private constructor() {}
 
-  /** The standard card back. */
-  public static standard(): CardSide {
+  /** The card back for an event. */
+  public static event(): CardSide {
+    return new CardSide({ image: 'event.avif' });
+  }
+
+  /** The card back for the draw deck. */
+  public static drawDeck(): CardSide {
     return new CardSide({ image: 'card-back.avif' });
   }
 }

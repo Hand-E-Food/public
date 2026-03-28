@@ -1,17 +1,17 @@
-import { Card } from '../cards/index.js';
-import type { Item } from '../item.js';
-import { Spacing } from './constants.js';
 import { Container } from './container.js';
+import { Card } from '../cards/index.js';
+import { Spacing } from './constants.js';
+import type { Item } from '../item.js';
 
 /** Contains cards actively providing positive morale. */
 export class PositiveStack extends Container {
-  override addItems(...items: Item[]): void {
+  override addItems(items: Item[]): void {
     for (const item of items) {
       if (!(item instanceof Card) || item.activeSide.morale <= 0) {
         throw new Error('Only cards with positive morale can be added to the positive stack.');
       }
     }
-    super.addItems(...items);
+    super.addItems(items);
   }
 
   protected arrange(): void {

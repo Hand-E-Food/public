@@ -1,10 +1,12 @@
 import type { Container } from './containers/container.js';
-import { game } from './game.js';
 
 /** One item, either a booster pack or a single card. */
 export abstract class Item {
   /** The height of an item's title bar. */
   public static readonly titleHeight = 30;
+
+  /** The animation transition time of an item in milliseconds. */
+  public static readonly transitionTime = 500;
 
   /**
    * Creates multiple copies of an item.
@@ -30,6 +32,9 @@ export abstract class Item {
   /** This item's name. */
   public abstract readonly name: string;
 
+  /** This item's animation transition time in milliseconds. */
+  public readonly transitionTime: number = Item.transitionTime;
+
   /** This item's width. */
   public abstract readonly width: number;
 
@@ -42,11 +47,12 @@ export abstract class Item {
   private onClicked(event: MouseEvent): void {
     const modifier = Item.getModifier(event);
     if (modifier === undefined) return;
-    game.onItemClicked(this, modifier);
+    this.onClickedListener?.(this, modifier);
   }
 
+  public onClickedListener: { (item: Item, modifier: number): void } | undefined;
+
   private static getModifier(event: MouseEvent): number | undefined {
-    console.log(event.button);
     const keys = (event.shiftKey ? 1 : 0) | (event.ctrlKey ? 2 : 0) | (event.altKey ? 4 : 0);
     switch (event.button) {
       case 0:
@@ -63,17 +69,17 @@ export abstract class Item {
         }
         break;
       case 1:
-        // Right click
-        switch (keys) {
-          case 0:
-            return 1;
-        }
-        break;
-      case 2:
         // Middle click
         switch (keys) {
           case 0:
             return 2;
+        }
+        break;
+      case 2:
+        // Right click
+        switch (keys) {
+          case 0:
+            return 1;
         }
         break;
     }

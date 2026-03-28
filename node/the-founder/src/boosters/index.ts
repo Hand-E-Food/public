@@ -1,2 +1,2 @@
 export * from './booster-pack.js';
-export * from './settlement.js';
+export * from './found-town.js';
