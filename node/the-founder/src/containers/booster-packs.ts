@@ -3,6 +3,7 @@ import { Container } from './container.js';
 import { Card } from '../cards/index.js';
 import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
+import { ZIndex } from './z-index.js';
 
 export class BoosterPacks extends Container {
   override addItems(items: Item[]): void {
@@ -16,7 +17,7 @@ export class BoosterPacks extends Container {
     const step = BoosterPack.width + Spacing;
     let left = Spacing * 3 + Card.width * 2.5;
     const top = Spacing;
-    let zIndex = 0;
+    let zIndex = ZIndex.LowerStack;
     for (const item of this.items) {
       item.reposition(left, top, zIndex);
       left += step;

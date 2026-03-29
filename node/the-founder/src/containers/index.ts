@@ -7,3 +7,4 @@ export * from './fed-family-stack.js';
 export * from './hand.js';
 export * from './negative-stack.js';
 export * from './positive-stack.js';
+export * from './z-index.js';

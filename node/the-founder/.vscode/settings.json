@@ -1,4 +1,6 @@
 {
+    "editor.formatOnSave": true,
+    "editor.indentSize": 2,
     "[css]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

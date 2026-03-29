@@ -1,6 +1,7 @@
 import { Container } from './container.js';
 import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
+import { ZIndex } from './z-index.js';
 
 export class BoosterTray extends Container {
   public readonly htmlElement: HTMLDivElement;
@@ -13,10 +14,10 @@ export class BoosterTray extends Container {
 
   override addItems(items: Item[]): void {
     super.addItems(items);
-    let zIndex = 901 + this.items.length;
+    let zIndex = ZIndex.Overlay + this.items.length;
     for (const item of items) {
-      zIndex--;
       item.reposition(`calc(50vw - ${item.width / 2}px)`, `calc(50vh - ${item.height / 2}px)`, zIndex);
+      zIndex--;
     }
   }
 

@@ -1,9 +1,7 @@
+import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
-import { DestroyItems } from './animations/destroy-items.js';
-import { ShowElement } from './animations/show-element.js';
-import { HideElement } from './animations/hide-element.js';
-import { MoveItems } from './animations/move-item.js';
 import type { GameState } from './game-state.js';
+import { ZIndex } from '../containers/index.js';
 import { Sequence } from './sequence.js';
 import type { Item } from '../item.js';
 import { game } from '../game.js';
@@ -36,10 +34,10 @@ class ClickBoosterPack implements GameState {
   public constructor(private readonly state: Properties) {}
 
   enter(): void {
-    this.state.boosterPack.htmlElement.style.zIndex = '1000';
     const groups = (this.state.groups = this.state.boosterPack.open());
     const items = groups.flatMap((group) => group.items);
     game.addItems(game.containers.boosterTray, items);
+    this.state.boosterPack.htmlElement.style.zIndex = `${ZIndex.Overlay + 99}`;
   }
 
   onItemClicked(item: Item, _modifier: number): void {
@@ -61,32 +59,16 @@ class SpreadItems implements GameState {
 }
 
 class ExploreItems implements GameState {
-  private isEnabled: boolean = true;
-
   public constructor(private readonly state: Properties) {}
 
-  enter(): void {
-    this.isEnabled = true;
-  }
-
-  pause(): void {
-    this.isEnabled = false;
-  }
-
   resume(): void {
-    if (game.containers.boosterTray.items.length > 0) this.isEnabled = true;
-    else game.popState();
-  }
-
-  exit(): void {
-    this.isEnabled = false;
+    if (game.containers.boosterTray.items.length === 0) game.popState();
   }
 
   onItemClicked(item: Item, _modifier: number): void {
-    if (!this.isEnabled) return;
     const group = this.state.groups!.find((group) => group.items.includes(item));
     if (!group) return;
-    const items = group.items.filter((item2) => item2.name === item.name);
+    const items = group.items.filter((item2) => item2.name === item.name).reverse();
     game.pushState(new MoveItems(group.container, items));
   }
 }

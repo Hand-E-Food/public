@@ -2,6 +2,7 @@ import { Container } from './container.js';
 import { Card } from '../cards/index.js';
 import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
+import { ZIndex } from './index.js';
 
 /** Contains cards actively providing positive morale. */
 export class PositiveStack extends Container {
@@ -18,7 +19,7 @@ export class PositiveStack extends Container {
     const step = Card.titleHeight;
     const left = Spacing;
     let top = Spacing - step;
-    let zIndex = 100;
+    let zIndex = ZIndex.LowerStack;
     for (const item of this.items) {
       if (!(item instanceof Card)) throw new Error('Positive stack can only contain cards.');
       top += step * item.activeSide.morale;

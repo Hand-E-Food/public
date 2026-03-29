@@ -35,6 +35,9 @@ export class Game {
   /** The number of resources available per booster pack. */
   public readonly resourcesPerBooster = 4;
 
+  /** The current game year. */
+  public year: number = 1800;
+
   public constructor() {
     this.htmlElement = document.createElement('div');
     this.htmlElement.classList.add('game');
@@ -86,11 +89,11 @@ export class Game {
    * @param nextState The next state to enter.
    */
   public nextState(nextState: GameState): void {
-    const prevState = this.stateStack[0];
+    const prevState = this.stateStack.shift();
     if (!prevState) throw new Error('Cannot transition to a new state when there is no current state.');
+    this.stateStack.unshift(nextState);
     console.log(`Exiting ${prevState.constructor.name}`);
     prevState.exit?.();
-    this.stateStack[0] = nextState;
     console.log(`Entering ${nextState.constructor.name}`);
     nextState.enter?.();
   }

@@ -2,6 +2,7 @@ import { Container } from './container.js';
 import { Card } from '../cards/index.js';
 import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
+import { ZIndex } from './z-index.js';
 
 /** Contains cards actively providing negative morale. */
 export class NegativeStack extends Container {
@@ -18,7 +19,7 @@ export class NegativeStack extends Container {
     const step = Card.titleHeight;
     const left = Spacing + Card.width / 2;
     let top = Spacing - step;
-    let zIndex = 200;
+    let zIndex = ZIndex.UpperStack;
     for (const item of this.items) {
       if (!(item instanceof Card)) throw new Error('Negative stack can only contain cards.');
       top -= step * item.activeSide.morale;
