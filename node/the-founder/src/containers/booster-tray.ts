@@ -9,7 +9,7 @@ export class BoosterTray extends Container {
   public constructor() {
     super();
     this.htmlElement = document.createElement('div');
-    this.htmlElement.classList.add('booster-tray');
+    this.htmlElement.classList.add('fade', 'booster-tray');
   }
 
   override addItems(items: Item[]): void {

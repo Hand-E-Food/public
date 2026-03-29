@@ -12,7 +12,7 @@ export class ShowElement implements GameState {
   enter(): void {
     this.htmlElement.style.opacity = '0%';
     game.htmlElement.appendChild(this.htmlElement);
-    setTimeout(() => this.fadeIn(), 1);
+    requestAnimationFrame(() => this.fadeIn());
   }
 
   private fadeIn(): void {

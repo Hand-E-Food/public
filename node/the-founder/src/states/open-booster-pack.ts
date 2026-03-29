@@ -5,6 +5,7 @@ import { Item } from '../item.js';
 import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
 import { WaitTime } from './animations/wait-time.js';
 import type { GameState } from './game-state.js';
+import { ModalTutorial } from './modal-tutorial.js';
 import { Sequence } from './sequence.js';
 
 type Properties = {
@@ -62,6 +63,20 @@ class SpreadItems implements GameState {
 
 class ExploreItems implements GameState {
   public constructor(private readonly state: Properties) {}
+
+  enter(): void {
+    game.pushState(
+      new ModalTutorial('OpenBoosterPack-ExploreItems', {
+        paragraphs: [
+          'Each booster pack can contain cards and/or more booster packs. Click each pile to distribute them to the game.',
+          'You will learn the details of each card as it becomes relevent.',
+        ],
+        left: 'calc(50vw - 200px)',
+        width: '400px',
+        bottom: `calc(50vh + 170px)`,
+      }),
+    );
+  }
 
   resume(): void {
     if (game.containers.boosterTray.items.length === 0) game.popState();

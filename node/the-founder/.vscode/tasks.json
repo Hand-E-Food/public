@@ -1,12 +1,36 @@
 {
     "tasks": [
         {
+            "label": "npm install",
+            "detail": "Installs dependencies.",
+            "icon": {
+                "id": "package",
+                "color": "terminal.ansiWhite",
+            },
+            "runOptions": {
+                "runOn": "folderOpen",
+                "instanceLimit": 1,
+                "instancePolicy": "silent",
+            },
+            "inSessions": false,
+            "command": "npm",
+            "args": ["clean-install"],
+            "presentation": {
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "promptOnClose": false,
+        },
+        {
             "label": "watch",
             "detail": "Watches for and serves changes.",
             "icon": {
                 "id": "eye-watch",
                 "color": "terminal.ansiWhite",
             },
+            "dependsOn": "npm install",
             "runOptions": {
                 "runOn": "folderOpen",
                 "instanceLimit": 1,

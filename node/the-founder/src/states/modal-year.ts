@@ -1,11 +1,11 @@
 import { game } from '../game.js';
-import { Report } from './animations/index.js';
+import { Modal } from './animations/index.js';
 
 /** Displays the current year. */
-export class ReportYear extends Report {
+export class ModalYear extends Modal {
   public constructor() {
     const htmlElement = document.createElement('div');
-    htmlElement.classList.add('year');
+    htmlElement.classList.add('fade', 'year');
     htmlElement.innerHTML = `<span>${game.year}</span>`;
     super(htmlElement);
   }

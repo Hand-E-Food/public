@@ -39,6 +39,7 @@ export abstract class Item {
   public abstract readonly width: number;
 
   protected constructor() {
+    this.htmlElement.classList.add('fade');
     this.htmlElement.onauxclick = (event) => this.onClicked(event);
     this.htmlElement.onclick = (event) => this.onClicked(event);
     this.htmlElement.oncontextmenu = (event) => event.preventDefault();
