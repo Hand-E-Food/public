@@ -1,8 +1,9 @@
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
 import { ZIndex } from '../containers/index.js';
 import { game } from '../game.js';
-import type { Item } from '../item.js';
+import { Item } from '../item.js';
 import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
+import { WaitTime } from './animations/wait-time.js';
 import type { GameState } from './game-state.js';
 import { Sequence } from './sequence.js';
 
@@ -25,6 +26,7 @@ export class OpenBoosterPack extends Sequence {
       new DestroyItems([boosterPack]),
       new SpreadItems(state),
       new ExploreItems(state),
+      new WaitTime(Item.transitionTime),
       new HideElement(boosterTray.htmlElement),
     ]);
   }
@@ -66,9 +68,12 @@ class ExploreItems implements GameState {
   }
 
   onItemClicked(item: Item, _modifier: number): void {
+    const boosterTray = game.containers.boosterTray;
+    if (item.container !== boosterTray) return;
     const group = this.state.groups!.find((group) => group.items.includes(item));
     if (!group) return;
     const items = group.items.filter((item2) => item2.name === item.name).reverse();
-    game.pushState(new MoveItems(group.container, items));
+    group.container.addItems(items);
+    if (boosterTray.items.length === 0) game.popState();
   }
 }
