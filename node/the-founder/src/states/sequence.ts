@@ -1,5 +1,5 @@
-import type { GameState } from './game-state.js';
 import { game } from '../game.js';
+import type { GameState } from './game-state.js';
 
 /** Iterates through a sequence of states. */
 export class Sequence implements GameState {

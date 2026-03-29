@@ -9,8 +9,8 @@ import {
   NegativeStack,
   PositiveStack,
 } from './containers/index.js';
-import type { GameState } from './states/index.js';
 import type { Item } from './item.js';
+import type { GameState } from './states/index.js';
 
 /** A singleton game environment. */
 export class Game {

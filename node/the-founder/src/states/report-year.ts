@@ -1,5 +1,5 @@
-import { Report } from './animations/index.js';
 import { game } from '../game.js';
+import { Report } from './animations/index.js';
 
 /** Displays the current year. */
 export class ReportYear extends Report {

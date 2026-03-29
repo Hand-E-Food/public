@@ -1,7 +1,7 @@
 import type { Container } from '../../containers/container.js';
-import type { GameState } from '../game-state.js';
-import { Item } from '../../item.js';
 import { game } from '../../game.js';
+import { Item } from '../../item.js';
+import type { GameState } from '../game-state.js';
 
 /** Moves items to a container and waits until it is finished. */
 export class MoveItems implements GameState {

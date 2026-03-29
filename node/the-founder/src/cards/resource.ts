@@ -1,6 +1,6 @@
-import { CardFace } from './card-face.js';
-import { CardBack } from './card-back.js';
 import { Card } from './card.js';
+import { CardBack } from './card-back.js';
+import { CardFace } from './card-face.js';
 
 interface ResourceParams {
   readonly image: string;

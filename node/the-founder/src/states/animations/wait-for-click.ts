@@ -1,5 +1,5 @@
-import type { GameState } from '../game-state.js';
 import { game } from '../../game.js';
+import type { GameState } from '../game-state.js';
 
 /** Waits for the specified element to be clicked. */
 export class WaitForClick implements GameState {

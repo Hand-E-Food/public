@@ -1,10 +1,10 @@
-import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
-import type { GameState } from './game-state.js';
 import { ZIndex } from '../containers/index.js';
-import { Sequence } from './sequence.js';
-import type { Item } from '../item.js';
 import { game } from '../game.js';
+import type { Item } from '../item.js';
+import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
+import type { GameState } from './game-state.js';
+import { Sequence } from './sequence.js';
 
 type Properties = {
   readonly boosterPack: BoosterPack;

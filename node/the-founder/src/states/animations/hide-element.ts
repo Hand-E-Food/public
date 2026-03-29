@@ -1,5 +1,5 @@
-import type { GameState } from '../game-state.js';
 import { game } from '../../game.js';
+import type { GameState } from '../game-state.js';
 
 /** Fades out a HTML element and removes it from the game. */
 export class HideElement implements GameState {

@@ -1,12 +1,12 @@
 import { BoosterPack, FoundTown } from '../boosters/index.js';
-import { OpenBoosterPack } from './open-booster-pack.js';
 import { ZIndex } from '../containers/z-index.js';
-import type { GameState } from './game-state.js';
-import { AnnualCycle } from './annual-cycle.js';
+import { game } from '../game.js';
 import { Report } from './animations/index.js';
+import { AnnualCycle } from './annual-cycle.js';
+import type { GameState } from './game-state.js';
+import { OpenBoosterPack } from './open-booster-pack.js';
 import { ReportYear } from './report-year.js';
 import { Sequence } from './sequence.js';
-import { game } from '../game.js';
 
 export class NewGame extends Sequence {
   public constructor() {

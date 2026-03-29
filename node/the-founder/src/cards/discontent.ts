@@ -1,5 +1,5 @@
-import { NegativeCardFace } from './negative-card-face.js';
 import { Card } from './card.js';
+import { NegativeCardFace } from './negative-card-face.js';
 
 export class Discontent extends Card {
   public override readonly name = 'Discontent';

@@ -1,5 +1,5 @@
-import { CardFace } from './card-face.js';
 import { Card } from './card.js';
+import { CardFace } from './card-face.js';
 
 /** A family that does not require feeding. */
 export class SelfSufficientFamily extends Card {

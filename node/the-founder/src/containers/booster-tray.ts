@@ -1,6 +1,6 @@
-import { Container } from './container.js';
-import { Spacing } from './constants.js';
 import type { Item } from '../item.js';
+import { Spacing } from './constants.js';
+import { Container } from './container.js';
 import { ZIndex } from './z-index.js';
 
 export class BoosterTray extends Container {

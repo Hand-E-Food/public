@@ -1,7 +1,7 @@
-import { WaitForClick } from './wait-for-click.js';
-import { ShowElement } from './show-element.js';
-import { HideElement } from './hide-element.js';
 import { Sequence } from '../sequence.js';
+import { HideElement } from './hide-element.js';
+import { ShowElement } from './show-element.js';
+import { WaitForClick } from './wait-for-click.js';
 
 /** Temporarily displays a HTML Element until it is clicked. */
 export class Report extends Sequence {

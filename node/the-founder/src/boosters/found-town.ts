@@ -1,7 +1,7 @@
 import { Family, Fish, PositiveCard, SelfSufficientFamily, Wood } from '../cards/index.js';
-import { BoosterPack, type BoosterItemGroup } from './booster-pack.js';
-import { Item } from '../item.js';
 import { game } from '../game.js';
+import { Item } from '../item.js';
+import { type BoosterItemGroup, BoosterPack } from './booster-pack.js';
 
 export class FoundTown extends BoosterPack {
   public constructor() {

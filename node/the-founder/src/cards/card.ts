@@ -1,5 +1,5 @@
-import type { CardSide } from './card-side.js';
 import { Item } from '../item.js';
+import type { CardSide } from './card-side.js';
 
 export interface CardParams {
   readonly sides: CardSide[];
