@@ -1,6 +1,6 @@
 import { game } from '../game.js';
+import { type GameState, stateMachine } from '../state-machine.js';
 import { GameOver } from './game-over.js';
-import type { GameState } from './game-state.js';
 import { ModalYear } from './modal-year.js';
 import { NewYear } from './new-year.js';
 import { PlayCards } from './play-cards.js';
@@ -9,17 +9,17 @@ import { Sequence } from './sequence.js';
 /** Runs the annual cycle, performing automatic operations and verifications. */
 export class AnnualCycle implements GameState {
   enter(): void {
-    game.pushState(new PlayCards());
+    stateMachine.push(new PlayCards());
   }
 
   resume(): void {
     const endState = this.validate();
     if (endState) {
-      game.pushState(endState);
+      stateMachine.push(endState);
       return;
     }
     game.year++;
-    game.pushState(new Sequence([new ModalYear(), new NewYear(), new PlayCards()]));
+    stateMachine.push(new Sequence([new ModalYear(), new NewYear(), new PlayCards()]));
   }
 
   private validate(): GameState | undefined {

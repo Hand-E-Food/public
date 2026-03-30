@@ -10,12 +10,11 @@ import {
   PositiveStack,
 } from './containers/index.js';
 import type { Item } from './item.js';
-import type { GameState } from './states/index.js';
+import { stateMachine } from './state-machine.js';
 
 /** A singleton game environment. */
 export class Game {
   private readonly items: Item[] = [];
-  private readonly stateStack: GameState[] = [];
 
   /** This game's item containers. */
   public readonly containers = {
@@ -69,51 +68,9 @@ export class Game {
     }
   }
 
-  /**
-   * Pauses the current state and temporarily enters a new state.
-   * @param nextState The next state to enter.
-   */
-  public pushState(nextState: GameState): void {
-    const prevState = this.stateStack[0];
-    if (prevState) {
-      console.log(`Pausing ${prevState.constructor.name}`);
-      prevState.pause?.();
-    }
-    this.stateStack.unshift(nextState);
-    console.log(`Entering ${nextState.constructor.name}`);
-    nextState.enter?.();
-  }
-
-  /**
-   * Exits the current state and enters a new state.
-   * @param nextState The next state to enter.
-   */
-  public nextState(nextState: GameState): void {
-    const prevState = this.stateStack.shift();
-    if (!prevState) throw new Error('Cannot transition to a new state when there is no current state.');
-    this.stateStack.unshift(nextState);
-    console.log(`Exiting ${prevState.constructor.name}`);
-    prevState.exit?.();
-    console.log(`Entering ${nextState.constructor.name}`);
-    nextState.enter?.();
-  }
-
-  /** Exits the current state and resumes the previously paused state. */
-  public popState(): void {
-    const prevState = this.stateStack.shift();
-    if (!prevState) throw new Error('Cannot pop a state when there is no current state.');
-    console.log(`Exiting ${prevState.constructor.name}`);
-    prevState.exit?.();
-    const nextState = this.stateStack[0];
-    if (nextState) {
-      console.log(`Resuming ${nextState.constructor.name}`);
-      nextState.resume?.();
-    }
-  }
-
   /** Passes the click event to the current state. */
   public onItemClicked(item: Item, modifier: number): void {
-    this.stateStack[0]?.onItemClicked?.(item, modifier);
+    stateMachine.current?.onItemClicked?.(item, modifier);
   }
 }
 

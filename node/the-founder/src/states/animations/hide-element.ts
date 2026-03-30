@@ -1,5 +1,4 @@
-import { game } from '../../game.js';
-import type { GameState } from '../game-state.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 /** Fades out a HTML element and removes it from the game. */
 export class HideElement implements GameState {
@@ -11,7 +10,7 @@ export class HideElement implements GameState {
 
   enter(): void {
     this.htmlElement.style.opacity = '0%';
-    setTimeout(() => game.popState(), 500);
+    setTimeout(() => stateMachine.pop(), 500);
   }
 
   exit(): void {

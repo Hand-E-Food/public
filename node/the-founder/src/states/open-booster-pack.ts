@@ -2,9 +2,9 @@ import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js'
 import { ZIndex } from '../containers/index.js';
 import { game } from '../game.js';
 import { Item } from '../item.js';
+import { type GameState, stateMachine } from '../state-machine.js';
 import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
 import { WaitTime } from './animations/wait-time.js';
-import type { GameState } from './game-state.js';
 import { ModalTutorial } from './modal-tutorial.js';
 import { Sequence } from './sequence.js';
 
@@ -45,7 +45,7 @@ class ClickBoosterPack implements GameState {
 
   onItemClicked(item: Item, _modifier: number): void {
     if (item !== this.state.boosterPack) return;
-    game.popState();
+    stateMachine.pop();
   }
 }
 
@@ -57,7 +57,7 @@ class SpreadItems implements GameState {
       ...this.state.groups!.flatMap((group) => group.items).map((item) => item.transitionTime),
     );
     game.containers.boosterTray.spreadItems();
-    setTimeout(() => game.popState(), transitionTime);
+    setTimeout(() => stateMachine.pop(), transitionTime);
   }
 }
 
@@ -65,7 +65,7 @@ class ExploreItems implements GameState {
   public constructor(private readonly state: Properties) {}
 
   enter(): void {
-    game.pushState(
+    stateMachine.push(
       new ModalTutorial('OpenBoosterPack-ExploreItems', {
         paragraphs: [
           'Each booster pack can contain cards and/or more booster packs. Click each pile to distribute them to the game.',
@@ -79,7 +79,7 @@ class ExploreItems implements GameState {
   }
 
   resume(): void {
-    if (game.containers.boosterTray.items.length === 0) game.popState();
+    if (game.containers.boosterTray.items.length === 0) stateMachine.pop();
   }
 
   onItemClicked(item: Item, _modifier: number): void {
@@ -89,6 +89,6 @@ class ExploreItems implements GameState {
     if (!group) return;
     const items = group.items.filter((item2) => item2.name === item.name).reverse();
     group.container.addItems(items);
-    if (boosterTray.items.length === 0) game.popState();
+    if (boosterTray.items.length === 0) stateMachine.pop();
   }
 }

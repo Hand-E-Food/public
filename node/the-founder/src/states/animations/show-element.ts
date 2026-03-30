@@ -1,5 +1,6 @@
 import { game } from '../../game.js';
-import type { GameState } from '../game-state.js';
+import { Item } from '../../item.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 /** Adds a HTML element to the game and fades it in. */
 export class ShowElement implements GameState {
@@ -17,6 +18,6 @@ export class ShowElement implements GameState {
 
   private fadeIn(): void {
     this.htmlElement.style.opacity = '100%';
-    setTimeout(() => game.popState(), 500);
+    setTimeout(() => stateMachine.pop(), Item.transitionTime);
   }
 }

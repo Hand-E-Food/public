@@ -1,4 +1,4 @@
-import { game } from './game.js';
+import { stateMachine } from './state-machine.js';
 import { NewGame } from './states/index.js';
 
-game.pushState(new NewGame());
+stateMachine.push(new NewGame());

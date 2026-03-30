@@ -1,5 +1,4 @@
-import { game } from '../../game.js';
-import type { GameState } from '../game-state.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 /** Waits for the specified promise to be resolved. */
 export class AwaitPromise implements GameState {
@@ -8,6 +7,6 @@ export class AwaitPromise implements GameState {
    * @param promise The promise to await.
    */
   public constructor(promise: Promise<void>) {
-    promise.then(() => game.popState());
+    promise.then(() => stateMachine.pop());
   }
 }

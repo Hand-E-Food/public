@@ -1,8 +1,7 @@
-import { game } from '../game.js';
-import type { GameState } from './game-state.js';
+import { type GameState, stateMachine } from '../state-machine.js';
 
 export class PlayCards implements GameState {
   enter(): void {
-    game.popState();
+    stateMachine.pop();
   }
 }

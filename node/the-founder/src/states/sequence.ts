@@ -1,5 +1,4 @@
-import { game } from '../game.js';
-import type { GameState } from './game-state.js';
+import { type GameState, stateMachine } from '../state-machine.js';
 
 /** Iterates through a sequence of states. */
 export class Sequence implements GameState {
@@ -19,8 +18,8 @@ export class Sequence implements GameState {
 
   private next(): void {
     const nextState = this.states.shift();
-    if (!nextState) game.popState();
-    //else if (this.states.length === 0) game.nextState(nextState);
-    else game.pushState(nextState);
+    if (!nextState) stateMachine.pop();
+    //else if (this.states.length === 0) stateMachine.nextState(nextState);
+    else stateMachine.push(nextState);
   }
 }

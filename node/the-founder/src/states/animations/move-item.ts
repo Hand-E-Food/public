@@ -1,7 +1,6 @@
 import type { Container } from '../../containers/container.js';
-import { game } from '../../game.js';
 import { Item } from '../../item.js';
-import type { GameState } from '../game-state.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 /** Moves items to a container and waits until it is finished. */
 export class MoveItems implements GameState {
@@ -17,11 +16,11 @@ export class MoveItems implements GameState {
 
   enter(): void {
     if (this.items.length === 0) {
-      game.popState();
+      stateMachine.pop();
       return;
     }
     this.container.addItems(this.items);
     const transitionTime = Math.max(...this.items.map((item) => item.transitionTime));
-    setTimeout(() => game.popState(), transitionTime);
+    setTimeout(() => stateMachine.pop(), transitionTime);
   }
 }

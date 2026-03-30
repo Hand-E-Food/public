@@ -1,6 +1,16 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always",
+    "source.sortImports": "always"
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "editor.indentSize": 2,
-  "js/ts.preferences.importModuleSpecifierEnding": "js"
+  "editor.indentSize": "tabSize",
+  "editor.tabSize": 2,
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

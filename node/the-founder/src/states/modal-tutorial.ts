@@ -1,7 +1,6 @@
-import { game } from '../game.js';
+import { type GameState, stateMachine } from '../state-machine.js';
 import { ManualPromise } from '../util/index.js';
 import { Modal } from './animations/index.js';
-import type { GameState } from './game-state.js';
 
 export interface ModalTutorialParams {
   /** The paragraphs to display in the tutorial. */
@@ -33,7 +32,7 @@ export class ModalTutorial implements GameState {
 
   enter(): void {
     if (ModalTutorial.tutorialsEnabled || ModalTutorial.closedTutorials.has(this.key)) {
-      game.popState();
+      stateMachine.pop();
       return;
     }
 
@@ -65,7 +64,7 @@ export class ModalTutorial implements GameState {
     closeAllElement.onclick = () => this.closeAll();
     htmlElement.appendChild(closeAllElement);
 
-    requestAnimationFrame(() => game.nextState(new Modal(htmlElement, this.promise)));
+    requestAnimationFrame(() => stateMachine.next(new Modal(htmlElement, this.promise)));
   }
 
   private closeOne(): void {

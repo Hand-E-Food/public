@@ -1,13 +1,13 @@
 import { game } from '../../game.js';
 import type { Item } from '../../item.js';
-import type { GameState } from '../game-state.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 export class DestroyItems implements GameState {
   public constructor(private readonly items: Item[]) {}
 
   enter(): void {
     for (const item of this.items) item.htmlElement.style.opacity = '0%';
-    setTimeout(() => game.popState(), 500);
+    setTimeout(() => stateMachine.pop(), 500);
   }
 
   exit(): void {

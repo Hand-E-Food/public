@@ -1,5 +1,4 @@
-import { game } from '../../game.js';
-import type { GameState } from '../game-state.js';
+import { type GameState, stateMachine } from '../../state-machine.js';
 
 /** Waits for a specific duration. */
 export class WaitTime implements GameState {
@@ -10,6 +9,6 @@ export class WaitTime implements GameState {
   public constructor(private readonly milliseconds: number) {}
 
   enter(): void {
-    setTimeout(() => game.popState(), this.milliseconds);
+    setTimeout(() => stateMachine.pop(), this.milliseconds);
   }
 }
