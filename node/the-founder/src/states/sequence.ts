@@ -20,6 +20,7 @@ export class Sequence implements GameState {
   private next(): void {
     const nextState = this.states.shift();
     if (!nextState) game.popState();
+    //else if (this.states.length === 0) game.nextState(nextState);
     else game.pushState(nextState);
   }
 }

@@ -6,6 +6,11 @@ import { ZIndex } from './index.js';
 
 /** Contains cards actively providing positive morale. */
 export class PositiveStack extends Container {
+  /** The total positive morale in this stack. This is a positive number. */
+  public get morale(): number {
+    return this.items.reduce((total, item) => total + (item as Card).activeSide.morale, 0);
+  }
+
   override addItems(items: Item[]): void {
     for (const item of items) {
       if (!(item instanceof Card) || item.activeSide.morale <= 0) {
