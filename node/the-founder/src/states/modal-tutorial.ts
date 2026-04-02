@@ -1,6 +1,6 @@
-import { type GameState, stateMachine } from '../state-machine.js';
+import { stateMachine } from '../singleton/index.js';
 import { ManualPromise } from '../util/index.js';
-import { Modal } from './animations/index.js';
+import { type GameState, Modal } from './primitive/index.js';
 
 export interface ModalTutorialParams {
   /** The paragraphs to display in the tutorial. */
@@ -15,8 +15,8 @@ export interface ModalTutorialParams {
 
 /** Temporarily displays a tutorial message. */
 export class ModalTutorial implements GameState {
-  private static readonly closedTutorials: Set<string> = new Set();
-  private static tutorialsEnabled: boolean = false;
+  private static allClosed: boolean = false;
+  private static readonly closed: Set<string> = new Set();
 
   private promise!: ManualPromise<void>;
 
@@ -31,7 +31,7 @@ export class ModalTutorial implements GameState {
   ) {}
 
   enter(): void {
-    if (ModalTutorial.tutorialsEnabled || ModalTutorial.closedTutorials.has(this.key)) {
+    if (ModalTutorial.allClosed || ModalTutorial.closed.has(this.key)) {
       stateMachine.pop();
       return;
     }
@@ -64,16 +64,16 @@ export class ModalTutorial implements GameState {
     closeAllElement.onclick = () => this.closeAll();
     htmlElement.appendChild(closeAllElement);
 
-    requestAnimationFrame(() => stateMachine.next(new Modal(htmlElement, this.promise)));
+    stateMachine.next(new Modal(htmlElement, this.promise));
   }
 
   private closeOne(): void {
-    ModalTutorial.closedTutorials.add(this.key);
+    ModalTutorial.closed.add(this.key);
     this.promise.resolve();
   }
 
   private closeAll(): void {
-    ModalTutorial.tutorialsEnabled = true;
+    ModalTutorial.allClosed = true;
     this.promise.resolve();
   }
 }

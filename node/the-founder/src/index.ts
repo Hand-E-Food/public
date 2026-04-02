@@ -1,4 +1,4 @@
-import { stateMachine } from './state-machine.js';
-import { NewGame } from './states/index.js';
+import { stateMachine } from './singleton/index.js';
+import { NewGame } from './states/new-game.js';
 
 stateMachine.push(new NewGame());

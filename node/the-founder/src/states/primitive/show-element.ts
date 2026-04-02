@@ -1,6 +1,6 @@
-import { game } from '../../game.js';
 import { Item } from '../../item.js';
-import { type GameState, stateMachine } from '../../state-machine.js';
+import { game, stateMachine } from '../../singleton/index.js';
+import { type GameState } from './game-state.js';
 
 /** Adds a HTML element to the game and fades it in. */
 export class ShowElement implements GameState {

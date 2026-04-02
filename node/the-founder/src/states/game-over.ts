@@ -1,4 +1,4 @@
-import { ShowElement } from './animations/show-element.js';
+import { ShowElement } from './primitive/show-element.js';
 
 /** Displays the game over screen. */
 export class GameOver extends ShowElement {

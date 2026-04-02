@@ -1,12 +1,10 @@
 import { BoosterPack, FoundTown } from '../boosters/index.js';
 import { ZIndex } from '../containers/z-index.js';
-import { game } from '../game.js';
-import { type GameState, stateMachine } from '../state-machine.js';
-import { Modal } from './animations/index.js';
-import { AnnualCycle } from './annual-cycle.js';
+import { game, stateMachine } from '../singleton/index.js';
+import { EndOfYear } from './end-of-year.js';
 import { ModalYear } from './modal-year.js';
 import { OpenBoosterPack } from './open-booster-pack.js';
-import { Sequence } from './sequence.js';
+import { type GameState, Modal, Sequence } from './primitive/index.js';
 
 export class NewGame extends Sequence {
   public constructor() {
@@ -19,7 +17,7 @@ export class NewGame extends Sequence {
       new ModalYear(),
       new AddBoosterPack(boosterPack),
       new OpenBoosterPack(boosterPack),
-      new AnnualCycle(),
+      new EndOfYear(),
     ]);
   }
 }

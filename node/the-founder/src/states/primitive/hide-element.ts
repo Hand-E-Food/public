@@ -1,4 +1,5 @@
-import { type GameState, stateMachine } from '../../state-machine.js';
+import { stateMachine } from '../../singleton/index.js';
+import type { GameState } from './game-state.js';
 
 /** Fades out a HTML element and removes it from the game. */
 export class HideElement implements GameState {

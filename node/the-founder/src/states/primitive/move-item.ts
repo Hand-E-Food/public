@@ -1,6 +1,7 @@
 import type { Container } from '../../containers/container.js';
 import { Item } from '../../item.js';
-import { type GameState, stateMachine } from '../../state-machine.js';
+import { stateMachine } from '../../singleton/index.js';
+import type { GameState } from './game-state.js';
 
 /** Moves items to a container and waits until it is finished. */
 export class MoveItems implements GameState {

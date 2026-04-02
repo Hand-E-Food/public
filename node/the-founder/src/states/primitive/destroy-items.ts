@@ -1,6 +1,6 @@
-import { game } from '../../game.js';
 import type { Item } from '../../item.js';
-import { type GameState, stateMachine } from '../../state-machine.js';
+import { game, stateMachine } from '../../singleton/index.js';
+import type { GameState } from './game-state.js';
 
 export class DestroyItems implements GameState {
   public constructor(private readonly items: Item[]) {}

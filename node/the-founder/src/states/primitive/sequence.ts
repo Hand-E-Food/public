@@ -1,4 +1,5 @@
-import { type GameState, stateMachine } from '../state-machine.js';
+import { stateMachine } from '../../singleton/index.js';
+import type { GameState } from './game-state.js';
 
 /** Iterates through a sequence of states. */
 export class Sequence implements GameState {

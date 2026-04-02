@@ -8,8 +8,8 @@ import {
   Hand,
   NegativeStack,
   PositiveStack,
-} from './containers/index.js';
-import type { Item } from './item.js';
+} from '../containers/index.js';
+import type { Item } from '../item.js';
 import { stateMachine } from './state-machine.js';
 
 /** A singleton game environment. */

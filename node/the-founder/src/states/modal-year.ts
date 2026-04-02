@@ -1,5 +1,5 @@
-import { game } from '../game.js';
-import { Modal } from './animations/index.js';
+import { game } from '../singleton/index.js';
+import { Modal } from './primitive/index.js';
 
 /** Displays the current year. */
 export class ModalYear extends Modal {

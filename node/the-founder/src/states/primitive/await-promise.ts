@@ -1,4 +1,5 @@
-import { type GameState, stateMachine } from '../../state-machine.js';
+import { stateMachine } from '../../singleton/index.js';
+import type { GameState } from './game-state.js';
 
 /** Waits for the specified promise to be resolved. */
 export class AwaitPromise implements GameState {

@@ -1,6 +1,6 @@
-import { Sequence } from '../sequence.js';
 import { AwaitPromise } from './await-promise.js';
 import { HideElement } from './hide-element.js';
+import { Sequence } from './sequence.js';
 import { ShowElement } from './show-element.js';
 
 /** Temporarily displays a HTML Element until it is clicked. */

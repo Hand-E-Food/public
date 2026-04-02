@@ -1,12 +1,17 @@
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
 import { ZIndex } from '../containers/index.js';
-import { game } from '../game.js';
 import { Item } from '../item.js';
-import { type GameState, stateMachine } from '../state-machine.js';
-import { DestroyItems, HideElement, MoveItems, ShowElement } from './animations/index.js';
-import { WaitTime } from './animations/wait-time.js';
+import { game, stateMachine } from '../singleton/index.js';
 import { ModalTutorial } from './modal-tutorial.js';
-import { Sequence } from './sequence.js';
+import {
+  AwaitTime,
+  DestroyItems,
+  type GameState,
+  HideElement,
+  MoveItems,
+  Sequence,
+  ShowElement,
+} from './primitive/index.js';
 
 type Properties = {
   readonly boosterPack: BoosterPack;
@@ -31,7 +36,7 @@ export class OpenBoosterPack extends Sequence {
       new DestroyItems([boosterPack]),
       new SpreadItems(props),
       new ExploreItems(props),
-      new WaitTime(Item.transitionTime),
+      new AwaitTime(Item.transitionTime),
       new HideElement(boosterTray.htmlElement),
     ]);
   }
