@@ -5,3 +5,4 @@ export * from './family.js';
 export * from './positive-card.js';
 export * from './resource.js';
 export * from './self-sufficient-family.js';
+export * from './your-family.js';
