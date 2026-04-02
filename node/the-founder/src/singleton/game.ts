@@ -47,18 +47,20 @@ export class Game {
    * @param container The container to add these items to.
    * @param items The items to add.
    */
-  public addItems(container: Container | undefined, items: Item[]): void {
+  // Use the spread operation to ensure the array is not modified during the operation.
+  public addItems(container: Container | undefined, ...items: Item[]): void {
     for (const item of items) {
       if (this.items.includes(item)) throw new Error('Cannot add the same item twice.');
       item.onClickedListener = (item, modifier) => this.onItemClicked(item, modifier);
       this.htmlElement.appendChild(item.htmlElement);
     }
     this.items.push(...items);
-    container?.addItems(items);
+    container?.addItems(...items);
   }
 
   /** Removes an item from this game. */
-  public removeItems(items: Item[]): void {
+  // Use the spread operation to ensure the array is not modified during the operation.
+  public removeItems(...items: Item[]): void {
     for (const item of items) {
       item.container?.removeItem(item);
       const i = this.items.indexOf(item);

@@ -20,6 +20,7 @@ type Properties = {
 };
 
 export class OpenBoosterPack extends Sequence {
+  public override readonly name: string;
   public groups!: BoosterItemGroup[];
 
   constructor(
@@ -31,24 +32,30 @@ export class OpenBoosterPack extends Sequence {
 
     super([
       new ShowElement(boosterTray.htmlElement),
-      new MoveItems(boosterTray, [boosterPack]),
+      new MoveItems(boosterTray, boosterPack),
       new ClickBoosterPack(props),
-      new DestroyItems([boosterPack]),
+      new DestroyItems(boosterPack),
       new SpreadItems(props),
       new ExploreItems(props),
       new AwaitTime(Item.transitionTime),
       new HideElement(boosterTray.htmlElement),
     ]);
+
+    this.name = `OpenBoosterPack(${boosterPack.name})`;
   }
 }
 
 class ClickBoosterPack implements GameState {
-  public constructor(private readonly props: Properties) {}
+  public readonly name: string;
+
+  public constructor(private readonly props: Properties) {
+    this.name = `ClickBoosterPack(${props.boosterPack.name})`;
+  }
 
   enter(): void {
     const groups = (this.props.groups = this.props.boosterPack.open());
     const items = groups.flatMap((group) => group.items);
-    game.addItems(game.containers.boosterTray, items);
+    game.addItems(game.containers.boosterTray, ...items);
     this.props.boosterPack.htmlElement.style.zIndex = `${ZIndex.Overlay + 99}`;
     if (this.props.isQuick) this.onItemClicked(this.props.boosterPack, 1);
   }
@@ -61,7 +68,11 @@ class ClickBoosterPack implements GameState {
 }
 
 class SpreadItems implements GameState {
-  public constructor(private readonly props: Properties) {}
+  public readonly name: string;
+
+  public constructor(private readonly props: Properties) {
+    this.name = `SpreadItems(${props.boosterPack.name})`;
+  }
 
   enter(): void {
     if (this.props.isQuick) {
@@ -71,13 +82,17 @@ class SpreadItems implements GameState {
         ...this.props.groups!.flatMap((group) => group.items).map((item) => item.transitionTime),
       );
       game.containers.boosterTray.spreadItems();
-      setTimeout(() => stateMachine.pop(), transitionTime);
+      stateMachine.next(new AwaitTime(transitionTime));
     }
   }
 }
 
 class ExploreItems implements GameState {
-  public constructor(private readonly props: Properties) {}
+  public readonly name: string;
+
+  public constructor(private readonly props: Properties) {
+    this.name = `ExploreItems(${props.boosterPack.name})`;
+  }
 
   enter(): void {
     if (this.props.isQuick) {
@@ -108,13 +123,13 @@ class ExploreItems implements GameState {
     const group = this.props.groups!.find((group) => group.items.includes(item));
     if (!group) return;
     const items = group.items.filter((item2) => item2.name === item.name).reverse();
-    group.container.addItems(items);
+    group.container.addItems(...items);
     if (boosterTray.items.length === 0) stateMachine.pop();
   }
 
   private distributeAll(): void {
     for (const group of this.props.groups!) {
-      group.container.addItems(group.items.reverse());
+      group.container.addItems(...group.items.reverse());
     }
     stateMachine.pop();
   }

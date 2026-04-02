@@ -5,6 +5,8 @@ import { ShowElement } from './show-element.js';
 
 /** Temporarily displays a HTML Element until it is clicked. */
 export class Modal extends Sequence {
+  public override readonly name: string = 'Modal';
+
   /**
    * Creates a state temporarily displaying a HTML element.
    * @param htmlElement The HTML element to display.

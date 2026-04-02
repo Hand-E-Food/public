@@ -12,8 +12,8 @@ export class BoosterTray extends Container {
     this.htmlElement.classList.add('fade', 'booster-tray');
   }
 
-  override addItems(items: Item[]): void {
-    super.addItems(items);
+  override addItems(...items: Item[]): void {
+    super.addItems(...items);
     let zIndex = ZIndex.Overlay + this.items.length;
     for (const item of items) {
       item.reposition(`calc(50vw - ${item.width / 2}px)`, `calc(50vh - ${item.height / 2}px)`, zIndex);

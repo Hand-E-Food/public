@@ -9,10 +9,12 @@ export abstract class Container {
    * Move items to this container.
    * @param items The items to add to this container.
    */
-  public addItems(items: Item[]): void {
+  // Use the spread operation to ensure the array is not modified during the operation.
+  public addItems(...items: Item[]): void {
     for (const card of items) {
       card.container?.removeItem(card);
       card.container = this;
+      console.log(`Moving ${card.name} to ${this.constructor.name}`);
     }
     this.items.push(...items);
     this.arrange();

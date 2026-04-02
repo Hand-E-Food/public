@@ -3,11 +3,15 @@ import type { GameState } from './game-state.js';
 
 /** Iterates through a sequence of states. */
 export class Sequence implements GameState {
+  public readonly name: string;
+
   /**
    * Creates a new sequence.
    * @param states The states to iterate through.
    */
-  public constructor(private readonly states: GameState[]) {}
+  public constructor(private readonly states: GameState[]) {
+    this.name = `Sequence(${states.map((state) => state.name).join(', ')})`;
+  }
 
   enter(): void {
     this.next();
@@ -20,7 +24,6 @@ export class Sequence implements GameState {
   private next(): void {
     const nextState = this.states.shift();
     if (!nextState) stateMachine.pop();
-    //else if (this.states.length === 0) stateMachine.nextState(nextState);
     else stateMachine.push(nextState);
   }
 }

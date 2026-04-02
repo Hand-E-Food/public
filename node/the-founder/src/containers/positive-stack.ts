@@ -11,13 +11,13 @@ export class PositiveStack extends Container {
     return this.items.reduce((total, item) => total + (item as Card).activeSide.morale, 0);
   }
 
-  override addItems(items: Item[]): void {
+  override addItems(...items: Item[]): void {
     for (const item of items) {
       if (!(item instanceof Card) || item.activeSide.morale <= 0) {
         throw new Error('Only cards with positive morale can be added to the positive stack.');
       }
     }
-    super.addItems(items);
+    super.addItems(...items);
   }
 
   protected arrange(): void {

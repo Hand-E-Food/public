@@ -2,6 +2,7 @@
 export enum GameEvent {
   /**
    * Invoked at the start of each year.
+   * - 50: fed families
    */
   NewYear,
 

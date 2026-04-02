@@ -20,6 +20,8 @@ export class ModalTutorial implements GameState {
 
   private promise!: ManualPromise<void>;
 
+  public readonly name: string;
+
   /**
    * Creates a state that temporarily displays a tutorial message.
    * @param key This tutorial's key.
@@ -28,7 +30,9 @@ export class ModalTutorial implements GameState {
   public constructor(
     private readonly key: string,
     private readonly params: ModalTutorialParams,
-  ) {}
+  ) {
+    this.name = `ModalTutorial(${key})`;
+  }
 
   enter(): void {
     if (ModalTutorial.allClosed || ModalTutorial.closed.has(this.key)) {

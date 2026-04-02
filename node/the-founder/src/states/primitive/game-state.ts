@@ -4,6 +4,11 @@ import type { Item } from '../../item.js';
 
 export interface GameState {
   /**
+   * This state's name, used for logging.
+   */
+  readonly name: string;
+
+  /**
    * Called when this state is entered.
    */
   enter?(): void;
