@@ -15,7 +15,7 @@ export class DrawDeck extends Container {
       if (!item) continue;
       promises.push(item.move({ left: `${left}px`, top: `calc(100vh - ${top}px)` }, ZIndex.LowerStack + zIndex));
       zIndex++;
-      if (i < 5) {
+      if (i < 6) {
         left += 1;
         top += 1;
       }

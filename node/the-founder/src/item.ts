@@ -63,6 +63,7 @@ export abstract class Item {
           case 2: // Right click
             return 1;
         }
+        break;
       case 1: // Shift + click
         return 1;
       case 2: // Ctrl + click

@@ -1,6 +1,6 @@
 import { tutorials } from '../singleton/index.js';
-import { Modal } from './modal.js';
 import { ManualPromise } from './manual-promise.js';
+import { Modal } from './modal.js';
 
 export interface ModalTutorialParams {
   /** This tutorial's unique key. */

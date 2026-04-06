@@ -7,4 +7,5 @@ export * from './modal-title-screen.js';
 export * from './modal-tutorial.js';
 export * from './modal-year.js';
 export * from './open-booster-pack.js';
+export * from './player-phase.js';
 export * from './primitive.js';

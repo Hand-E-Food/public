@@ -1,6 +1,6 @@
-import { PromiseQueue } from '../promise-queue.js';
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
 import { Item } from '../item.js';
+import { PromiseQueue } from '../promise-queue.js';
 import { game } from '../singleton/index.js';
 import { ModalTutorial } from './modal-tutorial.js';
 import { Primitive } from './primitive.js';

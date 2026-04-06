@@ -14,7 +14,7 @@ export class DiscardPile extends Container {
         item.move({ left: `calc(100vw - ${left}px)`, top: `calc(100vh - ${top}px)` }, ZIndex.LowerStack + zIndex),
       );
       zIndex++;
-      if (zIndex < 5) {
+      if (zIndex < 6) {
         left += 1;
         top += 1;
       }

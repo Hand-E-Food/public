@@ -2,6 +2,14 @@ body {
   margin: 0px;
 }
 
+div.game {
+  position: absolute;
+  margin: 0px;
+  width: 100vw;
+  height: 100vh;
+  background-color: #006000;
+}
+
 div.title-screen h1 {
   position: absolute;
   left: 0px;
@@ -22,6 +30,21 @@ div.title-screen footer {
   align-content: baseline;
   text-align: center;
   font-size: 12pt;
+}
+
+div.end-year {
+  position: absolute;
+  right: 15px;
+  bottom: 235px;
+  width: 125px;
+  background-color: saddlebrown;
+  border-color: saddlebrown;
+  border-style: outset;
+  border-width: 5px;
+  display: inline-block;
+  padding: 10px;
+  color: sandybrown;
+  text-align: center;
 }
 
 div.year {
@@ -102,14 +125,6 @@ div.game-over h1 {
   padding-top: 6px;
   padding-right: 4px;
   padding-bottom: 4px;
-}
-
-div.game {
-  position: absolute;
-  margin: 0px;
-  width: 100vw;
-  height: 100vh;
-  background-color: #006000;
 }
 
 div.booster-tray {

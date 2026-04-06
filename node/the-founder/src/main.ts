@@ -1,14 +1,24 @@
 import { FoundTown } from './boosters/index.js';
 import { ZIndex } from './containers/index.js';
-import { GameEvent, type EndYearProperties, type NewYearProperties } from './events/index.js';
+import { type EndYearProperties, GameEvent, type NewYearProperties } from './events/index.js';
 import { eventHub, game } from './singleton/index.js';
-import { CheckMorale, DiscardHand, DrawCards, ModalTitleScreen, ModalYear, OpenBoosterPack } from './states/index.js';
+import {
+  CheckMorale,
+  DiscardHand,
+  DrawCards,
+  ModalTitleScreen,
+  ModalYear,
+  OpenBoosterPack,
+  PlayerPhase,
+  Primitive,
+} from './states/index.js';
 
 export class Main {
   private readonly checkMorale = new CheckMorale();
   private readonly discardHand = new DiscardHand();
   private readonly drawCards = new DrawCards();
   private readonly modalYear = new ModalYear();
+  private readonly playerPhase = new PlayerPhase();
 
   public async execute(): Promise<void> {
     document.body.appendChild(game.htmlElement);
@@ -18,7 +28,7 @@ export class Main {
       eventHub.add(GameEvent.EndYear, 10, (props) => this.discardHand.execute(props)),
       eventHub.add(GameEvent.EndYear, 50, (props) => this.checkMorale.execute(props)),
     ];
-    await this.modalYear.execute();
+    await Promise.all([Primitive.fadeIn(this.playerPhase.endYearButton), this.modalYear.execute()]);
     await this.openFirstBoosterPack();
     const gameOver = await this.runGameLoop();
     eventHub.remove(...listeners);
@@ -39,25 +49,23 @@ export class Main {
 
   private async runGameLoop(): Promise<() => Promise<void>> {
     while (true) {
-      const result = await this.endYear();
-      if (result) return result;
+      const gameOver = await this.invokeEndYear();
+      if (gameOver) return gameOver;
       game.year++;
       await this.modalYear.execute();
-      await this.newYear();
-      await this.playCards();
+      await this.invokeNewYear();
+      await this.playerPhase.execute();
     }
   }
 
-  private async endYear(): Promise<(() => Promise<void>) | undefined> {
+  private async invokeEndYear(): Promise<(() => Promise<void>) | undefined> {
     const props: EndYearProperties = { stop: false };
     await eventHub.invoke(GameEvent.EndYear, props);
     return props.gameOver;
   }
 
-  private async newYear(): Promise<void> {
+  private async invokeNewYear(): Promise<void> {
     const props: NewYearProperties = { stop: false };
     await eventHub.invoke(GameEvent.NewYear, props);
   }
-
-  private async playCards(): Promise<void> {}
 }
