@@ -1,136 +1,82 @@
+import { PromiseQueue } from '../promise-queue.js';
 import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
-import { ZIndex } from '../containers/index.js';
 import { Item } from '../item.js';
-import { game, stateMachine } from '../singleton/index.js';
+import { game } from '../singleton/index.js';
 import { ModalTutorial } from './modal-tutorial.js';
-import {
-  AwaitTime,
-  DestroyItems,
-  type GameState,
-  HideElement,
-  MoveItems,
-  Sequence,
-  ShowElement,
-} from './primitive/index.js';
+import { Primitive } from './primitive.js';
 
-type Properties = {
-  readonly boosterPack: BoosterPack;
-  groups?: BoosterItemGroup[];
-  isQuick: boolean;
-};
-
-export class OpenBoosterPack extends Sequence {
-  public override readonly name: string;
+export class OpenBoosterPack {
   public groups!: BoosterItemGroup[];
 
-  constructor(
+  public constructor(
     public readonly boosterPack: BoosterPack,
-    isQuick = false,
-  ) {
-    const props: Properties = { boosterPack, isQuick };
+    private isQuick = false,
+  ) {}
+
+  public async execute(): Promise<void> {
     const boosterTray = game.containers.boosterTray;
-
-    super([
-      new ShowElement(boosterTray.htmlElement),
-      new MoveItems(boosterTray, boosterPack),
-      new ClickBoosterPack(props),
-      new DestroyItems(boosterPack),
-      new SpreadItems(props),
-      new ExploreItems(props),
-      new AwaitTime(Item.transitionTime),
-      new HideElement(boosterTray.htmlElement),
-    ]);
-
-    this.name = `OpenBoosterPack(${boosterPack.name})`;
-  }
-}
-
-class ClickBoosterPack implements GameState {
-  public readonly name: string;
-
-  public constructor(private readonly props: Properties) {
-    this.name = `ClickBoosterPack(${props.boosterPack.name})`;
-  }
-
-  enter(): void {
-    const groups = (this.props.groups = this.props.boosterPack.open());
-    const items = groups.flatMap((group) => group.items);
-    game.addItems(game.containers.boosterTray, ...items);
-    this.props.boosterPack.htmlElement.style.zIndex = `${ZIndex.Overlay + 99}`;
-    if (this.props.isQuick) this.onItemClicked(this.props.boosterPack, 1);
-  }
-
-  onItemClicked(item: Item, modifier: number): void {
-    if (item !== this.props.boosterPack) return;
-    this.props.isQuick = modifier === 1;
-    stateMachine.pop();
-  }
-}
-
-class SpreadItems implements GameState {
-  public readonly name: string;
-
-  public constructor(private readonly props: Properties) {
-    this.name = `SpreadItems(${props.boosterPack.name})`;
-  }
-
-  enter(): void {
-    if (this.props.isQuick) {
-      stateMachine.pop();
-    } else {
-      const transitionTime = Math.max(
-        ...this.props.groups!.flatMap((group) => group.items).map((item) => item.transitionTime),
-      );
-      game.containers.boosterTray.spreadItems();
-      stateMachine.next(new AwaitTime(transitionTime));
+    await Primitive.fadeIn(boosterTray.htmlElement);
+    await boosterTray.addBoosterPack(this.boosterPack);
+    this.groups = this.boosterPack.open();
+    game.addItems(game.containers.boosterTray, ...this.groups.flatMap((group) => group.items));
+    if (!this.isQuick) {
+      await this.waitClickBoosterPack();
     }
-  }
-}
-
-class ExploreItems implements GameState {
-  public readonly name: string;
-
-  public constructor(private readonly props: Properties) {
-    this.name = `ExploreItems(${props.boosterPack.name})`;
-  }
-
-  enter(): void {
-    if (this.props.isQuick) {
-      this.distributeAll();
+    await game.destroyItems(this.boosterPack);
+    if (!this.isQuick) {
+      await boosterTray.spreadItems();
+      await this.showTutorial();
+      await this.exploreItems();
     } else {
-      stateMachine.push(
-        new ModalTutorial('OpenBoosterPack-ExploreItems', {
-          paragraphs: [
-            "You've just opened a booster pack! Each booster pack contains cards and/or more booster packs. Click each pile to distribute them to the game.",
-            'You will learn the details of each card as it becomes relevent.',
-            '<strong>Tip:</strong> You can <strong>right-click</strong> or <strong>shift+click</strong> a booster pack to quickly distribute its contents.',
-          ],
-          left: 'calc(50vw - 200px)',
-          width: '400px',
-          bottom: `calc(50vh + 170px)`,
-        }),
-      );
+      await this.distributeAllItems();
     }
+    await Primitive.fadeOut(boosterTray.htmlElement);
   }
 
-  resume(): void {
-    if (game.containers.boosterTray.items.length === 0) stateMachine.pop();
+  private async waitClickBoosterPack(): Promise<void> {
+    await new Promise<void>((resolve) => {
+      game.onItemClicked = (item, modifier) => {
+        if (item !== this.boosterPack) return;
+        if (modifier === 1) this.isQuick = true;
+        resolve();
+      };
+    });
+    game.onItemClicked = null;
   }
 
-  onItemClicked(item: Item, _modifier: number): void {
+  private showTutorial() {
+    return ModalTutorial.show({
+      key: 'OpenBoosterPack',
+      paragraphs: [
+        "You've just opened a booster pack! Each booster pack contains cards and/or more booster packs. Click each pile to distribute them to the game.",
+        'You will learn the details of each card as it becomes relevent.',
+        '<strong>Tip:</strong> You can <strong>right-click</strong> or <strong>shift+click</strong> a booster pack to quickly distribute its contents.',
+      ],
+      left: 'calc(50vw - 200px)',
+      width: '400px',
+      bottom: `calc(50vh + 170px)`,
+    });
+  }
+
+  private async exploreItems(): Promise<void> {
+    const promiseQueue = new PromiseQueue();
+    game.onItemClicked = (item, modifier) => promiseQueue.push(this.exploreItem(item, modifier));
+    const boosterTray = game.containers.boosterTray;
+    while (promiseQueue.length > 0 || boosterTray.items.length > 0) await promiseQueue.next();
+    await promiseQueue.flush();
+    game.onItemClicked = null;
+  }
+
+  private async exploreItem(item: Item, _modifier: number): Promise<void> {
     const boosterTray = game.containers.boosterTray;
     if (item.container !== boosterTray) return;
-    const group = this.props.groups!.find((group) => group.items.includes(item));
+    const group = this.groups.find((group) => group.items.includes(item));
     if (!group) return;
     const items = group.items.filter((item2) => item2.name === item.name).reverse();
-    group.container.addItems(...items);
-    if (boosterTray.items.length === 0) stateMachine.pop();
+    await group.container.addItems(...items);
   }
 
-  private distributeAll(): void {
-    for (const group of this.props.groups!) {
-      group.container.addItems(...group.items.reverse());
-    }
-    stateMachine.pop();
+  private async distributeAllItems(): Promise<void> {
+    await Promise.all(this.groups!.map((group) => group.container.addItems(...group.items.reverse())));
   }
 }

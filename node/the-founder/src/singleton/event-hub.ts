@@ -1,25 +1,43 @@
-import type { Card } from '../cards/index.js';
-import type { EndYearProperties } from '../states/end-year.js';
-import { type GameState, Sequence } from '../states/primitive/index.js';
-import { GameEvent } from './game-event.js';
+import type {
+  CardDrawnProperties,
+  CardPlayedProperties,
+  EndYearProperties,
+  GameEvent,
+  GameEventProperties,
+  NewYearProperties,
+} from '../events/index.js';
 
 export type GameEventListener = {
   readonly event: GameEvent;
   readonly priority: number;
-  readonly createState: (...args: any[]) => GameState;
+  readonly execute: Execute<any>;
 };
+
+type Execute<T extends GameEventProperties> = (props: T) => Promise<void>;
 
 /** Handles event listeners and invocation. */
 export class EventHub {
   private readonly listeners: GameEventListener[] = [];
 
-  public add(event: GameEvent.NewYear, priority: number, createState: () => GameState): GameEventListener;
-  public add(event: GameEvent.CardDrawn, priority: number, createState: (card: Card) => GameState): GameEventListener;
-  public add(event: GameEvent.CardPlayed, priority: number, createState: (card: Card) => GameState): GameEventListener;
+  public add(
+    event: GameEvent.NewYear,
+    priority: number,
+    execute: Execute<GameEventProperties & NewYearProperties>,
+  ): GameEventListener;
+  public add(
+    event: GameEvent.CardDrawn,
+    priority: number,
+    execute: Execute<GameEventProperties & CardDrawnProperties>,
+  ): GameEventListener;
+  public add(
+    event: GameEvent.CardPlayed,
+    priority: number,
+    execute: Execute<GameEventProperties & CardPlayedProperties>,
+  ): GameEventListener;
   public add(
     event: GameEvent.EndYear,
     priority: number,
-    createState: (props: EndYearProperties) => GameState,
+    execute: Execute<GameEventProperties & EndYearProperties>,
   ): GameEventListener;
   /**
    * Adds an event listener.
@@ -28,44 +46,41 @@ export class EventHub {
    * @param createState A function that creates a GameState to enter when the event is invoked.
    * @returns An object representing the listener, which can be used to remove it later.
    */
-  public add(event: GameEvent, priority: number, createState: (...args: any[]) => GameState): GameEventListener {
-    const listener = { event, priority, createState };
+  public add<T extends GameEventProperties>(
+    event: GameEvent,
+    priority: number,
+    execute: Execute<T>,
+  ): GameEventListener {
+    const listener: GameEventListener = { event, priority, execute };
     this.listeners.push(listener);
     this.listeners.sort((a, b) => b.priority - a.priority);
     return listener;
   }
 
-  public invoke(event: GameEvent.NewYear): GameState;
-  /**
-   * @param card The card that was drawn.
-   */
-  public invoke(event: GameEvent.CardDrawn, card: Card): GameState;
-  /**
-   * @param card The card that was played.
-   */
-  public invoke(event: GameEvent.CardPlayed, card: Card): GameState;
-  /**
-   * @param props The properties for the end-of-year event.
-   */
-  public invoke(event: GameEvent.EndYear, props: EndYearProperties): GameState;
+  public async invoke(event: GameEvent.NewYear, props: NewYearProperties): Promise<void>;
+  public async invoke(event: GameEvent.CardDrawn, props: CardDrawnProperties): Promise<void>;
+  public async invoke(event: GameEvent.CardPlayed, props: CardPlayedProperties): Promise<void>;
+  public async invoke(event: GameEvent.EndYear, props: EndYearProperties): Promise<void>;
   /**
    * Invokes the listeners for the specified event, in order of priority.
-   * If a listener returns a value other than undefined, the invocation is stopped and that value is returned.
    * @param event The event to invoke.
-   * @param args The arguments to pass to the listeners.
-   * @returns The value returned by the first listener that returns a value other than undefined, or undefined if all
-   * listeners return undefined.
+   * @param props The event's properties.
    */
-  public invoke(event: GameEvent, ...args: any[]): GameState {
-    return new Sequence(this.listeners.filter((x) => x.event === event).map((x) => x.createState(...args)));
+  public async invoke(event: GameEvent, props: any): Promise<void> {
+    props = { stop: false, ...props };
+    for (const listener of this.listeners) {
+      if (listener.event === event) {
+        await listener.execute(props);
+        if (props.stop) break;
+      }
+    }
   }
 
   /**
    * Removes event listeners.
    * @param listeners The listeners to remove.
    */
-  public remove(listeners: GameEventListener | GameEventListener[]): void {
-    if (!Array.isArray(listeners)) listeners = [listeners];
+  public remove(...listeners: GameEventListener[]): void {
     for (let i = this.listeners.length - 1; i >= 0; i--) {
       const listener = this.listeners[i];
       if (listeners.includes(listener!)) this.listeners.splice(i, 1);

@@ -1,61 +1,41 @@
 import { type Card, Family } from '../cards/index.js';
-import { eventHub, game, GameEvent, stateMachine } from '../singleton/index.js';
-import { FlipCards, type GameState, NoOp, Sequence } from './primitive/index.js';
+import { GameEvent, type NewYearProperties } from '../events/index.js';
+import { eventHub, game } from '../singleton/index.js';
+import { Primitive } from './primitive.js';
 
-export class DrawCards implements GameState {
-  public readonly name: string = 'DrawCards';
-
-  enter(): void {
-    const states: GameState[] = [];
+export class DrawCards {
+  public async execute(_props: NewYearProperties): Promise<void> {
     const fedFamilies = game.containers.fedFamilyStack;
-    const negativeStack = game.containers.negativeStack;
     for (let i = fedFamilies.items.length - 1; i >= 0; i--) {
-      const family = fedFamilies.items[i] as Card;
-      if (family instanceof Family) states.push(new FlipCards(negativeStack, family));
-      states.push(new DrawCard());
-    }
-    stateMachine.next(new Sequence(states));
-  }
-}
-
-class DrawCard implements GameState {
-  public readonly name: string = 'DrawCard';
-
-  enter(): void {
-    stateMachine.push(game.containers.drawDeck.items.length === 0 ? new Shuffle() : new NoOp());
-  }
-
-  resume(): void {
-    const card = game.containers.drawDeck.items[0] as Card;
-    if (card) {
-      stateMachine.next(
-        new Sequence([new FlipCards(game.containers.hand, card), eventHub.invoke(GameEvent.CardDrawn, card)]),
-      );
-    } else {
-      stateMachine.pop();
+      await this.animateFamily(fedFamilies.items[i] as Family);
+      await this.drawCard();
     }
   }
-}
 
-class Shuffle implements GameState {
-  public readonly name: string = 'Shuffle';
+  private async animateFamily(family: Family) {
+    const promises: Promise<void>[] = [Primitive.glow(family.htmlElement, family.animationDuration)];
+    if (family instanceof Family) promises.push(family.flip(), game.containers.negativeStack.addItems(family));
+    await Promise.all(promises);
+  }
 
-  enter(): void {
+  private async drawCard(): Promise<void> {
+    if (game.containers.drawDeck.items.length === 0) await this.shuffleDiscardPile();
+    const card = game.containers.drawDeck.items.pop() as Card;
+    if (!card) return;
+    await Promise.all([card.flip(), game.containers.hand.addItems(card)]);
+    await eventHub.invoke(GameEvent.CardDrawn, { stop: false, card });
+  }
+
+  private async shuffleDiscardPile(): Promise<void> {
     const cards = game.containers.discardPile.items as Card[];
-    if (cards.length === 0) {
-      stateMachine.pop();
-    } else {
-      this.shuffle(cards);
-      stateMachine.next(new FlipCards(game.containers.drawDeck, ...cards));
-    }
-  }
+    if (cards.length === 0) return;
 
-  private shuffle(cards: Card[]): void {
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       const temp = cards[i]!;
       cards[i] = cards[j]!;
       cards[j] = temp;
     }
+    await Promise.all([...cards.map((card) => card.flip()), game.containers.drawDeck.addItems(...cards)]);
   }
 }

@@ -2,11 +2,6 @@ body {
   margin: 0px;
 }
 
-.fade {
-  transition-duration: 0.5s;
-  transition-property: all;
-}
-
 div.title-screen h1 {
   position: absolute;
   left: 0px;
@@ -136,11 +131,15 @@ div.item {
 }
 
 div.booster {
+  left: calc(50vw - 85px);
+  top: calc(50vh - 115px);
   width: 170px;
   height: 230px;
 }
 
 div.card {
+  left: calc(50vw - 75px);
+  top: calc(50vh - 105px);
   width: 150px;
   height: 210px;
 }
@@ -150,10 +149,9 @@ div.card > div {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.5s;
 }
 
-.flipped {
+.reverse {
   transform: rotateY(180deg);
 }
 

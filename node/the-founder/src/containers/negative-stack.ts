@@ -11,16 +11,17 @@ export class NegativeStack extends Container {
     return this.items.reduce((total, item) => total - (item as Card).activeSide.morale, 0);
   }
 
-  override addItems(...items: Item[]): void {
+  override addItems(...items: Item[]): Promise<void> {
     for (const item of items) {
       if (!(item instanceof Card) || item.activeSide.morale >= 0) {
         throw new Error('Only cards with negative morale can be added to the negative stack.');
       }
     }
-    super.addItems(...items);
+    return super.addItems(...items);
   }
 
-  protected arrange(): void {
+  protected async arrange(): Promise<void> {
+    const promises: Promise<void>[] = [];
     const step = Card.titleHeight;
     const left = Spacing + Card.width / 2;
     let top = Spacing - step;
@@ -28,8 +29,9 @@ export class NegativeStack extends Container {
     for (const item of this.items) {
       if (!(item instanceof Card)) throw new Error('Negative stack can only contain cards.');
       top -= step * item.activeSide.morale;
-      item.reposition(left, top, zIndex);
+      promises.push(item.move({ left: `${left}px`, top: `${top}px` }, zIndex));
       zIndex++;
     }
+    await Promise.all(promises);
   }
 }

@@ -12,6 +12,7 @@ export abstract class Card extends Item {
 
   private _activeSide: number = 0;
   private readonly flipDiv: HTMLDivElement;
+  private isFlipped: boolean = false;
   private readonly sides: CardSide[];
 
   public override readonly height = Card.height;
@@ -29,7 +30,7 @@ export abstract class Card extends Item {
     let first = true;
     for (const side of this.sides) {
       if (first) first = false;
-      else side.htmlElement.classList.add('flipped');
+      else side.htmlElement.classList.add('reverse');
       (side as any).card = this;
       this.flipDiv.appendChild(side.htmlElement);
     }
@@ -44,15 +45,22 @@ export abstract class Card extends Item {
     return side;
   }
 
-  /** Flip this card to it's other side. */
-  public flip(): void {
+  /**
+   * Flip this card to it's other side.
+   *
+   * Note: Flip cards before attempting to move them. For example:
+   * ```
+   * await Promise.all([card.flip, container.addItems(card)])
+   * ```
+   */
+  public async flip(): Promise<void> {
     if (this.sides.length === 1) throw new Error('Cannot flip this card.');
-    const classList = this.flipDiv.classList;
-    if (classList.contains('flipped')) {
-      classList.remove('flipped');
-    } else {
-      classList.add('flipped');
-    }
     this._activeSide = 1 - this._activeSide;
+    this.isFlipped = !this.isFlipped;
+    await this.flipDiv.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(180deg)' }], {
+      direction: this.isFlipped ? 'normal' : 'reverse',
+      duration: this.animationDuration,
+      fill: 'forwards',
+    }).finished;
   }
 }

@@ -1,12 +1,11 @@
 import type { Container } from './containers/container.js';
-
 /** One item, either a booster pack or a single card. */
 export abstract class Item {
+  /** The default animation duration of an item in milliseconds. */
+  public static readonly animationDuration = 500;
+
   /** The height of an item's title bar. */
   public static readonly titleHeight = 30;
-
-  /** The animation transition time of an item in milliseconds. */
-  public static readonly transitionTime = 500;
 
   /**
    * Creates multiple copies of an item.
@@ -20,6 +19,9 @@ export abstract class Item {
     return items;
   }
 
+  /** This item's animation duration in milliseconds. */
+  public readonly animationDuration: number = Item.animationDuration;
+
   /** The container currently holding this item. */
   public container: Container | undefined = undefined;
 
@@ -32,14 +34,10 @@ export abstract class Item {
   /** This item's name. */
   public abstract readonly name: string;
 
-  /** This item's animation transition time in milliseconds. */
-  public readonly transitionTime: number = Item.transitionTime;
-
   /** This item's width. */
   public abstract readonly width: number;
 
   protected constructor() {
-    this.htmlElement.classList.add('fade');
     this.htmlElement.onauxclick = (event) => this.onClicked(event);
     this.htmlElement.onclick = (event) => this.onClicked(event);
     this.htmlElement.oncontextmenu = (event) => event.preventDefault();
@@ -55,47 +53,40 @@ export abstract class Item {
 
   private static getModifier(event: MouseEvent): number | undefined {
     const keys = (event.shiftKey ? 1 : 0) | (event.ctrlKey ? 2 : 0) | (event.altKey ? 4 : 0);
-    switch (event.button) {
-      case 0:
-        // Left click
-        switch (keys) {
-          case 0:
+    switch (keys) {
+      case 0: // Click
+        switch (event.button) {
+          case 0: // Left click
             return 0;
-          case 1:
-            return 1;
-          case 2:
+          case 1: // Middle click
             return 2;
-          case 4:
-            return 3;
-        }
-        break;
-      case 1:
-        // Middle click
-        switch (keys) {
-          case 0:
-            return 2;
-        }
-        break;
-      case 2:
-        // Right click
-        switch (keys) {
-          case 0:
+          case 2: // Right click
             return 1;
         }
-        break;
+      case 1: // Shift + click
+        return 1;
+      case 2: // Ctrl + click
+        return 2;
+      case 4: // Alt + click
+        return 3;
     }
     return undefined;
   }
 
   /**
-   * Set this item's physical position.
-   * @param left The x-coordinate of this item's left side.
-   * @param top The y-coordinate of this item's top side.
-   * @param zIndex This item's Z index. Higher numbers are on top.
+   * Moves this item to a new location.
+   * @param to The location to move it to.
+   * @param zIndex This item's new Z-index.
    */
-  public reposition(left: number | string, top: number | string, zIndex: number): void {
-    this.htmlElement.style.left = typeof left === 'number' ? `${left}px` : left;
-    this.htmlElement.style.top = typeof top === 'number' ? `${top}px` : top;
-    setTimeout(() => (this.htmlElement.style.zIndex = `${zIndex}`), 250);
+  public async move(
+    to: { left?: string; top?: string; width?: string; height?: string },
+    zIndex?: number,
+  ): Promise<void> {
+    if (zIndex !== undefined) {
+      setTimeout(() => {
+        this.htmlElement.style.zIndex = `${zIndex}`;
+      }, this.animationDuration / 2);
+    }
+    await this.htmlElement.animate([{}, to], { duration: this.animationDuration, fill: 'forwards' }).finished;
   }
 }

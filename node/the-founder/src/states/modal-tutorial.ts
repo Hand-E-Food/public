@@ -1,8 +1,10 @@
-import { stateMachine } from '../singleton/index.js';
-import { ManualPromise } from '../util/index.js';
-import { type GameState, Modal } from './primitive/index.js';
+import { tutorials } from '../singleton/index.js';
+import { Modal } from './modal.js';
+import { ManualPromise } from './manual-promise.js';
 
 export interface ModalTutorialParams {
+  /** This tutorial's unique key. */
+  readonly key: string;
   /** The paragraphs to display in the tutorial. */
   readonly paragraphs: string[];
   readonly left?: string;
@@ -14,70 +16,76 @@ export interface ModalTutorialParams {
 }
 
 /** Temporarily displays a tutorial message. */
-export class ModalTutorial implements GameState {
-  private static allClosed: boolean = false;
-  private static readonly closed: Set<string> = new Set();
+export class ModalTutorial extends Modal {
+  /**
+   * If the specified tutorial should be shown, exsecutes a state that temporarily displays the tutorial message.
+   * @param params The tutorial's parameters.
+   */
+  public static async show(params: ModalTutorialParams): Promise<void> {
+    if (!tutorials.shouldShow(params.key)) return;
+    await new ModalTutorial(params).execute();
+  }
 
-  private promise!: ManualPromise<void>;
-
-  public readonly name: string;
+  private readonly key: string;
+  private readonly promise = new ManualPromise<void>();
 
   /**
    * Creates a state that temporarily displays a tutorial message.
-   * @param key This tutorial's key.
    * @param params This tutorial's parameters.
    */
-  public constructor(
-    private readonly key: string,
-    private readonly params: ModalTutorialParams,
-  ) {
-    this.name = `ModalTutorial(${key})`;
-  }
-
-  enter(): void {
-    if (ModalTutorial.allClosed || ModalTutorial.closed.has(this.key)) {
-      stateMachine.pop();
-      return;
-    }
-
-    this.promise = new ManualPromise<void>();
-
+  private constructor(params: ModalTutorialParams) {
     const htmlElement = document.createElement('div');
     htmlElement.classList.add('fade', 'tutorial');
-    if (this.params.left) htmlElement.style.left = this.params.left;
-    if (this.params.width) htmlElement.style.width = this.params.width;
-    if (this.params.right) htmlElement.style.right = this.params.right;
-    if (this.params.top) htmlElement.style.top = this.params.top;
-    if (this.params.height) htmlElement.style.height = this.params.height;
-    if (this.params.bottom) htmlElement.style.bottom = this.params.bottom;
-    for (const paragraph of this.params.paragraphs) {
+    if (params.left) htmlElement.style.left = params.left;
+    if (params.width) htmlElement.style.width = params.width;
+    if (params.right) htmlElement.style.right = params.right;
+    if (params.top) htmlElement.style.top = params.top;
+    if (params.height) htmlElement.style.height = params.height;
+    if (params.bottom) htmlElement.style.bottom = params.bottom;
+    for (const paragraph of params.paragraphs) {
       const p = document.createElement('p');
       p.innerHTML = paragraph;
       htmlElement.appendChild(p);
     }
 
-    const closeOneElement = document.createElement('p');
-    closeOneElement.classList.add('action');
-    closeOneElement.innerHTML = `"Thank you."`;
-    closeOneElement.onclick = () => this.closeOne();
-    htmlElement.appendChild(closeOneElement);
+    const closeElement = document.createElement('p');
+    closeElement.classList.add('action');
+    closeElement.innerHTML = `Close`;
+    closeElement.onclick = () => this.close();
+    htmlElement.appendChild(closeElement);
+
+    const closeAlwaysElement = document.createElement('p');
+    closeAlwaysElement.classList.add('action');
+    closeAlwaysElement.innerHTML = `Don't show this again.`;
+    closeAlwaysElement.onclick = () => this.closeAlways();
+    htmlElement.appendChild(closeAlwaysElement);
 
     const closeAllElement = document.createElement('p');
     closeAllElement.classList.add('action');
-    closeAllElement.innerHTML = `"I do not require your tutelage."`;
+    closeAllElement.innerHTML = `Don't show any tutorials.`;
     closeAllElement.onclick = () => this.closeAll();
     htmlElement.appendChild(closeAllElement);
 
-    stateMachine.next(new Modal(htmlElement, this.promise));
+    super(htmlElement);
+    this.key = params.key;
   }
 
-  private closeOne(): void {
-    ModalTutorial.closed.add(this.key);
+  private close(): void {
+    tutorials.close(this.key);
+    this.promise.resolve();
+  }
+
+  private closeAlways(): void {
+    tutorials.closeAlways(this.key);
     this.promise.resolve();
   }
 
   private closeAll(): void {
-    ModalTutorial.allClosed = true;
+    tutorials.closeAll();
     this.promise.resolve();
+  }
+
+  protected override waitClosed(): Promise<void> {
+    return this.promise;
   }
 }

@@ -6,22 +6,24 @@ import { Container } from './container.js';
 import { ZIndex } from './z-index.js';
 
 export class BoosterPacks extends Container {
-  override addItems(...items: Item[]): void {
+  override addItems(...items: Item[]): Promise<void> {
     for (const item of items) {
       if (!(item instanceof BoosterPack)) throw new Error('Only boosters can be added to the booster pack container.');
     }
-    super.addItems(...items);
+    return super.addItems(...items);
   }
 
-  protected arrange(): void {
+  protected async arrange(): Promise<void> {
+    const promises: Promise<void>[] = [];
     const step = BoosterPack.width + Spacing;
     let left = Spacing * 3 + Card.width * 2.5;
     const top = Spacing;
     let zIndex = ZIndex.LowerStack;
     for (const item of this.items) {
-      item.reposition(left, top, zIndex);
+      promises.push(item.move({ left: `${left}px`, top: `${top}px` }, zIndex));
       left += step;
       zIndex++;
     }
+    await Promise.all(promises);
   }
 }
