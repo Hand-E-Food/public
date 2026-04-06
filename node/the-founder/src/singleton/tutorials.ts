@@ -7,7 +7,7 @@ export class Tutorials {
   private allClosed: boolean = false;
 
   public constructor(private readonly storage: Storage) {
-    for (const key of this.storage.getItem(StorageKey) ?? []) this.alwaysClosedKeys.add(key);
+    this.loadFromStorage();
   }
 
   /**
@@ -34,7 +34,7 @@ export class Tutorials {
   public closeAlways(key: string): void {
     this.closedKeys.add(key);
     this.alwaysClosedKeys.add(key);
-    this.storage.setItem(StorageKey, JSON.stringify([...this.alwaysClosedKeys]));
+    this.saveToStorage();
   }
 
   /** Closes all tutorials for this session. */
@@ -47,7 +47,26 @@ export class Tutorials {
     this.closedKeys.clear();
     this.alwaysClosedKeys.clear();
     this.allClosed = false;
-    this.storage.setItem(StorageKey, JSON.stringify([]));
+    this.saveToStorage();
+  }
+
+  private loadFromStorage(): void {
+    try {
+      const json = this.storage.getItem(StorageKey);
+      if (json) {
+        const array = JSON.parse(json);
+        if (Array.isArray(array) && array.every((item) => typeof item === 'string')) {
+          for (const key of array) this.alwaysClosedKeys.add(key);
+          for (const key of this.alwaysClosedKeys) this.closedKeys.add(key);
+        }
+      }
+    } catch {
+      // Swallow
+    }
+  }
+
+  private saveToStorage(): void {
+    this.storage.setItem(StorageKey, JSON.stringify([...this.alwaysClosedKeys]));
   }
 }
 
