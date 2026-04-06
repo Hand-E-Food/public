@@ -1,15 +1,12 @@
-import { FoundTown } from '../boosters/index.js';
-import { ZIndex } from '../containers/index.js';
-import { GameEvent, type EndYearProperties, type NewYearProperties } from '../events/index.js';
-import { eventHub, game } from '../singleton/index.js';
-import { CheckMorale } from './check-morale.js';
-import { DrawCards } from './draw-cards.js';
-import { ModalTitleScreen } from './modal-title-screen.js';
-import { ModalYear } from './modal-year.js';
-import { OpenBoosterPack } from './open-booster-pack.js';
+import { FoundTown } from './boosters/index.js';
+import { ZIndex } from './containers/index.js';
+import { GameEvent, type EndYearProperties, type NewYearProperties } from './events/index.js';
+import { eventHub, game } from './singleton/index.js';
+import { CheckMorale, DiscardHand, DrawCards, ModalTitleScreen, ModalYear, OpenBoosterPack } from './states/index.js';
 
 export class Main {
   private readonly checkMorale = new CheckMorale();
+  private readonly discardHand = new DiscardHand();
   private readonly drawCards = new DrawCards();
   private readonly modalYear = new ModalYear();
 
@@ -18,9 +15,10 @@ export class Main {
     await this.showTitleScreen();
     const listeners = [
       eventHub.add(GameEvent.NewYear, 50, (props) => this.drawCards.execute(props)),
+      eventHub.add(GameEvent.EndYear, 10, (props) => this.discardHand.execute(props)),
       eventHub.add(GameEvent.EndYear, 50, (props) => this.checkMorale.execute(props)),
     ];
-    await this.showYear();
+    await this.modalYear.execute();
     await this.openFirstBoosterPack();
     const gameOver = await this.runGameLoop();
     eventHub.remove(...listeners);
@@ -44,14 +42,10 @@ export class Main {
       const result = await this.endYear();
       if (result) return result;
       game.year++;
-      await this.showYear();
+      await this.modalYear.execute();
       await this.newYear();
       await this.playCards();
     }
-  }
-
-  private async showYear(): Promise<void> {
-    await this.modalYear.execute();
   }
 
   private async endYear(): Promise<(() => Promise<void>) | undefined> {

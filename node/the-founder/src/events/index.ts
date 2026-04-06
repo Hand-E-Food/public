@@ -20,6 +20,7 @@ export enum GameEvent {
 
   /**
    * Invoked when the player ends the year.
+   * - 10: discard hand
    * - 50: check morale
    */
   EndYear,

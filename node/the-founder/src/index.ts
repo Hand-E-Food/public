@@ -1,3 +1,3 @@
-import { Main } from './states/main.js';
+import { Main } from './main.js';
 
 new Main().execute();
