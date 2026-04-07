@@ -6,6 +6,10 @@ import { ZIndex } from './index.js';
 
 /** Contains cards actively providing positive morale. */
 export class PositiveStack extends Container {
+  public static readonly left = Spacing;
+  public static readonly top = Spacing;
+  public static readonly width = Card.width;
+
   /** The total positive morale in this stack. This is a positive number. */
   public get morale(): number {
     return this.items.reduce((total, item) => total + (item as Card).activeSide.morale, 0);
@@ -23,13 +27,12 @@ export class PositiveStack extends Container {
   protected async arrange(): Promise<void> {
     const promises: Promise<void>[] = [];
     const step = Card.titleHeight;
-    const left = Spacing;
-    let top = Spacing - step;
+    let top = PositiveStack.top - step;
     let zIndex = ZIndex.LowerStack;
     for (const item of this.items) {
       if (!(item instanceof Card)) throw new Error('Positive stack can only contain cards.');
       top += step * item.activeSide.morale;
-      promises.push(item.move({ left: `${left}px`, top: `${top}px` }, zIndex));
+      promises.push(item.move({ left: `${PositiveStack.left}px`, top: `${top}px` }, zIndex));
       zIndex++;
     }
     await Promise.all(promises);
