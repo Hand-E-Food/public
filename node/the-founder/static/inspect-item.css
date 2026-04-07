@@ -1,0 +1,23 @@
+div.inspect-item {
+  left: calc(50vw - 455px);
+  top: 50%;
+  width: 910px;
+  transform: translateY(-50%);
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+div.inspect-item > img {
+  width: 300px;
+  min-height: 420px;
+  object-fit: contain;
+}
+
+div.inspect-item > .text-panel {
+  width: 600px;
+}

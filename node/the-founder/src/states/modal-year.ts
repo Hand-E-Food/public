@@ -6,13 +6,13 @@ export class ModalYear extends Modal {
   private readonly year: HTMLSpanElement;
 
   public constructor() {
-    const htmlElement = document.createElement('div');
-    htmlElement.classList.add('year');
+    const modal = document.createElement('div');
+    modal.classList.add('modal', 'year');
 
-    const year = document.createElement('span');
-    htmlElement.appendChild(year);
+    const year = document.createElement('h1');
+    modal.appendChild(year);
 
-    super(htmlElement);
+    super(modal);
     this.year = year;
   }
 

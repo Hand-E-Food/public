@@ -11,6 +11,12 @@ export class Discontent extends Card {
 
 class DiscontentFace extends NegativeCardFace {
   public constructor() {
-    super({ image: 'discontent.jpg', name: 'Discontent' });
+    super({
+      canInspect: true,
+      name: 'Discontent',
+      image: 'discontent.jpg',
+      flavourText: '<p><i>"There must be more to life than work and struggle..."</i></p>',
+      actions: [],
+    });
   }
 }

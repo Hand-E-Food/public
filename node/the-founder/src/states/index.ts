@@ -3,6 +3,7 @@ export * from './discard-hand.js';
 export * from './draw-cards.js';
 export * from './game-over.js';
 export * from './manual-promise.js';
+export * from './modal-inspect-item.js';
 export * from './modal-title-screen.js';
 export * from './modal-tutorial.js';
 export * from './modal-year.js';

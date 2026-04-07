@@ -12,12 +12,26 @@ export class Family extends Card {
 
 class HungryFamily extends NegativeCardFace {
   public constructor() {
-    super({ image: 'hungry-family.jpg', name: 'Hungry Family' });
+    super({
+      canInspect: true,
+      name: 'Hungry Family',
+      image: 'hungry-family.jpg',
+      flavourText: '<p><i>A hungry family will work to support themselves before helping the community.</i></p>',
+      actions: [],
+    });
   }
 }
 
 class FedFamily extends CardFace {
   public constructor() {
-    super({ image: 'fed-family.jpg', name: 'Fed Family' });
+    super({
+      canInspect: true,
+      name: 'Fed Family',
+      image: 'fed-family.jpg',
+      flavourText:
+        '<p><i>A fed family will be productive and help the community grow.</i></p>' +
+        '<p>At the start of the year, draw a card and flip this card.</p>',
+      actions: [],
+    });
   }
 }

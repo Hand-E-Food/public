@@ -1,23 +1,25 @@
 import { Card } from './card.js';
 import { CardFace } from './card-face.js';
-import { NegativeCardFace } from './negative-card-face.js';
 
 export class YourFamily extends Card {
   public override readonly name = 'Your Family';
 
   public constructor() {
-    super({ sides: [new YourHappyFamily(), new YourBetrayedFamily()] });
+    super({ sides: [new YourFamilyFace()] });
   }
 }
 
-class YourHappyFamily extends CardFace {
+class YourFamilyFace extends CardFace {
   public constructor() {
-    super({ image: 'fed-family.jpg', name: 'Your Family' });
-  }
-}
-
-class YourBetrayedFamily extends NegativeCardFace {
-  public constructor() {
-    super({ image: 'hungry-family.jpg', name: 'Your Family' });
+    super({
+      canInspect: true,
+      name: 'Your Family',
+      image: 'fed-family.jpg',
+      flavourText:
+        '<p><i>Your beloved family. As mayor, your needs are catered for and your family is always happy to ' +
+        'contribute to the community.</i></p>' +
+        '<p>At the start of each year, draw a card.</p>',
+      actions: [],
+    });
   }
 }

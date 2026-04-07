@@ -34,39 +34,32 @@ export class ModalTutorial extends Modal {
    * @param params This tutorial's parameters.
    */
   private constructor(params: ModalTutorialParams) {
-    const htmlElement = document.createElement('div');
-    htmlElement.classList.add('fade', 'tutorial');
-    if (params.left) htmlElement.style.left = params.left;
-    if (params.width) htmlElement.style.width = params.width;
-    if (params.right) htmlElement.style.right = params.right;
-    if (params.top) htmlElement.style.top = params.top;
-    if (params.height) htmlElement.style.height = params.height;
-    if (params.bottom) htmlElement.style.bottom = params.bottom;
+    const modal = document.createElement('div');
+    modal.classList.add('modal', 'text-panel', 'tutorial');
+    if (params.left) modal.style.left = params.left;
+    if (params.width) modal.style.width = params.width;
+    if (params.right) modal.style.right = params.right;
+    if (params.top) modal.style.top = params.top;
+    if (params.height) modal.style.height = params.height;
+    if (params.bottom) modal.style.bottom = params.bottom;
     for (const paragraph of params.paragraphs) {
       const p = document.createElement('p');
       p.innerHTML = paragraph;
-      htmlElement.appendChild(p);
+      modal.appendChild(p);
     }
 
-    const closeElement = document.createElement('p');
-    closeElement.classList.add('action');
-    closeElement.innerHTML = `Close`;
-    closeElement.onclick = () => this.close();
-    htmlElement.appendChild(closeElement);
+    function createButton(text: string, onclick: () => void): void {
+      const button = document.createElement('p');
+      button.classList.add('action');
+      button.innerHTML = text;
+      button.onclick = onclick;
+      modal.appendChild(button);
+    }
+    createButton(`Close`, () => this.close());
+    createButton(`Don't show this again.`, () => this.closeAlways());
+    createButton(`Don't show any tutorials.`, () => this.closeAll());
 
-    const closeAlwaysElement = document.createElement('p');
-    closeAlwaysElement.classList.add('action');
-    closeAlwaysElement.innerHTML = `Don't show this again.`;
-    closeAlwaysElement.onclick = () => this.closeAlways();
-    htmlElement.appendChild(closeAlwaysElement);
-
-    const closeAllElement = document.createElement('p');
-    closeAllElement.classList.add('action');
-    closeAllElement.innerHTML = `Don't show any tutorials.`;
-    closeAllElement.onclick = () => this.closeAll();
-    htmlElement.appendChild(closeAllElement);
-
-    super(htmlElement);
+    super(modal);
     this.key = params.key;
   }
 

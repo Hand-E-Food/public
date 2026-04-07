@@ -1,4 +1,36 @@
 import type { Container } from './containers/container.js';
+
+export interface ItemAction {
+  /** True if this action can be executed. */
+  readonly isEnabled: boolean;
+
+  /** True if this action is visible to the player. */
+  readonly isVisible: boolean;
+
+  /** This action's text as HTML. */
+  readonly text: string;
+
+  /** Executes this action. */
+  execute(item: Item): Promise<void>;
+}
+
+export interface ItemSide {
+  /** True if this item side can be inspected. */
+  readonly canInspect: boolean;
+  
+  /** This item side's background image. */
+  readonly image: string;
+  
+  /** This item side's name. */
+  readonly name: string;
+  
+  /** This item side's flavour text as HTML. Include `<p>` tags. */
+  readonly flavourText: string;
+
+  /** This item side's actions. */
+  readonly actions: ItemAction[];
+}
+
 /** One item, either a booster pack or a single card. */
 export abstract class Item {
   /** The default animation duration of an item in milliseconds. */
@@ -50,6 +82,8 @@ export abstract class Item {
   }
 
   public onClickedListener: { (item: Item, modifier: number): void } | undefined;
+
+  public abstract get activeSide(): ItemSide;
 
   private static getModifier(event: MouseEvent): number | undefined {
     const keys = (event.shiftKey ? 1 : 0) | (event.ctrlKey ? 2 : 0) | (event.altKey ? 4 : 0);

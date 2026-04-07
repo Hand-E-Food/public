@@ -1,0 +1,21 @@
+div.title-screen h1 {
+  position: absolute;
+  left: 0px;
+  bottom: 50vh;
+  width: 100vw;
+  height: 20vh;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
+  font-size: 20vh;
+}
+
+div.title-screen footer {
+  position: absolute;
+  left: 0px;
+  bottom: 5vh;
+  width: 100vw;
+  align-content: baseline;
+  text-align: center;
+  font-size: 12pt;
+}

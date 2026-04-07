@@ -2,9 +2,10 @@ import { Card } from './card.js';
 import { CardBack } from './card-back.js';
 import { CardFace } from './card-face.js';
 
-interface ResourceParams {
+type ResourceParams = {
   readonly image: string;
   readonly name: string;
+  readonly flavourText: string;
 }
 
 class Resource extends Card {
@@ -20,18 +21,30 @@ class Resource extends Card {
 
 class ResourceFace extends CardFace {
   public constructor(params: ResourceParams) {
-    super(params);
+    super({
+      canInspect: true,
+      actions: [],
+      ...params,
+    });
   }
 }
 
 export class Fish extends Resource {
   public constructor() {
-    super({ image: 'fish.jpg', name: 'Fish' });
+    super({
+      name: 'Fish',
+      image: 'fish.jpg',
+      flavourText: '',
+    });
   }
 }
 
 export class Wood extends Resource {
   public constructor() {
-    super({ image: 'wood.jpg', name: 'Wood' });
+    super({
+      name: 'Wood',
+      image: 'wood.jpg',
+      flavourText: '',
+    });
   }
 }

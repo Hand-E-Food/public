@@ -1,5 +1,6 @@
 import type { Item } from '../item.js';
 import { game } from '../singleton/index.js';
+import { ModalInspectItem } from './index.js';
 import { ManualPromise } from './manual-promise.js';
 
 /** The main part of the player's turn. */
@@ -41,5 +42,15 @@ export class PlayerPhase {
    * @param _item The clicked item.
    * @param _modifier The active modifier when the item was clicked.
    */
-  private onItemClicked(_item: Item, _modifier: number): void {}
+  private async onItemClicked(item: Item, modifier: number): Promise<void> {
+    if (modifier === 0) {
+      if (!item.activeSide.canInspect) return;
+      this.disable();
+      await new ModalInspectItem({item}).execute();
+      this.enable();
+    } else {
+      const action = item.activeSide.actions[modifier - 1];
+      if (!action) return;
+    }
+  }
 }

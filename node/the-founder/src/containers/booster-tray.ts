@@ -10,7 +10,7 @@ export class BoosterTray extends Container {
   public constructor() {
     super();
     this.htmlElement = document.createElement('div');
-    this.htmlElement.classList.add('fade', 'booster-tray');
+    this.htmlElement.classList.add('modal', 'booster-tray');
   }
 
   public async addBoosterPack(item: BoosterPack): Promise<void> {

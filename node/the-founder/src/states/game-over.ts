@@ -6,7 +6,7 @@ export class GameOver {
 
   public constructor() {
     const htmlElement = document.createElement('div');
-    htmlElement.classList.add('game-over');
+    htmlElement.classList.add('modal', 'game-over');
     htmlElement.innerHTML = `<h1>Game Over</h1>`;
 
     this.htmlElement = htmlElement;

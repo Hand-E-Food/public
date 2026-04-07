@@ -6,6 +6,9 @@ export class NegativeCardFace extends CardFace {
   public override morale: number = -1;
 
   public constructor(params: NegativeCardFaceParams) {
-    super({ ...params, icon: 'negative.svg' });
+    super({
+      icon: 'negative.svg',
+      ...params,
+    });
   }
 }

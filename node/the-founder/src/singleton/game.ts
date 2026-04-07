@@ -32,7 +32,7 @@ export class Game {
   public readonly htmlElement: HTMLDivElement;
 
   /** A callback function to be called when an item is clicked. */
-  public onItemClicked: ((item: Item, modifier: number) => void) | null = null;
+  public onItemClicked: ((item: Item, modifier: number) => void | Promise<void>) | null = null;
 
   /** The number of resources available per booster pack. */
   public readonly resourcesPerBooster = 4;

@@ -1,7 +1,12 @@
 import { Card } from './card.js';
-import { CardFace, type CardFaceParams } from './card-face.js';
+import { CardFace } from './card-face.js';
 
-type PositiveCardParams = Omit<CardFaceParams, 'icon'>;
+export type PositiveCardParams = {
+  readonly name: string;
+
+  /**  */
+  readonly image: string;
+}
 
 export class PositiveCard extends Card {
   public override name: string;
@@ -16,6 +21,12 @@ class PositiveCardFace extends CardFace {
   public override morale: number = 1;
 
   public constructor(params: PositiveCardParams) {
-    super({ ...params, icon: 'positive.svg' });
+    super({
+      canInspect: false,
+      flavourText: '',
+      actions: [],
+      icon: 'positive.svg',
+      ...params,
+    });
   }
 }
