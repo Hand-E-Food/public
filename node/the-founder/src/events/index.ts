@@ -6,7 +6,7 @@ export enum GameEvent {
    * Invoked at the start of each year.
    * - 50: fed families
    */
-  NewYear,
+  YearStarted,
 
   /**
    * Invoked when a card is drawn from the draw deck.
@@ -19,11 +19,17 @@ export enum GameEvent {
   CardPlayed,
 
   /**
-   * Invoked when the player ends the year.
+   * Invoked when a player ends the year to validate whether requirements have been met.
+   * - 10: validate all families fed
+   */
+  YearEnding,
+
+  /**
+   * Invoked when the player ends the year and all validation passes.
    * - 10: discard hand
    * - 50: check morale
    */
-  EndYear,
+  YearEnded,
 }
 
 export type GameEventProperties = {
@@ -31,7 +37,7 @@ export type GameEventProperties = {
   stop: boolean;
 };
 
-export type NewYearProperties = GameEventProperties & {};
+export type YearStartedProperties = GameEventProperties & {};
 
 export type CardDrawnProperties = GameEventProperties & {
   /** The card that was drawn. */
@@ -43,7 +49,12 @@ export type CardPlayedProperties = GameEventProperties & {
   card: Card;
 };
 
-export type EndYearProperties = GameEventProperties & {
+export type YearEndingProperties = GameEventProperties & {
+  /** Set to true to cancel ending the year. */
+  cancel: boolean;
+};
+
+export type YearEndedProperties = GameEventProperties & {
   /** The state transition to end the game with. */
   gameOver?: () => Promise<void>;
 };

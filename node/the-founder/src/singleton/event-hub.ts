@@ -1,10 +1,11 @@
 import type {
   CardDrawnProperties,
   CardPlayedProperties,
-  EndYearProperties,
   GameEvent,
   GameEventProperties,
-  NewYearProperties,
+  YearEndedProperties,
+  YearEndingProperties,
+  YearStartedProperties,
 } from '../events/index.js';
 
 export type GameEventListener = {
@@ -20,25 +21,14 @@ export class EventHub {
   private readonly listeners: GameEventListener[] = [];
 
   public add(
-    event: GameEvent.NewYear,
+    event: GameEvent.YearStarted,
     priority: number,
-    execute: Execute<GameEventProperties & NewYearProperties>,
+    execute: Execute<YearStartedProperties>,
   ): GameEventListener;
-  public add(
-    event: GameEvent.CardDrawn,
-    priority: number,
-    execute: Execute<GameEventProperties & CardDrawnProperties>,
-  ): GameEventListener;
-  public add(
-    event: GameEvent.CardPlayed,
-    priority: number,
-    execute: Execute<GameEventProperties & CardPlayedProperties>,
-  ): GameEventListener;
-  public add(
-    event: GameEvent.EndYear,
-    priority: number,
-    execute: Execute<GameEventProperties & EndYearProperties>,
-  ): GameEventListener;
+  public add(event: GameEvent.CardDrawn, priority: number, execute: Execute<CardDrawnProperties>): GameEventListener;
+  public add(event: GameEvent.CardPlayed, priority: number, execute: Execute<CardPlayedProperties>): GameEventListener;
+  public add(event: GameEvent.YearEnding, priority: number, execute: Execute<YearEndingProperties>): GameEventListener;
+  public add(event: GameEvent.YearEnded, priority: number, execute: Execute<YearEndedProperties>): GameEventListener;
   /**
    * Adds an event listener.
    * @param event The event to listen to.
@@ -57,17 +47,17 @@ export class EventHub {
     return listener;
   }
 
-  public async invoke(event: GameEvent.NewYear, props: NewYearProperties): Promise<void>;
+  public async invoke(event: GameEvent.YearStarted, props: YearStartedProperties): Promise<void>;
   public async invoke(event: GameEvent.CardDrawn, props: CardDrawnProperties): Promise<void>;
   public async invoke(event: GameEvent.CardPlayed, props: CardPlayedProperties): Promise<void>;
-  public async invoke(event: GameEvent.EndYear, props: EndYearProperties): Promise<void>;
+  public async invoke(event: GameEvent.YearEnding, props: YearEndingProperties): Promise<void>;
+  public async invoke(event: GameEvent.YearEnded, props: YearEndedProperties): Promise<void>;
   /**
    * Invokes the listeners for the specified event, in order of priority.
    * @param event The event to invoke.
    * @param props The event's properties.
    */
   public async invoke(event: GameEvent, props: any): Promise<void> {
-    props = { stop: false, ...props };
     for (const listener of this.listeners) {
       if (listener.event === event) {
         await listener.execute(props);

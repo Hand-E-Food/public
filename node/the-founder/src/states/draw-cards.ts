@@ -1,10 +1,10 @@
 import { type Card, Family } from '../cards/index.js';
-import { GameEvent, type NewYearProperties } from '../events/index.js';
+import { GameEvent, type YearStartedProperties } from '../events/index.js';
 import { eventHub, game } from '../singleton/index.js';
 import { Primitive } from './primitive.js';
 
 export class DrawCards {
-  public async execute(_props: NewYearProperties): Promise<void> {
+  public async execute(_props: YearStartedProperties): Promise<void> {
     const fedFamilies = game.containers.fedFamilyStack;
     for (let i = fedFamilies.items.length - 1; i >= 0; i--) {
       await this.animateFamily(fedFamilies.items[i] as Family);

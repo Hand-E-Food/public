@@ -3,7 +3,7 @@ import { ManualPromise } from './manual-promise.js';
 import { Modal } from './modal.js';
 
 export interface ModalTutorialParams {
-  /** This tutorial's unique key. */
+  /** This tutorial's unique key in TitleCase. */
   readonly key: string;
   /** The paragraphs to display in the tutorial. */
   readonly paragraphs: string[];

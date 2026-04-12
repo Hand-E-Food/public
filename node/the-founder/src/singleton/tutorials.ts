@@ -12,7 +12,7 @@ export class Tutorials {
 
   /**
    * Indicates whether the specified tutorial should be shown.
-   * @param key The key of the tutorial to check.
+   * @param key The key of the tutorial to check in TitleCase.
    * @returns True if the specified tutorial should be shown.
    */
   public shouldShow(key: string): boolean {
@@ -21,7 +21,7 @@ export class Tutorials {
 
   /**
    * Closes the specified tutorial for this session.
-   * @param key The key of the tutorial to close.
+   * @param key The key of the tutorial to close in TitleCase.
    */
   public close(key: string): void {
     this.closedKeys.add(key);
@@ -29,7 +29,7 @@ export class Tutorials {
 
   /**
    * Closes the specified tutorial for all sessions.
-   * @param key The key of the tutorial to close.
+   * @param key The key of the tutorial to close in TitleCase.
    */
   public closeAlways(key: string): void {
     this.closedKeys.add(key);
