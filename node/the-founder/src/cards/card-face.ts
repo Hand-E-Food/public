@@ -15,7 +15,7 @@ export class CardFace extends CardSide {
     super(params);
     this.htmlElement.classList.add('card-face');
     let innerHtml = '<div class="title">';
-    if (params.icon) innerHtml += `<img src="assets/${params.icon}" />`;
+    if (params.icon) innerHtml += `<img src="assets/icons/${params.icon}" />`;
     innerHtml += `<span>${params.name}</span></div>`;
     this.htmlElement.innerHTML += innerHtml;
   }

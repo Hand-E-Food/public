@@ -17,13 +17,13 @@ export interface ItemAction {
 export interface ItemSide {
   /** True if this item side can be inspected. */
   readonly canInspect: boolean;
-  
+
   /** This item side's background image. */
   readonly image: string;
-  
+
   /** This item side's name. */
   readonly name: string;
-  
+
   /** This item side's flavour text as HTML. Include `<p>` tags. */
   readonly flavourText: string;
 
@@ -117,11 +117,14 @@ export abstract class Item {
     to: { left?: string; top?: string; width?: string; height?: string },
     zIndex?: number,
   ): Promise<void> {
-    if (zIndex !== undefined) {
-      setTimeout(() => {
-        this.htmlElement.style.zIndex = `${zIndex}`;
-      }, this.animationDuration / 2);
+    const movement = this.htmlElement.animate([to], { duration: this.animationDuration, fill: 'forwards' });
+    if (zIndex === undefined) {
+      await movement.finished;
+    } else {
+      const oldZIndex = this.htmlElement.style.zIndex ? parseInt(this.htmlElement.style.zIndex) : 0;
+      this.htmlElement.style.zIndex = `${Math.max(oldZIndex, zIndex)}`;
+      await movement.finished;
+      this.htmlElement.style.zIndex = `${zIndex}`;
     }
-    await this.htmlElement.animate([{}, to], { duration: this.animationDuration, fill: 'forwards' }).finished;
   }
 }
