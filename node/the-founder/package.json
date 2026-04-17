@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && cpx \"static/**\" dist",
+    "clean": "rm -rf ./dist",
     "format": "eslint --fix ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "npm-run-all --parallel watch:*",

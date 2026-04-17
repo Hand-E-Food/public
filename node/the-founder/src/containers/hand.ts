@@ -1,7 +1,9 @@
 import { Card } from '../cards/index.js';
 import { Spacing } from './constants.js';
 import { Container } from './container.js';
-import { DiscardPile, DrawDeck, ZIndex } from './index.js';
+import { DiscardPile } from './discard-pile.js';
+import { DrawDeck } from './draw-deck.js';
+import { ZIndex } from './z-index.js';
 
 export class Hand extends Container {
   public static readonly left = DrawDeck.left + DrawDeck.width + Spacing;

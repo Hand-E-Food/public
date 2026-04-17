@@ -24,7 +24,7 @@ export class BoosterTray extends Container {
 
   override async addItems(...items: Item[]): Promise<void> {
     const promises: Promise<void>[] = [super.addItems(...items)];
-    let zIndex = ZIndex.Overlay + this.items.length;
+    let zIndex = ZIndex.Overlay + this.items.length + items.length;
     for (const item of items) {
       promises.push(
         item.move({ left: `calc(50vw - ${item.width / 2}px)`, top: `calc(50vh - ${item.height / 2}px)` }, zIndex),

@@ -3,6 +3,7 @@ import { Card } from '../cards/index.js';
 import type { Item } from '../item.js';
 import { Spacing } from './constants.js';
 import { Container } from './container.js';
+import { FedFamilyStack } from './fed-family-stack.js';
 import { ZIndex } from './z-index.js';
 
 export class BoosterPacks extends Container {
@@ -15,7 +16,7 @@ export class BoosterPacks extends Container {
 
   protected async arrange(): Promise<void> {
     const promises: Promise<void>[] = [];
-    const step = BoosterPack.width + Spacing;
+    const step = FedFamilyStack.left + FedFamilyStack.width + Spacing;
     let left = Spacing * 3 + Card.width * 2.5;
     const top = Spacing;
     let zIndex = ZIndex.LowerStack;

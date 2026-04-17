@@ -1,7 +1,8 @@
 import { Card } from '../cards/card.js';
 import { Spacing } from './constants.js';
 import { Container } from './container.js';
-import { NegativeStack, ZIndex } from './index.js';
+import { NegativeStack } from './negative-stack.js';
+import { ZIndex } from './z-index.js';
 
 /** Contains families that have been fed. */
 export class FedFamilyStack extends Container {

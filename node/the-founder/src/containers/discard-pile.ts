@@ -1,7 +1,7 @@
 import { Card } from '../cards/index.js';
 import { Spacing } from './constants.js';
 import { Container } from './container.js';
-import { ZIndex } from './index.js';
+import { ZIndex } from './z-index.js';
 
 export class DiscardPile extends Container {
   public static readonly right = Spacing;

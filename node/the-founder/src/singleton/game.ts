@@ -38,7 +38,7 @@ export class Game {
   public readonly resourcesPerBooster = 4;
 
   /** The current game year. */
-  public year: number = 1800;
+  public year: number = 1799;
 
   public constructor() {
     this.htmlElement = document.createElement('div');
@@ -51,14 +51,14 @@ export class Game {
    * @param items The items to add.
    */
   // Use the spread operation to ensure the array is not modified during the operation.
-  public addItems(container: Container | undefined, ...items: Item[]): void {
+  public async addItems(container: Container | undefined, ...items: Item[]): Promise<void> {
     for (const item of items) {
       if (this.items.includes(item)) throw new Error('Cannot add the same item twice.');
       item.onClickedListener = (item, modifier) => this.onItemClicked?.(item, modifier);
       this.htmlElement.appendChild(item.htmlElement);
     }
     this.items.push(...items);
-    container?.addItems(...items);
+    await container?.addItems(...items);
   }
 
   /**

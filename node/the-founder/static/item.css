@@ -3,9 +3,9 @@ div.item {
 }
 
 div.booster {
-  left: calc(50vw - 85px);
+  left: calc(50vw - 80px);
   top: calc(50vh - 115px);
-  width: 170px;
+  width: 160px;
   height: 230px;
 }
 
