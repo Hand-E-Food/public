@@ -132,13 +132,13 @@ class ResourceData {
   }
   /** Sets the quantity of the resource. */
   public set quantity(value: number) {
+    if (value !== 0) this.htmlElement.classList.remove('hidden');
     if (value < this._quantity) {
       this.text.animate([{ color: '#ff0000' }, {}], { duration: 500 });
     } else if (value > this._quantity) {
       this.text.animate([{ color: '#0080ff' }, {}], { duration: 500 });
     }
     this.text.innerText = value.toString();
-    this.htmlElement.classList.remove('hidden');
     this._quantity = value;
   }
 }

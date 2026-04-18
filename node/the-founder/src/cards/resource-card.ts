@@ -49,7 +49,7 @@ class ProduceResourcesAction implements ItemAction {
   public constructor(private readonly produce: ProduceQuantities) {
     let text = 'Produce';
     for (const [key, quantity] of Object.entries(produce)) {
-      const resource = key as unknown as Resource;
+      const resource = Number(key) as Resource;
       const img = resourceImage(resource, 'inline');
       text += ` ${quantity} ${img.outerHTML}`;
     }
@@ -59,10 +59,10 @@ class ProduceResourcesAction implements ItemAction {
 
   async execute(_item: Item): Promise<void> {
     for (const [key, quantity] of Object.entries(this.produce)) {
-      const resource = key as unknown as Resource;
+      const resource = Number(key) as Resource;
       game.resources.resources[resource].quantity += quantity;
     }
-    await Promise.all([this.item.flip(), game.containers.discardPile.addItems(this.item)]);
+    await game.containers.discardPile.addItems(this.item);
   }
 }
 
