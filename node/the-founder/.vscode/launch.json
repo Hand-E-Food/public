@@ -13,6 +13,16 @@
       "pathMapping": {
         "/": "${workspaceFolder}/dist"
       }
+    },
+    {
+      "name": "Launch Edge",
+      "request": "launch",
+      "type": "msedge",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/dist/**",
+      "pathMapping": {
+        "/": "${workspaceFolder}/dist"
+      }
     }
   ]
 }

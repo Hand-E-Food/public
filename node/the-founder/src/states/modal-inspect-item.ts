@@ -1,4 +1,4 @@
-import type { Item,ItemAction } from '../item.js';
+import type { Item, ItemAction } from '../item.js';
 import { ManualPromise } from './manual-promise.js';
 import { Modal } from './modal.js';
 
@@ -23,18 +23,18 @@ export class ModalInspectItem extends Modal {
     const img = document.createElement('img');
     img.src = `assets/${side.image}`;
     modal.appendChild(img);
-    
+
     const textPanel = document.createElement('div');
     textPanel.classList.add('text-panel');
     textPanel.innerHTML = `<h2>${side.name}</h2>${side.flavourText}`;
     modal.appendChild(textPanel);
 
     for (const action of side.actions) {
-      if (!action.isVisible) continue;
+      if (action.state === 'hidden') continue;
       const button = document.createElement('p');
       button.classList.add('action');
       button.innerHTML = action.text;
-      if (action.isEnabled) button.onclick = () => this.onActionClicked(action);
+      if (action.state === 'enabled') button.onclick = () => this.onActionClicked(action);
       else button.classList.add('disabled');
       textPanel.appendChild(button);
     }

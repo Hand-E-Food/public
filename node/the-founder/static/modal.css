@@ -50,12 +50,18 @@ div.text-panel p {
 }
 
 .action.disabled {
-  color: red;
+  color: #f45230;
 }
 
 .action:active {
   border-style: inset;
   padding: 6px 4px 4px 6px;
+}
+
+img.inline {
+  display: inline-block;
+  height: 1em;
+  vertical-align: middle;
 }
 
 div.year {

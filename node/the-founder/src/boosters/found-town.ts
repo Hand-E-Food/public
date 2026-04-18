@@ -57,9 +57,8 @@ export class FoundTown extends BoosterPack {
 }
 
 class FoundTownAction implements ItemAction {
-  public readonly isEnabled = true;
-  public readonly isVisible = true;
-  public readonly text = 'Found a new town.';
+  readonly state = 'enabled';
+  readonly text = 'Found a new town.';
 
   public async execute(item: Item): Promise<void> {
     await new OpenBoosterPack(item as BoosterPack).execute();

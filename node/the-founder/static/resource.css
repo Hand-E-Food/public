@@ -1,0 +1,31 @@
+.resources {
+  position: absolute;
+  text-align: center;
+  color: sandybrown;
+  text-wrap: nowrap;
+}
+
+.resource {
+  margin: 0px 5px;
+  height: 40px;
+  text-align: right;
+}
+
+.resource > span {
+  margin: 0px 5px 0px 0px;
+  width: 32px;
+  display: inline-block;
+  font-size: 32px;
+  vertical-align: middle;
+}
+
+.resource > img {
+  margin: 0px;
+  height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hidden {
+  display: none;
+}

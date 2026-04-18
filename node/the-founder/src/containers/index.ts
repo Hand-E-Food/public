@@ -4,6 +4,7 @@ export * from './z-index.js';
 
 export * from './draw-deck.js';
 export * from './discard-pile.js';
+export * from './resources.js';
 export * from './hand.js';
 
 export * from './positive-stack.js';

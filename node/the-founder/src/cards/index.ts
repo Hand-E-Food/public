@@ -3,6 +3,6 @@ export type * from './card-side.js';
 export * from './discontent.js';
 export * from './family.js';
 export * from './positive-card.js';
-export * from './resource.js';
+export * from './resource-card.js';
 export * from './self-sufficient-family.js';
 export * from './your-family.js';

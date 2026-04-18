@@ -1,11 +1,10 @@
 import type { Container } from './containers/container.js';
 
-export interface ItemAction {
-  /** True if this action can be executed. */
-  readonly isEnabled: boolean;
+export type ItemActionState = 'enabled' | 'disabled' | 'hidden';
 
-  /** True if this action is visible to the player. */
-  readonly isVisible: boolean;
+export interface ItemAction {
+  /** Indicates whether this action can be executed or seen. */
+  readonly state: ItemActionState;
 
   /** This action's text as HTML. */
   readonly text: string;

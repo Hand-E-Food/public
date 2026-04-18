@@ -44,15 +44,20 @@ export class PlayerPhase {
    * @param _modifier The active modifier when the item was clicked.
    */
   private async onItemClicked(item: Item, modifier: number): Promise<void> {
+    let execute: () => Promise<void>;
     if (modifier === 0) {
       if (!item.activeSide.canInspect) return;
       this.disable();
-      await new ModalInspectItem({ item }).execute();
+      execute = () => new ModalInspectItem({ item }).execute();
       this.enable();
     } else {
       const action = item.activeSide.actions[modifier - 1];
-      if (!action) return;
+      if (action?.state !== 'enabled') return;
+      execute = () => action.execute(item);
     }
+    this.disable();
+    await execute();
+    this.enable();
   }
 
   private async onEndYearClicked(): Promise<void> {

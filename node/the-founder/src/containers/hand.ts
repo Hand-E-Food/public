@@ -3,11 +3,12 @@ import { Spacing } from './constants.js';
 import { Container } from './container.js';
 import { DiscardPile } from './discard-pile.js';
 import { DrawDeck } from './draw-deck.js';
+import { Resources } from './resources.js';
 import { ZIndex } from './z-index.js';
 
 export class Hand extends Container {
   public static readonly left = DrawDeck.left + DrawDeck.width + Spacing;
-  public static readonly bottom = Spacing;
+  public static readonly bottom = Resources.bottom + Resources.height + Spacing;
   public static readonly right = DiscardPile.right + DiscardPile.width + Spacing;
   public static readonly height = Card.height;
 

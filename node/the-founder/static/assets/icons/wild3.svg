@@ -3,7 +3,7 @@
   <g transform-origin="center" transform="scale(0.5)">
     <g transform-origin="center" transform="translate(0 -57.73502692)">
       <!-- food -->
-      <path d="M 50 30 Q 50 20 60 20 Q 90 20 90 50 Q 90 80 60 80 Q 50 80 50 70 Q 50 80 40 80 Q 10 80 10 50 Q 10 20 40 20 Q 50 20 50 30 Z" fill="green" />
+      <path d="M 50 30 Q 50 20 60 20 Q 90 20 90 50 Q 90 80 60 80 Q 50 80 50 70 Q 50 80 40 80 Q 10 80 10 50 Q 10 20 40 20 Q 50 20 50 30 Z" fill="green" stroke="none"/>
     </g>
     <g transform-origin="center" transform="translate(-50 28.86751346)">
     <!-- wood -->
@@ -13,7 +13,7 @@
     </g>
     <g transform-origin="center" transform="translate(50 28.86751346)">
       <!-- stone -->
-      <rect x="10" y="20" width="80" height="60" fill="gray"/>
+      <rect x="10" y="20" width="80" height="60" fill="gray" stroke="none"/>
     </g>
   </g>
 </svg>

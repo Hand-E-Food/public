@@ -8,6 +8,7 @@ import {
   Hand,
   NegativeStack,
   PositiveStack,
+  Resources,
 } from '../containers/index.js';
 import type { Item } from '../item.js';
 import { Primitive } from '../states/primitive.js';
@@ -34,6 +35,9 @@ export class Game {
   /** A callback function to be called when an item is clicked. */
   public onItemClicked: ((item: Item, modifier: number) => void | Promise<void>) | null = null;
 
+  /** This game's resource container. */
+  public readonly resources = new Resources();
+
   /** The number of resources available per booster pack. */
   public readonly resourcesPerBooster = 4;
 
@@ -43,6 +47,7 @@ export class Game {
   public constructor() {
     this.htmlElement = document.createElement('div');
     this.htmlElement.classList.add('game');
+    this.htmlElement.appendChild(this.resources.htmlElement);
   }
 
   /**
