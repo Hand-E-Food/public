@@ -31,6 +31,13 @@ export class Resources {
     this.htmlElement = htmlElement;
   }
 
+  /** Resets all resource quantities to zero. */
+  public clear(): void {
+    for (const resource of Object.values(this.resources)) {
+      if (resource.quantity) resource.quantity = 0;
+    }
+  }
+
   /**
    * Checks if there are sufficient resources to pay the specified quantities, including using wild resources.
    * @param quantities The resources to spend.
