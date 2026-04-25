@@ -18,7 +18,7 @@ class HungryFamily extends NegativeCardFace {
     super({
       canInspect: true,
       name: 'Hungry Family',
-      image: 'hungry-family.jpg',
+      image: 'family-hungry.png',
       flavourText: '<p><i>A hungry family will work to support themselves before helping the community.</i></p>',
       actions: [new FeedFamilyAction()],
     });
@@ -30,7 +30,7 @@ class FedFamily extends CardFace {
     super({
       canInspect: true,
       name: 'Fed Family',
-      image: 'fed-family.jpg',
+      image: 'family-fed.png',
       flavourText:
         '<p><i>A fed family will be productive and help the community grow.</i></p>' +
         '<p>At the start of the year, draw a card and flip this card.</p>',

@@ -126,4 +126,6 @@ export abstract class Item {
       this.htmlElement.style.zIndex = `${zIndex}`;
     }
   }
+
+  public destroy(): void {}
 }

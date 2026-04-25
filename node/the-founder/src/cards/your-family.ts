@@ -14,7 +14,7 @@ class YourFamilyFace extends CardFace {
     super({
       canInspect: true,
       name: 'Your Family',
-      image: 'fed-family.jpg',
+      image: 'family-fed.png',
       flavourText:
         '<p><i>Your beloved family. As mayor, your needs are catered for and your family is always happy to ' +
         'contribute to the community.</i></p>' +

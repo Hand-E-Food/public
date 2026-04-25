@@ -15,7 +15,7 @@ class FedFamily extends CardFace {
     super({
       canInspect: true,
       name: 'Self-Sufficient Family',
-      image: 'fed-family.jpg',
+      image: 'family-fed.png',
       flavourText:
         '<p><i>This family have secured their needs and are always happy to contribute to the community.</i></p>' +
         '<p>At the start of each year, draw a card.</p>',

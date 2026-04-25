@@ -55,7 +55,6 @@ div.title {
   width: calc(100% - 14px);
   height: 20px;
   display: flex;
-  background-color: #bb876f;
   border-radius: 5px;
   align-items: center;
 }
@@ -76,4 +75,10 @@ div.title > span {
   align-content: center;
   text-align: center;
   font-size: 16px;
+  font-weight: bold;
+  text-shadow:
+    +1px +1px 0 #f6cf94,
+    -1px +1px 0 #f6cf94,
+    -1px -1px 0 #f6cf94,
+    +1px -1px 0 #f6cf94;
 }

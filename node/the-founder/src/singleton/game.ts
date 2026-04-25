@@ -72,7 +72,10 @@ export class Game {
    */
   // Use the spread operation to ensure the array is not modified during the operation.
   public async destroyItems(...items: Item[]): Promise<void> {
-    for (const item of items) item.htmlElement.onclick = null;
+    for (const item of items) {
+      item.htmlElement.onclick = null;
+      item.destroy();
+    }
     await Promise.all(items.map((item) => Primitive.fadeOut(item.htmlElement, item.animationDuration)));
     for (let i = this.items.length - 1; i >= 0; i--) if (items.includes(this.items[i]!)) this.items.splice(i, 1);
     await this.removeFromContainers(items);

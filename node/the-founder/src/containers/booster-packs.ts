@@ -1,5 +1,4 @@
 import { BoosterPack } from '../boosters/booster-pack.js';
-import { Card } from '../cards/index.js';
 import type { Item } from '../item.js';
 import { Spacing } from './constants.js';
 import { Container } from './container.js';
@@ -16,13 +15,12 @@ export class BoosterPacks extends Container {
 
   protected async arrange(): Promise<void> {
     const promises: Promise<void>[] = [];
-    const step = FedFamilyStack.left + FedFamilyStack.width + Spacing;
-    let left = Spacing * 3 + Card.width * 2.5;
+    let left = FedFamilyStack.left + FedFamilyStack.width + Spacing;
     const top = Spacing;
     let zIndex = ZIndex.LowerStack;
     for (const item of this.items) {
       promises.push(item.move({ left: `${left}px`, top: `${top}px` }, zIndex));
-      left += step;
+      left += item.width + Spacing;
       zIndex++;
     }
     await Promise.all(promises);

@@ -1,6 +1,9 @@
 import { Card } from '../cards/index.js';
 import type { Container } from '../containers/index.js';
-import { Item, type ItemAction, type ItemSide } from '../item.js';
+import { Item, type ItemAction, type ItemActionState, type ItemSide } from '../item.js';
+import type { PayQuantities } from '../resource.js';
+import { game } from '../singleton/index.js';
+import { OpenBoosterPack } from '../states/index.js';
 
 export interface BoosterPackParams {
   readonly image: string;
@@ -33,7 +36,8 @@ export abstract class BoosterPack extends Item implements ItemSide {
     this.flavourText = params.flavourText;
     this.actions = params.actions;
     this.htmlElement.classList.add('item', 'booster', 'side');
-    this.htmlElement.innerHTML += `<img src="assets/${params.image}" /><span class='title'>${params.name}</span>`;
+    this.htmlElement.innerHTML += `<img src="assets/${params.image}" />`;
+    this.htmlElement.innerHTML += `<div class='title'><span>${params.name}</span></div>`;
   }
 
   public open(): BoosterItemGroup[] {
@@ -49,3 +53,27 @@ export type BoosterItemGroup = {
   readonly container: Container;
   readonly items: Item[];
 };
+
+export type OpenBoosterPackActionParams = {
+  readonly text: string;
+  readonly cost: PayQuantities;
+};
+
+export class OpenBoosterPackAction implements ItemAction {
+  protected readonly cost: PayQuantities;
+  public readonly text: string;
+
+  public constructor(params: OpenBoosterPackActionParams) {
+    this.cost = params.cost;
+    this.text = params.text;
+  }
+
+  public async execute(item: Item): Promise<void> {
+    game.resources.spend(this.cost);
+    await new OpenBoosterPack(item as BoosterPack).execute();
+  }
+
+  public get state(): ItemActionState {
+    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
+  }
+}

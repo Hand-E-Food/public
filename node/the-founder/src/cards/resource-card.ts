@@ -66,13 +66,68 @@ class ProduceResourcesAction implements ItemAction {
   }
 }
 
+export class Crop extends ResourceCard {
+  public constructor() {
+    super({
+      name: 'Crop',
+      image: 'crop.png',
+      flavourText: '',
+      produce: { [Resource.Food]: 2 },
+    });
+  }
+}
+
 export class Fish extends ResourceCard {
   public constructor() {
     super({
       name: 'Fish',
-      image: 'fish.jpg',
+      image: 'fish.png',
       flavourText: '',
       produce: { [Resource.Food]: 2 },
+    });
+  }
+}
+
+export class Livestock extends ResourceCard {
+  public constructor() {
+    super({
+      name: 'Livestock',
+      image: 'livestock.png',
+      flavourText: '',
+      produce: { [Resource.Food]: 4 },
+    });
+  }
+}
+
+export class Gold extends ResourceCard {
+  public constructor() {
+    super({
+      name: 'Gold',
+      image: 'gold.png',
+      flavourText: '',
+      produce: { [Resource.Luxury]: 2 },
+    });
+  }
+}
+
+export class Stone extends ResourceCard {
+  public constructor() {
+    super({
+      name: 'Stone',
+      image: 'stone.png',
+      flavourText: '',
+      produce: { [Resource.Stone]: 2 },
+    });
+  }
+}
+
+export class Wine extends ResourceCard {
+  public constructor() {
+    super({
+      name: 'Wine',
+      image: 'wine.png',
+      flavourText: '',
+      produce: { [Resource.Luxury]: 2 },
     });
   }
 }
@@ -81,7 +136,7 @@ export class Wood extends ResourceCard {
   public constructor() {
     super({
       name: 'Wood',
-      image: 'wood.jpg',
+      image: 'wood.png',
       flavourText: '',
       produce: { [Resource.Wood]: 2 },
     });

@@ -1,18 +1,25 @@
 import { Family, Fish, PositiveCard, SelfSufficientFamily, Wood, YourFamily } from '../cards/index.js';
-import { Item, type ItemAction } from '../item.js';
+import { Item } from '../item.js';
 import { game } from '../singleton/index.js';
-import { OpenBoosterPack } from '../states/open-booster-pack.js';
-import { type BoosterItemGroup, BoosterPack } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { Farm } from './farm.js';
+import { Quarry } from './quarry.js';
+import { Vineyard } from './vineyard.js';
 
 export class FoundTown extends BoosterPack {
   public constructor() {
     super({
-      image: 'found-town.jpg',
+      image: 'found-town.png',
       name: 'Found Your Town',
       flavourText:
         '<p><i>Your caravan has trundled across the landscape for weeks. You arrive at a land bordered by rich ' +
         'mountains, fresh water, fertile soil, and generous woodlands. This is your promised land.</i></p>',
-      actions: [new FoundTownAction()],
+      actions: [
+        new OpenBoosterPackAction({
+          text: 'Found a new town.',
+          cost: {},
+        }),
+      ],
     });
   }
 
@@ -23,15 +30,15 @@ export class FoundTown extends BoosterPack {
         items: [
           new PositiveCard({
             name: 'Town Square',
-            image: 'town-square.avif',
+            image: 'town-square.png',
           }),
           new PositiveCard({
             name: 'Fishery',
-            image: 'fishery.jpg',
+            image: 'fishery.png',
           }),
           new PositiveCard({
-            name: 'Logger',
-            image: 'logger.jpg',
+            name: 'Logging Camp',
+            image: 'logging-camp.png',
           }),
         ],
       },
@@ -46,6 +53,10 @@ export class FoundTown extends BoosterPack {
           ...Item.multiple(game.resourcesPerBooster, () => new Wood()),
         ],
       },
+      {
+        container: game.containers.boosterPacks,
+        items: [new Farm(), new Quarry(), new Vineyard()],
+      },
     ];
   }
 
@@ -53,14 +64,5 @@ export class FoundTown extends BoosterPack {
     const family = new Family();
     family.flip();
     return family;
-  }
-}
-
-class FoundTownAction implements ItemAction {
-  readonly state = 'enabled';
-  readonly text = 'Found a new town.';
-
-  public async execute(item: Item): Promise<void> {
-    await new OpenBoosterPack(item as BoosterPack).execute();
   }
 }

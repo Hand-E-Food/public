@@ -31,7 +31,7 @@ export abstract class Card extends Item {
     for (const side of this.sides) {
       if (first) first = false;
       else side.htmlElement.classList.add('reverse');
-      (side as any).card = this;
+      (side as any).item = this;
       this.flipDiv.appendChild(side.htmlElement);
     }
     this.htmlElement.classList.add('item', 'card');
