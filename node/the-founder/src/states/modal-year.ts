@@ -1,6 +1,6 @@
 import { game } from '../singleton/index.js';
 import { Modal } from './modal.js';
-import { Primitive } from './primitive.js';
+import { Animate } from './animate.js';
 
 /** Displays the current year. */
 export class ModalYear extends Modal {
@@ -25,7 +25,7 @@ export class ModalYear extends Modal {
   protected override waitClosed(): Promise<void> {
     return new Promise((resolve) => {
       this.htmlElement.onclick = () => resolve();
-      setTimeout(resolve, Primitive.defaultDuration);
+      setTimeout(resolve, Animate.defaultDuration);
     });
   }
 }

@@ -2,8 +2,8 @@ import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js'
 import { Item } from '../item.js';
 import { PromiseQueue } from '../promise-queue.js';
 import { game } from '../singleton/index.js';
+import { Animate } from './animate.js';
 import { ModalTutorial } from './modal-tutorial.js';
-import { Primitive } from './primitive.js';
 
 export class OpenBoosterPack {
   public groups!: BoosterItemGroup[];
@@ -15,7 +15,7 @@ export class OpenBoosterPack {
 
   public async execute(): Promise<void> {
     const boosterTray = game.containers.boosterTray;
-    await Primitive.fadeIn(boosterTray.htmlElement);
+    await Animate.fadeIn(boosterTray.htmlElement);
     await boosterTray.addBoosterPack(this.boosterPack);
     this.groups = this.boosterPack.open();
     game.addItems(game.containers.boosterTray, ...this.groups.flatMap((group) => group.items));
@@ -30,7 +30,7 @@ export class OpenBoosterPack {
     } else {
       await this.distributeAllItems();
     }
-    await Primitive.fadeOut(boosterTray.htmlElement);
+    await Animate.fadeOut(boosterTray.htmlElement);
   }
 
   private async waitClickBoosterPack(): Promise<void> {
@@ -48,9 +48,11 @@ export class OpenBoosterPack {
     return ModalTutorial.show({
       key: 'OpenBoosterPack',
       paragraphs: [
-        "You've just opened a booster pack! Each booster pack contains cards and/or more booster packs. Click each pile to distribute them to the game.",
+        "You've just opened a booster pack! Each booster pack contains cards and/or more booster packs. Click each " +
+          'pile to distribute them to the game.',
         'You will learn the details of each card as it becomes relevent.',
-        '<strong>Tip:</strong> You can <strong>right-click</strong> or <strong>shift+click</strong> a booster pack to quickly distribute its contents.',
+        '<strong>Tip:</strong> You can <strong>right-click</strong> or <strong>shift+click</strong> a booster pack ' +
+          'to quickly distribute its contents.',
       ],
       left: 'calc(50vw - 200px)',
       width: '400px',

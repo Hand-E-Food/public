@@ -1,5 +1,4 @@
 import type { ItemAction, ItemSide } from '../item.js';
-import type { Card } from './card.js';
 
 export interface CardSideParams {
   /**
@@ -23,9 +22,6 @@ export interface CardSideParams {
 
 /** One side of a card. */
 export class CardSide implements ItemSide {
-  /** The card this side belongs to. */
-  protected readonly card!: Card;
-
   public readonly canInspect: boolean;
   public readonly flavourText: string;
   /** This card side's HTML element. */

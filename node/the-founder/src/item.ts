@@ -3,13 +3,24 @@ import type { Container } from './containers/container.js';
 export type ItemActionState = 'enabled' | 'disabled' | 'hidden';
 
 export interface ItemAction {
-  /** Indicates whether this action can be executed or seen. */
-  readonly state: ItemActionState;
+  /**
+   * Gets this action's text as HTML.
+   * @param item This action's parent item.
+   * @returns This action's text as HTML.
+   */
+  getText(item: Item): string;
 
-  /** This action's text as HTML. */
-  readonly text: string;
+  /**
+   * Indicates whether this action can be executed or seen.
+   * @param item This action's parent item.
+   * @returns This action's current state.
+   */
+  getState(item: Item): ItemActionState;
 
-  /** Executes this action. */
+  /**
+   * Executes this action.
+   * @param item This action's parent item.
+   */
   execute(item: Item): Promise<void>;
 }
 

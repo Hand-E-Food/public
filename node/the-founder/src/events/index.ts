@@ -21,7 +21,9 @@ export enum GameEvent {
 
   /**
    * Invoked when a player ends the year to validate whether requirements have been met.
+   * -  0: town founded
    * - 10: validate all families fed
+   * - 20: validate morale is not negative
    */
   YearEnding,
 

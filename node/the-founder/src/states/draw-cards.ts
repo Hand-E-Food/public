@@ -1,7 +1,7 @@
 import { type Card, Family } from '../cards/index.js';
 import { GameEvent, type YearStartedProperties } from '../events/index.js';
 import { eventHub, game } from '../singleton/index.js';
-import { Primitive } from './primitive.js';
+import { Animate } from './animate.js';
 
 export class DrawCards {
   public async execute(_props: YearStartedProperties): Promise<void> {
@@ -13,7 +13,7 @@ export class DrawCards {
   }
 
   private async animateFamily(family: Family) {
-    const promises: Promise<void>[] = [Primitive.glow(family.htmlElement, family.animationDuration)];
+    const promises: Promise<void>[] = [Animate.glow(family.htmlElement, family.animationDuration)];
     if (family instanceof Family) promises.push(family.flip(), game.containers.negativeStack.addItems(family));
     await Promise.all(promises);
   }

@@ -1,8 +1,8 @@
 import { FoundTown } from './boosters/index.js';
 import { GameEvent, type YearEndedProperties, type YearStartedProperties } from './events/index.js';
-import { AllFamiliesFedValidation, TownFoundedValidation } from './rules/index.js';
+import { AllFamiliesFedValidation, NegativeMoraleValidation, TownFoundedValidation } from './rules/index.js';
 import { eventHub, game } from './singleton/index.js';
-import { DrawCards, ModalTitleScreen, ModalYear, PlayerPhase, Primitive, YearEnded } from './states/index.js';
+import { Animate, DrawCards, ModalTitleScreen, ModalYear, PlayerPhase, YearEnded } from './states/index.js';
 
 export class Main {
   private readonly drawCards = new DrawCards();
@@ -18,6 +18,7 @@ export class Main {
       eventHub.add(GameEvent.YearEnded, 20, (props) => this.yearEnded.discardHand(props)),
       eventHub.add(GameEvent.YearEnded, 50, (props) => this.yearEnded.checkMorale(props)),
       new AllFamiliesFedValidation().listener,
+      new NegativeMoraleValidation().listener,
       new TownFoundedValidation().listener,
     ];
     await this.showTitleScreen();
@@ -35,8 +36,8 @@ export class Main {
     const boosterPack = new FoundTown();
     await Promise.all([
       game.addItems(game.containers.boosterPacks, boosterPack),
-      Primitive.fadeIn(boosterPack.htmlElement),
-      Primitive.fadeIn(this.playerPhase.endYearButton),
+      Animate.fadeIn(boosterPack.htmlElement),
+      Animate.fadeIn(this.playerPhase.endYearButton),
     ]);
   }
 

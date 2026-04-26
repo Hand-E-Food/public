@@ -1,11 +1,12 @@
 import { Crop, Discontent, Family, PositiveCard } from '../cards/index.js';
 import { Item } from '../item.js';
-import { Resource } from '../resource.js';
+import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
 import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
 
 export class Farm extends BoosterPack {
   public constructor() {
+    const cost: PayQuantities = { [Resource.Wood]: 6 };
     super({
       image: 'farm.png',
       name: 'Farm',
@@ -14,8 +15,8 @@ export class Farm extends BoosterPack {
         'focus on producing food.</i></p>',
       actions: [
         new OpenBoosterPackAction({
-          text: 'Build a farm.',
-          cost: { [Resource.Wood]: 6 },
+          text: `Pay ${formatQuantities(cost)}. Build a farm.`,
+          cost,
         }),
       ],
     });

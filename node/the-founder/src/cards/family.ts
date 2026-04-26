@@ -42,12 +42,12 @@ class FedFamily extends CardFace {
 class FeedFamilyAction implements ItemAction {
   private cost: PayQuantities = { [Resource.Food]: 1 };
 
-  get state(): ItemActionState {
-    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
+  public getText(_item: Item): string {
+    return `Pay ${formatQuantities(this.cost)} and flip this card.`;
   }
 
-  get text(): string {
-    return `Pay ${formatQuantities(this.cost)} and flip this card.`;
+  public getState(_item: Item): ItemActionState {
+    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
   }
 
   async execute(item: Item): Promise<void> {

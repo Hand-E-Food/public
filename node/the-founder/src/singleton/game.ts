@@ -9,9 +9,11 @@ import {
   NegativeStack,
   PositiveStack,
   Resources,
+  StorageItems,
+  StorageSpace,
 } from '../containers/index.js';
 import type { Item } from '../item.js';
-import { Primitive } from '../states/primitive.js';
+import { Animate } from '../states/index.js';
 
 /** A singleton game environment. */
 export class Game {
@@ -27,6 +29,8 @@ export class Game {
     hand: new Hand(),
     negativeStack: new NegativeStack(),
     positiveStack: new PositiveStack(),
+    storageItems: new StorageItems(),
+    storageSpace: new StorageSpace(),
   };
 
   /** This game's HTML element. */
@@ -76,7 +80,7 @@ export class Game {
       item.htmlElement.onclick = null;
       item.destroy();
     }
-    await Promise.all(items.map((item) => Primitive.fadeOut(item.htmlElement, item.animationDuration)));
+    await Promise.all(items.map((item) => Animate.fadeOut(item.htmlElement, item.animationDuration)));
     for (let i = this.items.length - 1; i >= 0; i--) if (items.includes(this.items[i]!)) this.items.splice(i, 1);
     await this.removeFromContainers(items);
   }

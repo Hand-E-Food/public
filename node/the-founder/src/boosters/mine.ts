@@ -1,6 +1,6 @@
 import { Discontent, Family, Gold, PositiveCard, Stone } from '../cards/index.js';
 import { Item } from '../item.js';
-import { formatQuantities, Resource, type PayQuantities } from '../resource.js';
+import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
 import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
 

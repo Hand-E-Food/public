@@ -30,11 +30,12 @@ export class ModalInspectItem extends Modal {
     modal.appendChild(textPanel);
 
     for (const action of side.actions) {
-      if (action.state === 'hidden') continue;
+      const state = action.getState(params.item);
+      if (state === 'hidden') continue;
       const button = document.createElement('p');
       button.classList.add('action');
-      button.innerHTML = action.text;
-      if (action.state === 'enabled') button.onclick = () => this.onActionClicked(action);
+      button.innerHTML = action.getText(params.item);
+      if (state === 'enabled') button.onclick = () => this.onActionClicked(action);
       else button.classList.add('disabled');
       textPanel.appendChild(button);
     }

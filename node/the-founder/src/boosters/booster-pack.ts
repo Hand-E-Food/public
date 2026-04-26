@@ -60,20 +60,25 @@ export type OpenBoosterPackActionParams = {
 };
 
 export class OpenBoosterPackAction implements ItemAction {
+  private readonly text: string;
+
   protected readonly cost: PayQuantities;
-  public readonly text: string;
 
   public constructor(params: OpenBoosterPackActionParams) {
     this.cost = params.cost;
     this.text = params.text;
   }
 
+  public getText(_item: Item): string {
+    return this.text;
+  }
+
+  public getState(_item: Item): ItemActionState {
+    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
+  }
+
   public async execute(item: Item): Promise<void> {
     game.resources.spend(this.cost);
     await new OpenBoosterPack(item as BoosterPack).execute();
-  }
-
-  public get state(): ItemActionState {
-    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
   }
 }

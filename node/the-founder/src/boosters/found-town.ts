@@ -4,6 +4,7 @@ import { game } from '../singleton/index.js';
 import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
 import { Farm } from './farm.js';
 import { Quarry } from './quarry.js';
+import { StorageSpace } from './storage-space.js';
 import { Vineyard } from './vineyard.js';
 
 export class FoundTown extends BoosterPack {
@@ -55,7 +56,7 @@ export class FoundTown extends BoosterPack {
       },
       {
         container: game.containers.boosterPacks,
-        items: [new Farm(), new Quarry(), new Vineyard()],
+        items: [new Farm(), new Quarry(), new Vineyard(), new StorageSpace(0)],
       },
     ];
   }

@@ -17,7 +17,7 @@ export class Hand extends Container {
     const step = Card.width + Spacing / 2;
     let left = Hand.left;
     const top = -Hand.bottom - Hand.height;
-    let zIndex = ZIndex.LowerStack;
+    let zIndex = ZIndex.UpperStack;
     for (const item of this.items) {
       promises.push(item.move({ left: `${left}px`, top: `calc(100vh + ${top}px)` }, zIndex));
       left += step;

@@ -52,7 +52,7 @@ export class PlayerPhase {
       this.enable();
     } else {
       const action = item.activeSide.actions[modifier - 1];
-      if (action?.state !== 'enabled') return;
+      if (action?.getState(item) !== 'enabled') return;
       execute = () => action.execute(item);
     }
     this.disable();

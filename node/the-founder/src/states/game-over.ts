@@ -1,4 +1,4 @@
-import { Primitive } from './primitive.js';
+import { Animate } from './animate.js';
 
 /** Displays the game over screen. */
 export class GameOver {
@@ -13,6 +13,6 @@ export class GameOver {
   }
 
   public execute(): Promise<void> {
-    return Primitive.fadeIn(this.htmlElement, 2000);
+    return Animate.fadeIn(this.htmlElement, 2000);
   }
 }
