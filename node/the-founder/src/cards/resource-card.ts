@@ -74,7 +74,7 @@ export class Fish extends ResourceCard {
       name: 'Fish',
       image: 'fish.png',
       flavourText: '',
-      produce: { [Resource.Food]: 2 },
+      produce: { [Resource.Food]: 3 },
     });
   }
 }

@@ -1,21 +1,21 @@
-import { Crop, Discontent, Family, PositiveCard } from '../cards/index.js';
+import { Discontent, Family, PositiveCard, Wood } from '../cards/index.js';
 import { Item } from '../item.js';
 import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
 import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
 
-export class Farm extends BoosterPack {
+export class LoggingCamp extends BoosterPack {
   public constructor(private readonly index: number) {
-    const cost: PayQuantities = Farm.calculateCost(index);
+    const cost: PayQuantities = LoggingCamp.calculateCost(index);
     super({
-      image: 'farm.png',
-      name: 'Farm',
+      image: 'logging-camp.png',
+      name: 'Logging Camp',
       flavourText:
-        '<p><i>As the population grows, so does the need for food. The farm houses another productive family with a ' +
-        'focus on producing food.</i></p>',
+        '<p><i>As the population grows, so does the need for wood. The logging camp houses another productive family ' +
+        'with a focus on producing wood.</i></p>',
       actions: [
         new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Build a farm.`,
+          text: `Pay ${formatQuantities(cost)}. Build a logging camp.`,
           cost,
         }),
       ],
@@ -34,7 +34,7 @@ export class Farm extends BoosterPack {
     return [
       {
         container: game.containers.positiveStack,
-        items: [new PositiveCard({ image: 'farm.png', name: 'Farm' })],
+        items: [new PositiveCard({ image: 'logging-camp.png', name: 'Logging Camp' })],
       },
       {
         container: game.containers.negativeStack,
@@ -42,11 +42,11 @@ export class Farm extends BoosterPack {
       },
       {
         container: game.containers.discardPile,
-        items: [...Item.multiple(game.resourcesPerBooster, () => new Crop()), new Discontent()],
+        items: [...Item.multiple(game.resourcesPerBooster, () => new Wood()), new Discontent()],
       },
       {
         container: game.containers.boosterPacks,
-        items: [new Farm(this.index + 1)],
+        items: [new LoggingCamp(this.index + 1)],
       },
     ];
   }

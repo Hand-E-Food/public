@@ -26,7 +26,9 @@ class DiscontentFace extends NegativeCardFace {
       canInspect: true,
       name: 'Discontent',
       image: 'discontent.png',
-      flavourText: '<p><i>Tensions are rising with the daily struggle to survive.</i></p>',
+      flavourText:
+        '<p><i>Tensions are rising with the daily struggle to survive.</i></p>' +
+        '<p>When you draw this card, immediately add it to the negative stack.</p>',
       actions: [new DiscontentAction()],
     });
     this.listeners.push(eventHub.add(GameEvent.CardDrawn, 50, (props) => this.onCardDrawn(props)));

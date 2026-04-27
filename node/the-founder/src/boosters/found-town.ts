@@ -3,6 +3,8 @@ import { Item } from '../item.js';
 import { game } from '../singleton/index.js';
 import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
 import { Farm } from './farm.js';
+import { Fishery } from './fishery.js';
+import { LoggingCamp } from './logging-camp.js';
 import { Quarry } from './quarry.js';
 import { StorageSpace } from './storage-space.js';
 import { Vineyard } from './vineyard.js';
@@ -56,7 +58,7 @@ export class FoundTown extends BoosterPack {
       },
       {
         container: game.containers.boosterPacks,
-        items: [new Farm(), new Quarry(), new Vineyard(), new StorageSpace(0)],
+        items: [new Fishery(), new LoggingCamp(1), new Farm(0), new Quarry(), new Vineyard(), new StorageSpace(0)],
       },
     ];
   }

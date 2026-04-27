@@ -10,6 +10,7 @@ export enum GameEvent {
 
   /**
    * Invoked when a card is drawn from the draw deck.
+   * - 10: no fish
    * - 50: discontent
    */
   CardDrawn,
