@@ -1,26 +1,36 @@
-import type { Item, ItemAction, ItemActionState } from '../item.js';
+import type { ItemAction, ItemActionState } from '../item.js';
 import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/game.js';
-import { Card } from './card.js';
-import { CardFace } from './card-face.js';
-import { NegativeCardFace } from './negative-card-face.js';
+import { Card, CardFace, NegativeCardFace } from './common/index.js';
 
 export class Family extends Card {
+  private readonly fed = new FedFamily();
+  private readonly hungry: HungryFamily;
   public override readonly name = 'Family';
 
-  public constructor() {
-    super({ sides: [new HungryFamily(), new FedFamily()] });
+  public constructor(initialSide: 'hungry' | 'fed' = 'hungry') {
+    super();
+    this.hungry = new HungryFamily(this);
+    this.initialSide = initialSide === 'hungry' ? this.hungry : this.fed;
+  }
+
+  public async flipToFed(): Promise<void> {
+    await this.flipTo(this.fed);
+  }
+
+  public async flipToHungry(): Promise<void> {
+    await this.flipTo(this.hungry);
   }
 }
 
 class HungryFamily extends NegativeCardFace {
-  public constructor() {
+  public constructor(card: Family) {
     super({
       canInspect: true,
       name: 'Hungry Family',
       image: 'family-hungry.png',
       flavourText: '<p><i>A hungry family will work to support themselves before helping the community.</i></p>',
-      actions: [new FeedFamilyAction()],
+      actions: [new FeedFamilyAction(card)],
     });
   }
 }
@@ -40,20 +50,19 @@ class FedFamily extends CardFace {
 }
 
 class FeedFamilyAction implements ItemAction {
-  private cost: PayQuantities = { [Resource.Food]: 1 };
+  public constructor(private readonly card: Family) {}
 
-  public getText(_item: Item): string {
+  private cost: PayQuantities = { [Resource.Food]: 1 };
+  get state(): ItemActionState {
+    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
+  }
+  get text(): string {
     return `Pay ${formatQuantities(this.cost)} and flip this card.`;
   }
 
-  public getState(_item: Item): ItemActionState {
-    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
-  }
-
-  async execute(item: Item): Promise<void> {
-    const card = item as Card;
+  async execute(): Promise<void> {
     if (!game.resources.has(this.cost)) throw new Error('Not enough resources to feed this family.');
     game.resources.spend(this.cost);
-    await Promise.all([card.flip(), game.containers.fedFamilyStack.addItems(card)]);
+    await Promise.all([this.card.flipToFed(), game.containers.fedFamilyStack.addItems(this.card)]);
   }
 }

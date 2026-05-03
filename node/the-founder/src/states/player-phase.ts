@@ -1,22 +1,22 @@
 import { GameEvent, type YearEndingProperties } from '../events/index.js';
 import type { Item } from '../item.js';
 import { eventHub, game } from '../singleton/index.js';
-import { ModalInspectItem } from './index.js';
 import { ManualPromise } from './manual-promise.js';
+import { ModalInspectItem } from './modal-inspect-item.js';
 
 /** The main part of the player's turn. */
 export class PlayerPhase {
-  private endYearPromise!: ManualPromise<void>;
-
-  /** The "End Year" button. */
-  public readonly endYearButton: HTMLDivElement;
-
   public constructor() {
     const endYearButton = document.createElement('div');
     endYearButton.classList.add('end-year');
     endYearButton.innerHTML = 'End Year';
     this.endYearButton = endYearButton;
   }
+
+  private endYearPromise!: ManualPromise<void>;
+
+  /** The "End Year" button. */
+  public readonly endYearButton: HTMLDivElement;
 
   /** Executes this state. */
   public async execute(): Promise<void> {
@@ -52,8 +52,8 @@ export class PlayerPhase {
       this.enable();
     } else {
       const action = item.activeSide.actions[modifier - 1];
-      if (action?.getState(item) !== 'enabled') return;
-      execute = () => action.execute(item);
+      if (action?.state !== 'enabled') return;
+      execute = () => action.execute();
     }
     this.disable();
     await execute();

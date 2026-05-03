@@ -1,7 +1,7 @@
-import { BoosterPack } from '../boosters/booster-pack.js';
+import { BoosterPack } from '../boosters/common/booster-pack.js';
+import { Container } from '../container.js';
 import type { Item } from '../item.js';
 import { Spacing } from './constants.js';
-import { Container } from './container.js';
 import { FedFamilyStack } from './fed-family-stack.js';
 import { ZIndex } from './z-index.js';
 

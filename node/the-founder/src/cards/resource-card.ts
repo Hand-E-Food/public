@@ -1,11 +1,8 @@
-import type { Container } from '../containers/index.js';
-import type { Item, ItemAction, ItemActionState } from '../item.js';
+import type { Container } from '../container.js';
+import type { ItemAction, ItemActionState } from '../item.js';
 import { formatQuantities, type ProduceQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { Card } from './card.js';
-import { CardBack } from './card-back.js';
-import { CardFace } from './card-face.js';
-import { StorageAction } from './storage-action.js';
+import { CardBack, CardFace, CardSide, DeckCard, StorageAction } from './common/index.js';
 
 type ResourceParams = {
   readonly image: string;
@@ -14,46 +11,49 @@ type ResourceParams = {
   readonly produce: ProduceQuantities;
 };
 
-class ResourceCard extends Card {
+class ResourceCard extends DeckCard {
+  protected override back = CardBack.town();
+  protected override face: CardSide;
   public override readonly name: string;
 
   public constructor(params: ResourceParams) {
-    const face = new ResourceFace(params);
-    super({
-      sides: [face, CardBack.town()],
-    });
+    super();
     this.name = params.name;
+    this.face = new ResourceFace(this, params);
+    this.initialSide = this.face;
   }
 }
 
 class ResourceFace extends CardFace {
-  public constructor(params: ResourceParams) {
+  public constructor(card: ResourceCard, params: ResourceParams) {
     super({
       canInspect: true,
-      actions: [new ProduceResourcesAction(params.produce), new StorageAction()],
+      actions: [new ProduceResourcesAction(card, params.produce), new StorageAction(card)],
       ...params,
     });
   }
 }
 
 class ProduceResourcesAction implements ItemAction {
-  public constructor(public readonly produce: ProduceQuantities) {}
+  public constructor(
+    private readonly card: ResourceCard,
+    public readonly produce: ProduceQuantities,
+  ) {}
 
-  public getText(_item: Item): string {
+  get state(): ItemActionState {
+    const validContainers: (Container | undefined)[] = [game.containers.hand, game.containers.storageItems];
+    return validContainers.includes(this.card.container) ? 'enabled' : 'disabled';
+  }
+  get text(): string {
     return `Produce ${formatQuantities(this.produce)}.`;
   }
 
-  public getState(item: Item): ItemActionState {
-    const validContainers: (Container | undefined)[] = [game.containers.hand, game.containers.storageItems];
-    return validContainers.includes(item.container) ? 'enabled' : 'disabled';
-  }
-
-  async execute(item: Item): Promise<void> {
+  async execute(): Promise<void> {
     for (const [key, quantity] of Object.entries(this.produce)) {
       const resource = Number(key) as Resource;
       game.resources.resources[resource].quantity += quantity;
     }
-    await game.containers.discardPile.addItems(item);
+    await game.containers.discardPile.addItems(this.card);
   }
 }
 

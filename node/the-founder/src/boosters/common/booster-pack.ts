@@ -1,16 +1,25 @@
-import { Card } from '../cards/index.js';
-import type { Container } from '../containers/index.js';
-import { Item, type ItemAction, type ItemActionState, type ItemSide } from '../item.js';
-import type { PayQuantities } from '../resource.js';
-import { game } from '../singleton/index.js';
-import { OpenBoosterPack } from '../states/index.js';
+import { Card } from '../../cards/common/index.js';
+import type { Container } from '../../container.js';
+import { Item, type ItemAction, type ItemActionState, type ItemSide } from '../../item.js';
+import { formatQuantities, type PayQuantities } from '../../resource.js';
+import { game } from '../../singleton/index.js';
+import { OpenBoosterPack } from '../../states/index.js';
 
 export interface BoosterPackParams {
+  /** This booster pack's image filename. */
   readonly image: string;
+
+  /** This booster pack's name. */
   readonly name: string;
+
   /** This booster pack's flavour text as HTML. Include `<p>` tags. */
   readonly flavourText: string;
-  readonly actions: ItemAction[];
+
+  /** The cost to open this booster pack. */
+  readonly cost: PayQuantities;
+
+  /** This booster pack's action text that will open the booster pack. Exclude the cost. */
+  readonly actionText: string;
 }
 
 /** A booster pack containing more items. */
@@ -34,7 +43,7 @@ export abstract class BoosterPack extends Item implements ItemSide {
     this.name = params.name;
     this.image = params.image;
     this.flavourText = params.flavourText;
-    this.actions = params.actions;
+    this.actions = [new OpenBoosterPackAction(this, params.actionText, params.cost)];
     this.htmlElement.classList.add('item', 'booster', 'side');
     this.htmlElement.innerHTML += `<img src="assets/${params.image}" />`;
     this.htmlElement.innerHTML += `<div class='title'><span>${params.name}</span></div>`;
@@ -54,31 +63,26 @@ export type BoosterItemGroup = {
   readonly items: Item[];
 };
 
-export type OpenBoosterPackActionParams = {
-  readonly text: string;
-  readonly cost: PayQuantities;
-};
+class OpenBoosterPackAction implements ItemAction {
+  public constructor(
+    private readonly boosterPack: BoosterPack,
+    private readonly actionText: string,
+    private readonly cost: PayQuantities,
+  ) {}
 
-export class OpenBoosterPackAction implements ItemAction {
-  private readonly text: string;
-
-  protected readonly cost: PayQuantities;
-
-  public constructor(params: OpenBoosterPackActionParams) {
-    this.cost = params.cost;
-    this.text = params.text;
+  private get hasZeroCost(): boolean {
+    return Object.values(this.cost).every((cost) => cost === 0);
   }
-
-  public getText(_item: Item): string {
-    return this.text;
-  }
-
-  public getState(_item: Item): ItemActionState {
+  get state(): ItemActionState {
     return game.resources.has(this.cost) ? 'enabled' : 'disabled';
   }
+  get text(): string {
+    if (this.hasZeroCost) return this.actionText;
+    else return `Pay ${formatQuantities(this.cost)}. ${this.actionText}`;
+  }
 
-  public async execute(item: Item): Promise<void> {
+  async execute(): Promise<void> {
     game.resources.spend(this.cost);
-    await new OpenBoosterPack(item as BoosterPack).execute();
+    await new OpenBoosterPack(this.boosterPack as BoosterPack).execute();
   }
 }

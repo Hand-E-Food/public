@@ -1,5 +1,4 @@
 /* eslint-disable simple-import-sort/exports */
-export type * from './container.js';
 export * from './z-index.js';
 
 export * from './draw-deck.js';

@@ -1,7 +1,7 @@
 import { Family, Fish, PositiveCard, SelfSufficientFamily, Wood, YourFamily } from '../cards/index.js';
 import { Item } from '../item.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 import { Farm } from './farm.js';
 import { Fishery } from './fishery.js';
 import { LoggingCamp } from './logging-camp.js';
@@ -17,12 +17,8 @@ export class FoundTown extends BoosterPack {
       flavourText:
         '<p><i>Your caravan has trundled across the landscape for weeks. You arrive at a land bordered by rich ' +
         'mountains, fresh water, fertile soil, and generous woodlands. This is your promised land.</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: 'Found a new town.',
-          cost: {},
-        }),
-      ],
+      actionText: 'Found a new town.',
+      cost: {},
     });
   }
 
@@ -47,7 +43,7 @@ export class FoundTown extends BoosterPack {
       },
       {
         container: game.containers.fedFamilyStack,
-        items: [new YourFamily(), new SelfSufficientFamily(), ...Item.multiple(2, FoundTown.createFedFamily)],
+        items: [new YourFamily(), new SelfSufficientFamily(), ...Item.multiple(2, () => new Family('fed'))],
       },
       {
         container: game.containers.discardPile,
@@ -58,14 +54,8 @@ export class FoundTown extends BoosterPack {
       },
       {
         container: game.containers.boosterPacks,
-        items: [new Fishery(), new LoggingCamp(1), new Farm(0), new Quarry(), new Vineyard(), new StorageSpace(0)],
+        items: [new Fishery(), new LoggingCamp(0), new Farm(0), new Quarry(), new Vineyard(), new StorageSpace(0)],
       },
     ];
-  }
-
-  private static createFedFamily(): Family {
-    const family = new Family();
-    family.flip();
-    return family;
   }
 }

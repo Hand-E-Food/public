@@ -1,7 +1,7 @@
 import { StorageSpace as StorageSpaceCard } from '../cards/index.js';
-import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
+import { type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 
 export class StorageSpace extends BoosterPack {
   public constructor(private readonly index: number) {
@@ -14,12 +14,8 @@ export class StorageSpace extends BoosterPack {
       flavourText:
         '<p><i>Increase your storage space to retain cards from one year to the next.</i></p>' +
         '<p><i>Store excess food and drink for difficult years, materials required for larger projects.</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Increase your storage capacity.`,
-          cost,
-        }),
-      ],
+      actionText: 'Increase your storage capacity.',
+      cost,
     });
   }
 

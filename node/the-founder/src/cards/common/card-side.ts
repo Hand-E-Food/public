@@ -1,4 +1,4 @@
-import type { ItemAction, ItemSide } from '../item.js';
+import type { ItemAction, ItemSide } from '../../item.js';
 
 export interface CardSideParams {
   /**

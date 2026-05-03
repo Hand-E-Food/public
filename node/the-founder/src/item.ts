@@ -1,27 +1,16 @@
-import type { Container } from './containers/container.js';
+import type { Container } from './container.js';
 
 export type ItemActionState = 'enabled' | 'disabled' | 'hidden';
 
 export interface ItemAction {
-  /**
-   * Gets this action's text as HTML.
-   * @param item This action's parent item.
-   * @returns This action's text as HTML.
-   */
-  getText(item: Item): string;
+  /** Gets this action's text as HTML. */
+  readonly text: string;
 
-  /**
-   * Indicates whether this action can be executed or seen.
-   * @param item This action's parent item.
-   * @returns This action's current state.
-   */
-  getState(item: Item): ItemActionState;
+  /** Indicates whether this action can be executed or seen. */
+  readonly state: ItemActionState;
 
-  /**
-   * Executes this action.
-   * @param item This action's parent item.
-   */
-  execute(item: Item): Promise<void>;
+  /** Executes this action. */
+  execute(): Promise<void>;
 }
 
 export interface ItemSide {
@@ -91,8 +80,10 @@ export abstract class Item {
     this.onClickedListener?.(this, modifier);
   }
 
+  /** Called when this item's HTML element is clicked. */
   public onClickedListener: { (item: Item, modifier: number): void } | undefined;
 
+  /** This item's face up side. */
   public abstract get activeSide(): ItemSide;
 
   private static getModifier(event: MouseEvent): number | undefined {
@@ -138,5 +129,6 @@ export abstract class Item {
     }
   }
 
+  /** Performs cleanup when this item is destroyed. */
   public destroy(): void {}
 }

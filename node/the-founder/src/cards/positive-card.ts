@@ -1,19 +1,21 @@
-import { Card } from './card.js';
-import { CardFace } from './card-face.js';
+import { Card, CardFace } from './common/index.js';
 
 export type PositiveCardParams = {
+  /** This card's name. */
   readonly name: string;
 
-  /**  */
+  /** This card's image filename. */
   readonly image: string;
-}
+};
 
+/** A card that adds positive morale. */
 export class PositiveCard extends Card {
   public override name: string;
 
   public constructor(params: PositiveCardParams) {
-    super({ sides: [new PositiveCardFace(params)] });
+    super();
     this.name = params.name;
+    this.initialSide = new PositiveCardFace(params);
   }
 }
 

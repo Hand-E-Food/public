@@ -17,11 +17,6 @@ export class CardBack extends CardSide {
     return new CardBack({ image: 'event.png' });
   }
 
-  /** The card back for a storage card. */
-  public static storage(): CardSide {
-    return new CardBack({ image: 'storage.png' });
-  }
-
   /** The card back for the town deck. */
   public static town(): CardSide {
     return new CardBack({ image: 'town.png' });

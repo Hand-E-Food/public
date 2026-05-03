@@ -1,5 +1,5 @@
-import type { BoosterItemGroup, BoosterPack } from '../boosters/booster-pack.js';
-import { Item } from '../item.js';
+import type { BoosterItemGroup, BoosterPack } from '../boosters/common/booster-pack.js';
+import type { Item } from '../item.js';
 import { PromiseQueue } from '../promise-queue.js';
 import { game } from '../singleton/index.js';
 import { Animate } from './animate.js';

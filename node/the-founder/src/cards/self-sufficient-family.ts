@@ -1,18 +1,12 @@
-import { Card } from './card.js';
-import { CardFace } from './card-face.js';
+import { Card, CardFace } from './common/index.js';
 
 /** A family that does not require feeding. */
 export class SelfSufficientFamily extends Card {
   public override readonly name = 'Self-Sufficient Family';
 
   public constructor() {
-    super({ sides: [new FedFamily()] });
-  }
-}
-
-class FedFamily extends CardFace {
-  public constructor() {
-    super({
+    super();
+    this.initialSide = new CardFace({
       canInspect: true,
       name: 'Self-Sufficient Family',
       image: 'family-fed.png',

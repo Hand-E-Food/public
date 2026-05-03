@@ -1,4 +1,4 @@
-import type { Card } from '../cards/index.js';
+import type { Card } from '../cards/common/index.js';
 
 /** The events that can be invoked. */
 export enum GameEvent {

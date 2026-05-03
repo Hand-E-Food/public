@@ -1,7 +1,7 @@
-import type { BoosterPack } from '../boosters/index.js';
+import type { BoosterPack } from '../boosters/common/index.js';
+import { Container } from '../container.js';
 import type { Item } from '../item.js';
 import { Spacing } from './constants.js';
-import { Container } from './container.js';
 import { ZIndex } from './z-index.js';
 
 export class BoosterTray extends Container {

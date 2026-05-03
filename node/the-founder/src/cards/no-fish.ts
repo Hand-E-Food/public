@@ -1,26 +1,24 @@
 import { type CardDrawnProperties, GameEvent } from '../events/index.js';
 import { eventHub, game, type GameEventListener } from '../singleton/index.js';
-import { Card } from './card.js';
-import { CardBack } from './card-back.js';
-import { CardFace } from './card-face.js';
+import { CardBack, CardFace, CardSide, DeckCard } from './common/index.js';
 
-export class NoFish extends Card {
-  public override name: string = 'No Fish';
+/** A special resource card that produces nothing. */
+export class NoFish extends DeckCard {
+  protected override back = CardBack.town();
+  protected override face: CardSide;
+  public override name = 'No Fish';
 
   public constructor() {
-    const face = new NoFishFace();
-    super({
-      sides: [face, CardBack.town()],
-    });
-    (face as any).card = this;
+    super();
+    this.face = new NoFishFace(this);
+    this.initialSide = this.face;
   }
 }
 
 class NoFishFace extends CardFace {
-  private readonly card!: Card;
   private readonly listeners: GameEventListener[];
 
-  public constructor() {
+  public constructor(private readonly card: NoFish) {
     super({
       canInspect: true,
       image: 'no-fish.png',

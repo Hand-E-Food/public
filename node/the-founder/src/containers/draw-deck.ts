@@ -1,6 +1,6 @@
-import { Card } from '../cards/index.js';
+import { Card } from '../cards/common/index.js';
+import { Container } from '../container.js';
 import { Spacing } from './constants.js';
-import { Container } from './container.js';
 import { ZIndex } from './z-index.js';
 
 /** The deck of cards to draw from. */

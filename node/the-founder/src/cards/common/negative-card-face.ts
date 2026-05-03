@@ -2,6 +2,7 @@ import { CardFace, type CardFaceParams } from './card-face.js';
 
 type NegativeCardFaceParams = Omit<CardFaceParams, 'icon'>;
 
+/** A card side for negativew morale. */
 export class NegativeCardFace extends CardFace {
   public override morale: number = -1;
 

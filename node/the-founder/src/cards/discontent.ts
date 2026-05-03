@@ -1,27 +1,22 @@
 import { type CardDrawnProperties, GameEvent } from '../events/index.js';
-import type { Item, ItemAction, ItemActionState } from '../item.js';
+import type { ItemAction, ItemActionState } from '../item.js';
 import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
-import { eventHub, type GameEventListener } from '../singleton/event-hub.js';
-import { game } from '../singleton/index.js';
-import { Card } from './card.js';
-import { CardBack } from './card-back.js';
-import { NegativeCardFace } from './negative-card-face.js';
+import { eventHub, game, type GameEventListener } from '../singleton/index.js';
+import { CardBack, CardSide, DeckCard, NegativeCardFace } from './common/index.js';
 
-export class Discontent extends Card {
-  public override readonly name = 'Discontent';
-
+export class Discontent extends DeckCard {
   public constructor() {
-    const face = new DiscontentFace();
-    super({ sides: [face, CardBack.town()] });
-    (face as any).card = this;
+    super();
+    this.face = new DiscontentFace(this);
   }
+
+  protected back = CardBack.town();
+  protected face: CardSide;
+  override readonly name = 'Discontent';
 }
 
 class DiscontentFace extends NegativeCardFace {
-  private readonly card!: Card;
-  private readonly listeners: GameEventListener[] = [];
-
-  public constructor() {
+  public constructor(private readonly card: Discontent) {
     super({
       canInspect: true,
       name: 'Discontent',
@@ -29,10 +24,12 @@ class DiscontentFace extends NegativeCardFace {
       flavourText:
         '<p><i>Tensions are rising with the daily struggle to survive.</i></p>' +
         '<p>When you draw this card, immediately add it to the negative stack.</p>',
-      actions: [new DiscontentAction()],
+      actions: [new DiscontentAction(card)],
     });
     this.listeners.push(eventHub.add(GameEvent.CardDrawn, 50, (props) => this.onCardDrawn(props)));
   }
+
+  private readonly listeners: GameEventListener[] = [];
 
   private async onCardDrawn(props: CardDrawnProperties): Promise<void> {
     if (props.card !== this.card) return;
@@ -45,18 +42,18 @@ class DiscontentFace extends NegativeCardFace {
 }
 
 class DiscontentAction implements ItemAction {
-  private readonly cost: PayQuantities = { [Resource.Luxury]: 1 };
+  public constructor(private readonly card: Discontent) {}
 
-  public getText(_item: Item): string {
+  private readonly cost: PayQuantities = { [Resource.Luxury]: 1 };
+  get state(): ItemActionState {
+    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
+  }
+  get text(): string {
     return `Pay ${formatQuantities(this.cost)}. Discard this card.`;
   }
 
-  public getState(_item: Item): ItemActionState {
-    return game.resources.has(this.cost) ? 'enabled' : 'disabled';
-  }
-
-  public async execute(item: Item): Promise<void> {
+  async execute(): Promise<void> {
     game.resources.spend(this.cost);
-    await game.containers.discardPile.addItems(item);
+    await game.containers.discardPile.addItems(this.card);
   }
 }

@@ -1,6 +1,6 @@
-import { Card } from '../cards/card.js';
+import { Card } from '../cards/common/index.js';
+import { Container } from '../container.js';
 import { Spacing } from './constants.js';
-import { Container } from './container.js';
 import { NegativeStack } from './negative-stack.js';
 import { ZIndex } from './z-index.js';
 

@@ -1,17 +1,11 @@
-import { Card } from './card.js';
-import { CardFace } from './card-face.js';
+import { Card, CardFace } from './common/index.js';
 
 export class YourFamily extends Card {
   public override readonly name = 'Your Family';
 
   public constructor() {
-    super({ sides: [new YourFamilyFace()] });
-  }
-}
-
-class YourFamilyFace extends CardFace {
-  public constructor() {
-    super({
+    super();
+    this.initialSide = new CardFace({
       canInspect: true,
       name: 'Your Family',
       image: 'family-fed.png',

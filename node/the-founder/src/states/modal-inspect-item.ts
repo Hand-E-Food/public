@@ -8,17 +8,12 @@ export interface ModalInspectItemParams {
 
 /** Displays the current year. */
 export class ModalInspectItem extends Modal {
-  private executedAction?: ItemAction;
-  private readonly item: Item;
-  private readonly promise = new ManualPromise<void>();
-
   public constructor(params: ModalInspectItemParams) {
     const side = params.item.activeSide;
 
     const modal = document.createElement('div');
     modal.classList.add('modal', 'inspect-item');
     super(modal);
-    this.item = params.item;
 
     const img = document.createElement('img');
     img.src = `assets/${side.image}`;
@@ -30,11 +25,11 @@ export class ModalInspectItem extends Modal {
     modal.appendChild(textPanel);
 
     for (const action of side.actions) {
-      const state = action.getState(params.item);
+      const state = action.state;
       if (state === 'hidden') continue;
       const button = document.createElement('p');
       button.classList.add('action');
-      button.innerHTML = action.getText(params.item);
+      button.innerHTML = action.text;
       if (state === 'enabled') button.onclick = () => this.onActionClicked(action);
       else button.classList.add('disabled');
       textPanel.appendChild(button);
@@ -47,9 +42,12 @@ export class ModalInspectItem extends Modal {
     modal.appendChild(closeButton);
   }
 
+  private executedAction?: ItemAction;
+  private readonly promise = new ManualPromise<void>();
+
   public override async execute(): Promise<void> {
     await super.execute();
-    if (this.executedAction) await this.executedAction.execute(this.item);
+    if (this.executedAction) await this.executedAction.execute();
   }
 
   protected override async waitClosed(): Promise<void> {

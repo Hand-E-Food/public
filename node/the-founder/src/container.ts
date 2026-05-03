@@ -1,4 +1,4 @@
-import type { Item } from '../item.js';
+import type { Item } from './item.js';
 
 /** Arranges cards on part of the game area. */
 export abstract class Container {
@@ -11,7 +11,7 @@ export abstract class Container {
    */
   // Use the spread operation to ensure the array is not modified during the operation.
   public async addItems(...items: Item[]): Promise<void> {
-    const { game } = await import('../singleton/game.js');
+    const { game } = await import('./singleton/game.js');
     const removePromise = game.removeFromContainers(items);
     for (const card of items) {
       card.container = this;

@@ -1,10 +1,16 @@
-import { Card } from './card.js';
-import { CardBack } from './card-back.js';
+import { Card, CardFace } from './common/index.js';
 
 export class StorageSpace extends Card {
   public override readonly name: string = 'Storage Space';
 
   public constructor() {
-    super({ sides: [CardBack.storage()] });
+    super();
+    this.initialSide = new CardFace({
+      image: 'storage.png',
+      canInspect: false,
+      name: '',
+      flavourText: '',
+      actions: [],
+    });
   }
 }

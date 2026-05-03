@@ -1,25 +1,21 @@
 import { Discontent, Family, PositiveCard, Stone } from '../cards/index.js';
 import { Item } from '../item.js';
-import { formatQuantities, Resource } from '../resource.js';
+import { Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 import { Mine } from './mine.js';
 
 export class Quarry extends BoosterPack {
   public constructor() {
-    const cost = { [Resource.Wood]: 6 };
+    const cost = { [Resource.Wood]: 5 };
     super({
       image: 'quarry.png',
       name: 'Quarry',
       flavourText:
         '<p><i>Stone is sturdy and will allow you to construct better buildings. The quarry houses a productive ' +
         'family with a focus on mining stone.</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Build a quarry.`,
-          cost,
-        }),
-      ],
+      actionText: 'Build a quarry.',
+      cost,
     });
   }
 

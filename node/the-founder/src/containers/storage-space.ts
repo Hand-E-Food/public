@@ -1,8 +1,8 @@
-import { Card } from '../cards/index.js';
+import { Card } from '../cards/common/index.js';
+import { Container } from '../container.js';
 import { Item } from '../item.js';
 import { ModalTutorial } from '../states/modal-tutorial.js';
 import { Spacing } from './constants.js';
-import { Container } from './container.js';
 import { StorageItems } from './storage-items.js';
 import { ZIndex } from './z-index.js';
 
@@ -31,7 +31,7 @@ export class StorageSpace extends Container {
         paragraphs: [
           'You can now store cards from one year to the next. Each storage card allows you to store any one card ' +
             'from your hand.',
-          'Once a card is in storage, it can be used jsut like it was in your hand, or it can be discarded to free ' +
+          'Once a card is in storage, it can be used just like it was in your hand, or it can be discarded to free ' +
             'up space for a different card.',
           'Click on the card and choose the action to store it or discard it. You can also use ' +
             '<strong>middle-click</strong> or <strong>ctrl+click</strong> as a shortcut.',

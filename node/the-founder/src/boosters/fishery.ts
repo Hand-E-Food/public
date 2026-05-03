@@ -1,25 +1,20 @@
-import { Discontent, Family, Fish, PositiveCard } from '../cards/index.js';
-import { NoFish } from '../cards/no-fish.js';
+import { Discontent, Family, Fish, NoFish, PositiveCard } from '../cards/index.js';
 import { Item } from '../item.js';
-import { formatQuantities, Resource } from '../resource.js';
+import { Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 
 export class Fishery extends BoosterPack {
   public constructor() {
-    const cost = { [Resource.Wood]: 7, [Resource.Stone]: 1 };
+    const cost = { [Resource.Wood]: 6, [Resource.Stone]: 1 };
     super({
       image: 'fishery.png',
       name: 'Fishery',
       flavourText:
         '<p><i>The river is full of fish. Another fishery will house a productive family focused on catching ' +
         'fish.</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Build a fishery.`,
-          cost,
-        }),
-      ],
+      actionText: 'Build a fishery.',
+      cost,
     });
   }
 

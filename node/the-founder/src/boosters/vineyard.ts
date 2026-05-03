@@ -1,24 +1,20 @@
 import { Discontent, Family, PositiveCard, Wine } from '../cards/index.js';
 import { Item } from '../item.js';
-import { formatQuantities, Resource } from '../resource.js';
+import { Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 
 export class Vineyard extends BoosterPack {
   public constructor() {
-    const cost = { [Resource.Wood]: 6 };
+    const cost = { [Resource.Wood]: 5 };
     super({
       image: 'vineyard.png',
       name: 'Vineyard',
       flavourText:
         '<p><i>What is work without reward. The vineyard houses a productive family with a focus on making wine.' +
         '</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Build a vineyard.`,
-          cost,
-        }),
-      ],
+      actionText: 'Build a vineyard.',
+      cost,
     });
   }
 

@@ -1,8 +1,8 @@
 import { Discontent, Family, Gold, PositiveCard, Stone } from '../cards/index.js';
 import { Item } from '../item.js';
-import { formatQuantities, type PayQuantities, Resource } from '../resource.js';
+import { type PayQuantities, Resource } from '../resource.js';
 import { game } from '../singleton/index.js';
-import { type BoosterItemGroup, BoosterPack, OpenBoosterPackAction } from './booster-pack.js';
+import { type BoosterItemGroup, BoosterPack } from './common/booster-pack.js';
 
 type Version = { cost: PayQuantities; cards: { stone: number; gold: number; imps: number } };
 
@@ -50,12 +50,8 @@ export class Mine extends BoosterPack {
       flavourText:
         '<p><i>To harvest more stone, you will need to dig into the mountain. What else will you find underneath?' +
         '</i></p>',
-      actions: [
-        new OpenBoosterPackAction({
-          text: `Pay ${formatQuantities(cost)}. Dig a mine.`,
-          cost,
-        }),
-      ],
+      actionText: 'Dig a mine.',
+      cost,
     });
     this.version = version;
   }

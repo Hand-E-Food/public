@@ -1,7 +1,7 @@
+import type { Container } from '../container.js';
 import {
   BoosterPacks,
   BoosterTray,
-  type Container,
   DiscardPile,
   DrawDeck,
   FedFamilyStack,
