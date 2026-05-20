@@ -1,15 +1,18 @@
  #   Count     Sample    Name
  1    80730   9          Single
- 2    80730  ♥︎ ♥︎ ♥︎       Flush of Three
- 3    39546   9 9        Pair
- 4    30030  ♥︎ ♥︎ ♥︎ ♥︎     Flush of Four
- 5    29553   9 8 7      Straight of Three
- 6    13037  ♥︎9♥︎8♥︎7      Straight Flush of Three
- 7     7204   9 8 7 6    Straight of Four
- 8     5226   9 9 7 7    Two Pair
- 9     4004  ♥︎ ♥︎ ♥︎ ♥︎ ♥︎   Flush of Five
-10     3510   9 9 9      Three of a Kind
-11     1718  ♥︎9♥︎8♥︎7♥︎6    Straight Flush of Four
-12      880   9 8 7 6 5  Straight of Five
-13       92  ♥︎9♥︎8♥︎7♥︎6♥︎5  Straight Flush of Five
-14       78   9 9 9 7 7  Full House
+ 2    80730  ♥︎ ♥︎         Flush of Two
+ 3    80730  ♥︎ ♥︎ ♥︎       Flush of Three
+ 4    68988   9 8        Adjacent Pair
+ 5    49278  ♥︎9♥︎8        Adjacent Flush
+ 6    39546   9 9        Pair
+ 7    30030  ♥︎ ♥︎ ♥︎ ♥︎     Flush of Four
+ 8    29553   9 8 7      Straight of Three
+ 9    13037  ♥︎9♥︎8♥︎7      Straight Flush of Three
+10     7204   9 8 7 6    Straight of Four
+11     5226   9 9 7 7    Two Pair
+12     4004  ♥︎ ♥︎ ♥︎ ♥︎ ♥︎   Flush of Five
+13     3510   9 9 9      Three of a Kind
+14     1718  ♥︎9♥︎8♥︎7♥︎6    Straight Flush of Four
+15      880   9 8 7 6 5  Straight of Five
+16       92  ♥︎9♥︎8♥︎7♥︎6♥︎5  Straight Flush of Five
+17       78   9 9 9 7 7  Full House

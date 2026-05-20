@@ -113,8 +113,8 @@ class StraightFlush(Army):
                 return True
         return False
 
-def main(jokers: int) -> None:
-    cards = [(number, suit) for number in range(13) for suit in range(4)]
+def main(jokers: int, suits: int = 4) -> None:
+    cards = [(number, suit) for number in range(13) for suit in range(suits)]
     cards.extend(Joker for _ in range(jokers))
     armies: List[Army] = [
         Single(),
@@ -124,12 +124,15 @@ def main(jokers: int) -> None:
         Kind('Five of a Kind', 5),
         Kind('Two Pair', 2, 2),
         Kind('Full House', 3, 2),
+        Flush('Flush of Two', 2),
         Flush('Flush of Three', 3),
         Flush('Flush of Four', 4),
         Flush('Flush of Five', 5),
+        Straight('Adjacent Pair', 2),
         Straight('Straight of Three', 3),
         Straight('Straight of Four', 4),
         Straight('Straight of Five', 5),
+        StraightFlush('Adjacent Flush', 2),
         StraightFlush('Straight Flush of Three', 3),
         StraightFlush('Straight Flush of Four', 4),
         StraightFlush('Straight Flush of Five', 5),
@@ -141,15 +144,19 @@ def main(jokers: int) -> None:
         for army in armies:
             if army.is_valid(hand):
                 army.count += 1
-    
+
     armies.sort(key=lambda army: army.count, reverse=True)
 
     rank = 0
     print(' #   Count     Sample    Name')
     for army in armies:
+        if army.count == 0:
+            break
         rank += 1
         print(f'{rank:2}  {army.count:7}  {army.sample:10}  {army.name}')
 
+def get_inputs() -> Tuple[int, ...]:
+    return tuple(int(arg) for arg in sys.argv[1:])
+
 if __name__ == '__main__':
-    jokers = int(sys.argv[1])
-    main(jokers)
+    main(*get_inputs())
