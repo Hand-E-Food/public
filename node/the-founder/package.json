@@ -11,23 +11,23 @@
     "clean": "rm -rf ./dist",
     "format": "eslint --fix ./src",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "npm-run-all --parallel watch:*",
+    "watch": "concurrently \"npm run watch:serve\" \"npm run watch:static\" \"npm run watch:ts\"",
     "watch:serve": "npx serve ./dist",
     "watch:static": "cpx \"static/**\" dist --watch",
     "watch:ts": "tsc --watch"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.9.5",
     "@types/typescript": "^0.4.29",
-    "cpx2": "^8.0.0",
-    "eslint": "^10.1.0",
+    "concurrently": "^8.2.2",
+    "cpx2": "^8.0.2",
+    "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "globals": "^17.4.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^3.8.1",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.2"
+    "typescript-eslint": "^8.65.0"
   }
 }
